@@ -10,9 +10,7 @@ import { NotificationsProvider } from '../components/providers/notifications-pro
 import { csrfManager } from '../lib/csrf'
 import { I18nProvider } from '../lib/i18n'
 
-const ThemeProvider = dynamic(() => import('next-themes').then((mod) => mod.ThemeProvider), {
-  ssr: false,
-})
+import { ThemeProvider } from 'next-themes'
 
 const QueryClientProvider = dynamic(
   () => import('@tanstack/react-query').then((mod) => mod.QueryClientProvider),
@@ -49,11 +47,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <I18nProvider>
         <ThemeProvider
           attribute="class"
-          defaultTheme="vibrant"
+          defaultTheme="light"
           enableSystem={true}
           disableTransitionOnChange={false}
           storageKey="topsteel-theme"
-          themes={['light', 'dark', 'vibrant', 'system']}
+          themes={['light', 'dark', 'system']}
         >
           <TooltipProvider>
             <AuthProvider>

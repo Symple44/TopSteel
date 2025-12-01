@@ -53,8 +53,8 @@ export function useDataSorting<T>({
       if (!sortable) return
 
       setSortConfig((prev) => {
-        // Si pas de multi-tri, effacer les autres tris
-        const currentConfig = multiSort ? prev : []
+        // Si pas de multi-tri, garder uniquement le tri sur cette colonne pour permettre le cycle
+        const currentConfig = multiSort ? prev : prev.filter((s) => s.column === columnId)
 
         return updateSortConfig(currentConfig, columnId, forceDirection)
       })

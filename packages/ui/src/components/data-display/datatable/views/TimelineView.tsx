@@ -2,7 +2,12 @@
 
 import { Calendar, MoreHorizontal } from 'lucide-react'
 import { Button } from '../../../primitives/button'
-import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../../primitives/dropdown'
 import { Badge } from '../../badge'
 import type { TimelineItem } from '../use-data-views'
 
@@ -77,11 +82,11 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
               {group.items
                 .sort((a, b) => b.date.getTime() - a.date.getTime())
                 .map((item, _index) => (
-                  <button
+                  <div
                     key={item.id}
+                    role="button"
                     className="relative flex items-start gap-4 cursor-pointer hover:bg-muted/30 rounded-lg p-2 -ml-2 w-full text-left"
                     onClick={() => onItemClick?.(item)}
-                    type="button"
                     onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onItemClick?.(item)}
                     tabIndex={0}
                     aria-label={`View details for ${item.title}`}
@@ -124,9 +129,8 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
                           </div>
                         </div>
 
-                        <DropdownPortal
-                          align="end"
-                          trigger={
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
                             <Button
                               type="button"
                               variant="ghost"
@@ -137,20 +141,21 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
-                          }
-                        >
-                          {onItemEdit && (
-                            <DropdownItem onClick={() => onItemEdit(item)}>Modifier</DropdownItem>
-                          )}
-                          {onItemDelete && (
-                            <DropdownItem
-                              onClick={() => onItemDelete(item)}
-                              className="text-red-600"
-                            >
-                              Supprimer
-                            </DropdownItem>
-                          )}
-                        </DropdownPortal>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            {onItemEdit && (
+                              <DropdownMenuItem onClick={() => onItemEdit(item)}>Modifier</DropdownMenuItem>
+                            )}
+                            {onItemDelete && (
+                              <DropdownMenuItem
+                                onClick={() => onItemDelete(item)}
+                                className="text-red-600"
+                              >
+                                Supprimer
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
 
                       {item.description && (
@@ -159,7 +164,7 @@ export function TimelineView({ items, onItemClick, onItemEdit, onItemDelete }: T
                         </p>
                       )}
                     </div>
-                  </button>
+                  </div>
                 ))}
             </div>
           </div>

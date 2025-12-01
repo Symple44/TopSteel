@@ -4,7 +4,7 @@
  */
 
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import type { Prisma, NotificationRule, NotificationRuleExecution, NotificationEvent } from '@prisma/client'
 import {
   ConditionOperator,
@@ -15,9 +15,12 @@ import {
 
 @Injectable()
 export class NotificationRuleService {
-  constructor(
-    private readonly prisma: PrismaService
-  ) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   // ===== GESTION DES RÈGLES =====
 

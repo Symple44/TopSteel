@@ -5,6 +5,12 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  // Disable Turbopack to fix workspace resolution issues
+  turbopack: {
+    resolveAlias: {
+      '@erp/ui': '../../packages/ui/src/index.ts',
+    },
+  },
   // Minimal transpile packages
   transpilePackages: ['@erp/types', '@erp/ui', '@erp/api-client', '@erp/utils'],
 

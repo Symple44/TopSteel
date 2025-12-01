@@ -5,7 +5,7 @@
 
 import { Injectable, Logger } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 
 /**
@@ -142,11 +142,16 @@ export class AuditService {
   private flushTimer?: NodeJS.Timeout
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly eventEmitter: EventEmitter2,
     private readonly cacheService: OptimizedCacheService
   ) {
     this.startBatchProcessor()
+  }
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
   }
 
   /**

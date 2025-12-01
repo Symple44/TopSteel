@@ -10,6 +10,7 @@ import {
     Post,
     Put,
     Query,
+    Req,
     UseGuards,
 } from '@nestjs/common'
 import {
@@ -35,20 +36,14 @@ import type { UserQueryDto } from '../../../domains/users/dto/user-query.dto'
 import { UsersService } from '../../../domains/users/users.service'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { Public } from '../../../core/multi-tenant'
-
-// Interface for database errors
-interface DatabaseError {
-  code?: string
-  message?: string
-  [key: string]: unknown
-}
-
-// Interface for authenticated user with tenant info
-interface AuthenticatedUserWithTenant {
-  id: string
-  societeId?: string
-  [key: string]: unknown
-}
+import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import {
+  isAuthenticatedUser,
+  isUserWithTenant,
+  isDatabaseError,
+  type AuthenticatedUser,
+  type UserWithTenant,
+} from '../guards/type-guards'
 
 @Controller('admin/users')
 @ApiTags('🔧 Admin - Users')
@@ -62,7 +57,8 @@ export class AdminUsersController {
     private readonly usersService: UsersService,
     private readonly unifiedRolesService: UnifiedRolesService,
     private readonly roleFormattingService: RoleFormattingService,
-    private readonly cacheService: OptimizedCacheService
+    private readonly cacheService: OptimizedCacheService,
+    private readonly prisma: PrismaService
   ) {}
 
   @Get()
@@ -262,7 +258,7 @@ export class AdminUsersController {
   @ApiResponse({ status: 201, description: 'Utilisateur créé avec succès' })
   @ApiResponse({ status: 400, description: 'Données invalides' })
   @ApiResponse({ status: 409, description: 'Utilisateur déjà existant' })
-  async createUser(@Body() createUserDto: CreateUserDto) {
+  async createUser(@Body() createUserDto: CreateUserDto, @Req() request: any) {
     try {
       // Validation supplémentaire pour les rôles
       if (
@@ -273,6 +269,34 @@ export class AdminUsersController {
       }
 
       const user = await this.usersService.create(createUserDto)
+
+      // Audit logging
+      try {
+        await this.prisma.auditLog.create({
+          data: {
+            userId: request.user?.id,
+            action: 'CREATE',
+            resource: 'USER',
+            resourceId: user.id,
+            description: `Création de l'utilisateur ${user.email}`,
+            ipAddress: request.ip || request.headers?.['x-forwarded-for'] || request.connection?.remoteAddress,
+            userAgent: request.headers?.['user-agent'],
+            changes: {
+              email: user.email,
+              nom: user.nom,
+              prenom: user.prenom,
+              role: user.role,
+              actif: user.actif,
+            },
+            metadata: {
+              action: 'user_created',
+              userId: user.id,
+            },
+          },
+        })
+      } catch (auditError) {
+        this.logger.warn('Failed to create audit log:', auditError)
+      }
 
       // Invalider le cache des utilisateurs
       await this.invalidateUsersCache()
@@ -292,7 +316,7 @@ export class AdminUsersController {
         statusCode: 201,
       }
     } catch (error: unknown) {
-      if ((error as DatabaseError).code === '23505') {
+      if (isDatabaseError(error) && error.code === '23505') {
         // Violation de contrainte unique PostgreSQL
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
@@ -306,7 +330,7 @@ export class AdminUsersController {
   @ApiResponse({ status: 200, description: 'Utilisateur mis à jour avec succès' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @ApiResponse({ status: 400, description: 'Données invalides' })
-  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto, @Req() request: any) {
     try {
       // Vérifier que l'utilisateur existe
       const existingUser = await this.usersService.findById(id)
@@ -322,11 +346,57 @@ export class AdminUsersController {
         throw new BadRequestException('Rôle invalide')
       }
 
+      // Capture changes for audit log
+      const changes: Record<string, { old: any; new: any }> = {}
+      if (updateUserDto.email && updateUserDto.email !== existingUser.email) {
+        changes.email = { old: existingUser.email, new: updateUserDto.email }
+      }
+      if (updateUserDto.nom && updateUserDto.nom !== existingUser.nom) {
+        changes.nom = { old: existingUser.nom, new: updateUserDto.nom }
+      }
+      if (updateUserDto.prenom && updateUserDto.prenom !== existingUser.prenom) {
+        changes.prenom = { old: existingUser.prenom, new: updateUserDto.prenom }
+      }
+      if (updateUserDto.role && updateUserDto.role !== existingUser.role) {
+        changes.role = { old: existingUser.role, new: updateUserDto.role }
+      }
+      if (updateUserDto.actif !== undefined && updateUserDto.actif !== existingUser.actif) {
+        changes.actif = { old: existingUser.actif, new: updateUserDto.actif }
+      }
+      if (updateUserDto.password) {
+        changes.password = { old: '[MASKED]', new: '[MASKED]' }
+      }
+
       await this.usersService.update(id, updateUserDto)
       const updatedUser = await this.usersService.findById(id)
 
       if (!updatedUser) {
         throw new NotFoundException('Utilisateur non trouvé après mise à jour')
+      }
+
+      // Audit logging
+      if (Object.keys(changes).length > 0) {
+        try {
+          await this.prisma.auditLog.create({
+            data: {
+              userId: request.user?.id,
+              action: 'UPDATE',
+              resource: 'USER',
+              resourceId: id,
+              description: `Mise à jour de l'utilisateur ${updatedUser.email}`,
+              ipAddress: request.ip || request.headers?.['x-forwarded-for'] || request.connection?.remoteAddress,
+              userAgent: request.headers?.['user-agent'],
+              changes,
+              metadata: {
+                action: 'user_updated',
+                userId: id,
+                fieldsChanged: Object.keys(changes),
+              },
+            },
+          })
+        } catch (auditError) {
+          this.logger.warn('Failed to create audit log:', auditError)
+        }
       }
 
       // Invalider le cache des utilisateurs
@@ -347,7 +417,7 @@ export class AdminUsersController {
         statusCode: 200,
       }
     } catch (error: unknown) {
-      if ((error as DatabaseError).code === '23505') {
+      if (isDatabaseError(error) && error.code === '23505') {
         throw new BadRequestException('Un utilisateur avec cet email existe déjà')
       }
       throw error
@@ -359,23 +429,67 @@ export class AdminUsersController {
   @ApiResponse({ status: 200, description: 'Utilisateur supprimé avec succès' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
   @ApiResponse({ status: 400, description: 'Impossible de supprimer cet utilisateur' })
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Param('id') id: string, @Req() request: any) {
     // Vérifier que l'utilisateur existe
     const existingUser = await this.usersService.findById(id)
     if (!existingUser) {
       throw new NotFoundException('Utilisateur non trouvé')
     }
 
-    // Protection : empêcher la suppression des utilisateurs système
-    if (
-      existingUser.email === 'admin@topsteel.fr' ||
-      existingUser.email === 'test@topsteel.com'
-    ) {
-      throw new BadRequestException('Impossible de supprimer un utilisateur système')
+    // Protection : empêcher la suppression du dernier SUPER_ADMIN
+    if (existingUser.role === GlobalUserRole.SUPER_ADMIN) {
+      // Compter le nombre de SUPER_ADMIN actifs
+      const allUsers = await this.usersService.findAll({})
+      const superAdminCount = allUsers.filter(
+        (user: { role?: string; actif?: boolean }) =>
+          user.role === GlobalUserRole.SUPER_ADMIN && user.actif
+      ).length
+
+      if (superAdminCount <= 1) {
+        throw new BadRequestException(
+          'Impossible de supprimer le dernier administrateur système (SUPER_ADMIN). ' +
+          'Au moins un SUPER_ADMIN actif doit être maintenu dans le système.'
+        )
+      }
+
+      this.logger.warn(
+        `Tentative de suppression d'un SUPER_ADMIN (${existingUser.email}). ` +
+        `${superAdminCount - 1} SUPER_ADMIN(s) restera(ont) actif(s).`
+      )
     }
 
     try {
       await this.usersService.remove(id)
+
+      // Audit logging
+      try {
+        await this.prisma.auditLog.create({
+          data: {
+            userId: request.user?.id,
+            action: 'DELETE',
+            resource: 'USER',
+            resourceId: id,
+            description: `Suppression de l'utilisateur ${existingUser.email}`,
+            ipAddress: request.ip || request.headers?.['x-forwarded-for'] || request.connection?.remoteAddress,
+            userAgent: request.headers?.['user-agent'],
+            changes: {
+              deletedUser: {
+                id: existingUser.id,
+                email: existingUser.email,
+                nom: existingUser.nom,
+                prenom: existingUser.prenom,
+                role: existingUser.role,
+              },
+            },
+            metadata: {
+              action: 'user_deleted',
+              userId: id,
+            },
+          },
+        })
+      } catch (auditError) {
+        this.logger.warn('Failed to create audit log:', auditError)
+      }
 
       // Invalider le cache des utilisateurs
       await this.invalidateUsersCache()
@@ -408,6 +522,7 @@ export class AdminUsersController {
   })
   @ApiResponse({ status: 201, description: 'Rôle assigné avec succès' })
   @ApiResponse({ status: 404, description: 'Utilisateur non trouvé' })
+  @ApiResponse({ status: 403, description: 'Privilèges insuffisants pour assigner ce rôle' })
   async assignSocieteRole(
     @Param('id') userId: string,
     @Body() body: {
@@ -417,10 +532,19 @@ export class AdminUsersController {
       restrictedPermissions?: string[]
       expiresAt?: Date
     },
-    request: Record<string, unknown>
+    @Req() request: Record<string, unknown>
   ) {
-    const tenant = request.tenant as AuthenticatedUserWithTenant
-    const currentUser = request.user as AuthenticatedUserWithTenant
+    // Type guard for tenant
+    if (!isUserWithTenant(request.tenant)) {
+      throw new BadRequestException('Contexte de société requis')
+    }
+    const tenant = request.tenant
+
+    // Type guard for current user
+    if (!isAuthenticatedUser(request.user)) {
+      throw new BadRequestException('Utilisateur non authentifié')
+    }
+    const currentUser = request.user
 
     // Vérifier que l'utilisateur existe
     const user = await this.usersService.findById(userId)
@@ -433,10 +557,50 @@ export class AdminUsersController {
       throw new BadRequestException('Type de rôle invalide')
     }
 
+    // VÉRIFICATION DE LA HIÉRARCHIE DES RÔLES
+    // Récupérer le rôle global de l'utilisateur courant (celui qui fait l'action)
+    const currentUserData = await this.usersService.findById(currentUser.id)
+    if (!currentUserData) {
+      throw new BadRequestException('Utilisateur courant non trouvé')
+    }
+    const currentUserGlobalRole = (currentUserData.role || 'USER') as GlobalUserRole
+
+    // SUPER_ADMIN peut assigner n'importe quel rôle
+    if (currentUserGlobalRole !== GlobalUserRole.SUPER_ADMIN) {
+      // Récupérer le rôle société actuel de l'utilisateur courant dans cette société
+      const currentUserSocieteRole = await this.unifiedRolesService.getUserSocieteRole(
+        currentUser.id,
+        tenant.societeId
+      )
+
+      if (!currentUserSocieteRole) {
+        throw new BadRequestException(
+          "Vous n'avez pas de rôle dans cette société pour effectuer cette opération"
+        )
+      }
+
+      // Obtenir le rôle effectif de l'utilisateur courant
+      const currentUserEffectiveSocieteRole = currentUserSocieteRole.effectiveRole as SocieteRoleType
+
+      // Vérifier que l'utilisateur courant peut assigner le rôle demandé
+      // L'utilisateur peut uniquement assigner des rôles de niveau égal ou inférieur
+      const canAssignRole = this.canAssignSocieteRole(
+        currentUserEffectiveSocieteRole,
+        body.roleType
+      )
+
+      if (!canAssignRole) {
+        throw new BadRequestException(
+          `Vous ne pouvez pas assigner le rôle "${body.roleType}". ` +
+          `Votre rôle actuel (${currentUserEffectiveSocieteRole}) ne vous permet d'assigner que des rôles de niveau égal ou inférieur.`
+        )
+      }
+    }
+
     try {
       const userSocieteRole = await this.unifiedRolesService.assignUserToSociete(
         userId,
-        tenant.societeId!,
+        tenant.societeId,
         body.roleType,
         currentUser.id,
         {
@@ -563,16 +727,29 @@ export class AdminUsersController {
    */
   private async invalidateUsersCache(): Promise<void> {
     try {
-      // Simple suppression de quelques clés de cache communes
-      const commonKeys = [
-        'admin:users:{}',
-        'admin:users:{"page":1,"limit":10}',
-        'admin:users:{"includePermissions":true}',
-      ]
+      // Invalider toutes les clés de cache liées aux utilisateurs en utilisant un pattern
+      await this.cacheService.invalidatePattern('admin:users:*')
+    } catch (error) {
+      this.logger.warn('Erreur lors de l\'invalidation du cache utilisateurs:', error)
+    }
+  }
 
-      for (const key of commonKeys) {
-        await this.cacheService.delete(key)
-      }
-    } catch (_error) {}
+  /**
+   * Vérifie si un utilisateur avec un rôle donné peut assigner un autre rôle
+   * Un utilisateur peut assigner des rôles de niveau égal ou inférieur au sien
+   */
+  private canAssignSocieteRole(
+    assignerRole: SocieteRoleType,
+    roleToAssign: SocieteRoleType
+  ): boolean {
+    // Import des constantes de hiérarchie
+    const { SOCIETE_ROLE_HIERARCHY } = require('../../../domains/auth/core/constants/roles.constants')
+
+    // Récupérer les niveaux hiérarchiques
+    const assignerLevel = SOCIETE_ROLE_HIERARCHY[assignerRole]
+    const roleToAssignLevel = SOCIETE_ROLE_HIERARCHY[roleToAssign]
+
+    // L'utilisateur peut assigner un rôle si son niveau est supérieur ou égal
+    return assignerLevel >= roleToAssignLevel
   }
 }

@@ -7,7 +7,15 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  PageContainer,
+  PageSection,
+} from '@erp/ui'
 import {
   ArrowRight,
   BarChart3,
@@ -97,27 +105,26 @@ export default function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
-      <div className="px-4 sm:px-6 lg:px-8 py-12">
+    <PageContainer maxWidth="full" padding="default">
+      <PageSection spacing="default">
         {/* Hero Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <div className="flex justify-center mb-8">
             <CompanyLogo size="xl" showCompanyName={false} className="drop-shadow-xl" />
           </div>
 
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl font-bold text-foreground mb-4">
             {t('welcome', { companyName: companyInfo?.name || 'TopSteel' })}
           </h1>
 
-          <p className="text-xl text-slate-600 mb-2">{t('subtitle')}</p>
+          <p className="text-xl text-muted-foreground mb-2">{t('subtitle')}</p>
 
-          <p className="text-slate-500 mb-8">{t('description')}</p>
+          <p className="text-muted-foreground mb-8">{t('description')}</p>
 
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-center gap-4">
             <Button
               type="button"
               onClick={() => router?.push('/dashboard')}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg px-8"
             >
               <BarChart3 className="mr-2 h-5 w-5" />
               {t('accessDashboard')}
@@ -127,7 +134,6 @@ export default function HomePage() {
               type="button"
               variant="outline"
               onClick={() => router?.push('/admin/company')}
-              className="border-slate-200 bg-white/80 backdrop-blur-sm hover:bg-white px-8"
             >
               <Building2 className="mr-2 h-5 w-5" />
               {t('configureCompany')}
@@ -136,8 +142,8 @@ export default function HomePage() {
         </div>
 
         {/* Quick Actions Grid */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-800 text-center mb-8">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground text-center mb-8">
             {t('quickActionsTitle')}
           </h2>
 
@@ -150,13 +156,9 @@ export default function HomePage() {
                 aria-label={`Navigate to ${action.title}`}
                 className="block w-full text-left"
               >
-                <Card className="group cursor-pointer border-0 bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 overflow-hidden relative">
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${action.color}/10 opacity-0 group-hover:opacity-100 transition-opacity`}
-                  />
-
-                  <CardHeader className="pb-3 relative z-10">
-                    <CardTitle className="text-lg flex items-center text-slate-800 group-hover:text-slate-900 transition-colors">
+                <Card className="group cursor-pointer hover:shadow-lg transition-all duration-300 hover:scale-[1.02] overflow-hidden relative h-full">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg flex items-center text-foreground">
                       <div
                         className={`p-3 bg-gradient-to-r ${action.color} rounded-lg mr-3 group-hover:scale-110 transition-transform`}
                       >
@@ -166,11 +168,11 @@ export default function HomePage() {
                     </CardTitle>
                   </CardHeader>
 
-                  <CardContent className="relative z-10">
-                    <p className="text-slate-600 group-hover:text-slate-700 mb-4">
+                  <CardContent>
+                    <p className="text-muted-foreground mb-4">
                       {action.description}
                     </p>
-                    <div className="flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                    <div className="flex items-center text-sm font-medium text-primary">
                       {t('actions.access')}
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -180,7 +182,7 @@ export default function HomePage() {
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      </PageSection>
+    </PageContainer>
   )
 }

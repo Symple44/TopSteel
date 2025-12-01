@@ -42,21 +42,21 @@ export function DataTableEmpty({
     <div
       className={cn(
         'flex flex-col items-center justify-center py-12 px-6 text-center',
-        'border rounded-lg bg-gray-50',
+        'border border-border rounded-lg bg-muted/30',
         className
       )}
     >
       <div className="mb-4">
         {isSearchResult ? (
-          <Search className="h-12 w-12 text-gray-400 mx-auto" />
+          <Search className="h-12 w-12 text-muted-foreground/50 mx-auto" />
         ) : (
-          <Package className="h-12 w-12 text-gray-400 mx-auto" />
+          <Package className="h-12 w-12 text-muted-foreground/50 mx-auto" />
         )}
       </div>
 
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title || defaultTitle}</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-2">{title || defaultTitle}</h3>
 
-      <p className="text-sm text-gray-600 mb-6 max-w-md">{description || defaultDescription}</p>
+      <p className="text-sm text-muted-foreground mb-6 max-w-md">{description || defaultDescription}</p>
 
       <div className="flex flex-col sm:flex-row gap-3">
         {isSearchResult && onClearSearch && (

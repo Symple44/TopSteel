@@ -6,7 +6,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { MenuItem, MenuConfiguration, UserMenuPreference } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import { DiscoveredPage, PageDiscoveryService } from './page-discovery.service'
 
@@ -200,11 +200,16 @@ export class MenuSyncService {
   ]
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly pageDiscoveryService: PageDiscoveryService,
     private readonly cacheService: OptimizedCacheService,
     private readonly eventEmitter: EventEmitter2
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Synchronize discovered pages with menu system

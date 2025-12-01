@@ -10,17 +10,17 @@ import { ThemeProvider as NextThemeProvider, useTheme as useNextTheme } from 'ne
 import * as React from 'react'
 import { createContext, useContext } from 'react'
 import type { ResolvedTheme, ThemeConfig } from '../../../lib/design-system'
-import { darkTheme, lightTheme, vibrantTheme } from '../../../lib/design-system'
+import { darkTheme, lightTheme } from '../../../lib/design-system'
 
 // ===== TYPES UNIFIÉS =====
 
-export type Theme = 'light' | 'dark' | 'vibrant' | 'system'
+export type Theme = 'light' | 'dark' | 'system'
 
 interface TopSteelThemeProviderProps {
   children: React.ReactNode
   /**
    * Thème par défaut
-   * @default 'vibrant'
+   * @default 'light'
    */
   defaultTheme?: Theme
   /**
@@ -40,7 +40,7 @@ interface TopSteelThemeProviderProps {
   disableTransitionOnChange?: boolean
   /**
    * Thèmes supportés
-   * @default ['light', 'dark', 'vibrant', 'system']
+   * @default ['light', 'dark', 'system']
    */
   themes?: Theme[]
   /**
@@ -76,7 +76,6 @@ interface TopSteelThemeContextValue {
 export const themeConfigs: Record<ResolvedTheme, ThemeConfig> = {
   light: lightTheme,
   dark: darkTheme,
-  vibrant: vibrantTheme,
 }
 
 // ===== CONTEXT =====
@@ -97,11 +96,11 @@ export function useTheme(): TopSteelThemeContextValue {
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'vibrant',
+  defaultTheme = 'light',
   storageKey = 'topsteel-theme',
   enableSystem = true,
   disableTransitionOnChange = false,
-  themes = ['light', 'dark', 'vibrant', 'system'],
+  themes = ['light', 'dark', 'system'],
   forcedTheme,
   attribute = 'class',
   ...props

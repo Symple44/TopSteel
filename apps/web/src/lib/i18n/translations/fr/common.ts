@@ -36,7 +36,6 @@ export const common = {
   light: 'Clair',
   dark: 'Sombre',
   system: 'Auto',
-  vibrant: '🎨 Coloré',
   logout: 'Déconnexion',
   profile: 'Profil',
   settings: 'Paramètres',

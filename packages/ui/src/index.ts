@@ -5,6 +5,14 @@
 // === RE-EXPORTS EXTERNES ===
 export { cva, type VariantProps } from 'class-variance-authority'
 export { type ClassValue, clsx } from 'clsx'
+
+// === DESIGN SYSTEM (nouveaux modules) ===
+// Les modules tokens/, themes/, variants/ sont disponibles via imports directs:
+// import { tokens } from '@erp/ui/tokens'
+// import { themes } from '@erp/ui/themes'
+// import { buttonVariants } from '@erp/ui/variants'
+// Note: les anciens exports design-system/ sont conservés pour backward compatibility
+
 // Business components
 export * from './components/business'
 // Data Display
@@ -30,10 +38,55 @@ export {
   DataTable,
   DataTable as AdvancedDataTable,
   DataTableExample,
+  HierarchicalDataTable,
   HierarchicalDataTableExample,
   type SelectionState,
   SimpleDataTableExample,
   usePersistedTableSettings,
+  // Views alternatives
+  CalendarView,
+  CardsView,
+  KanbanView,
+  MapView,
+  TimelineView,
+  // Types for views
+  type MapMarker,
+  // Hooks
+  useDataViews,
+  // Preset System
+  applyPreset,
+  createCustomPreset,
+  getRecommendedPreset,
+  comparePresets,
+  hasFeature,
+  getEnabledFeatures,
+  DATATABLE_PRESETS,
+  type DataTablePreset,
+  type PresetConfig,
+  // Import System
+  ImportDialog,
+  parseCSV,
+  parseExcel,
+  parseFile,
+  validateImport,
+  useImport,
+  type ImportFormat,
+  type ImportConfig,
+  type ValidationSchema,
+  type ImportDialogProps,
+  // Data Adapter System
+  LocalAdapter,
+  RestAdapter,
+  GraphQLAdapter,
+  SupabaseAdapter,
+  useDataAdapter,
+  type DataAdapter,
+  type DataQuery,
+  type DataResponse,
+  type RestAdapterConfig,
+  type GraphQLAdapterConfig,
+  type SupabaseAdapterConfig,
+  type LocalAdapterConfig,
 } from './components/data-display/datatable'
 // Export ReorderableListConfig and related types
 export type {
@@ -203,7 +256,7 @@ export {
 } from './components/primitives'
 // Export Button and other primitive types explicitly
 export type { ButtonProps } from './components/primitives/button/Button'
-export type { InputProps } from './components/primitives/input/Input'
+export type { InputBaseProps as InputProps } from './components/primitives/input/types'
 export type { TextareaProps } from './components/primitives/textarea/Textarea'
 
 // Theme

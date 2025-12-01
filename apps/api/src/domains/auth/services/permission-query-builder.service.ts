@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import type { User, Permission, Role, RolePermission, UserSocieteRole } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type {
   PermissionData,
@@ -132,9 +132,14 @@ export interface PermissionConflict {
 @Injectable()
 export class PermissionQueryBuilderService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly cacheService: OptimizedCacheService
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Build and execute a permission query

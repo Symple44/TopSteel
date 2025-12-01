@@ -44,7 +44,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
           if (data.company && company && data?.company?.id !== company.id) {
             toast?.info(
               <div className="flex items-center space-x-3">
-                <Building className="h-5 w-5 text-blue-500" />
+                <Building className="h-5 w-5 text-info" />
                 <div className="flex-1">
                   <p className="font-medium">{t('tabSync.societyChanged')}</p>
                   <p className="text-sm text-muted-foreground">
@@ -75,7 +75,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
           if (isAuthenticated) {
             toast?.error(
               <div className="flex items-center space-x-3">
-                <LogOut className="h-5 w-5 text-red-500" />
+                <LogOut className="h-5 w-5 text-destructive" />
                 <div className="flex-1">
                   <p className="font-medium">{t('tabSync.disconnected')}</p>
                   <p className="text-sm text-muted-foreground">{t('tabSync.logoutInOtherTab')}</p>
@@ -102,7 +102,7 @@ export default function TabSyncNotification({ enabled = true }: TabSyncNotificat
           if (!isAuthenticated) {
             toast?.success(
               <div className="flex items-center space-x-3">
-                <AlertCircle className="h-5 w-5 text-green-500" />
+                <AlertCircle className="h-5 w-5 text-success" />
                 <div className="flex-1">
                   <p className="font-medium">{t('tabSync.connectionDetected')}</p>
                   <p className="text-sm text-muted-foreground">{t('tabSync.loginInOtherTab')}</p>

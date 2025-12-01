@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { PrismaService } from '../../../core/database/prisma/prisma.service'
 import type { Notification, Prisma } from '@prisma/client'
 
@@ -6,12 +7,13 @@ import type { Notification, Prisma } from '@prisma/client'
  * NotificationPrismaService - Phase 2.5
  *
  * Service pour gestion des notifications utilisateur avec Prisma
+ * Utilise TenantPrismaService pour le filtrage automatique par societeId
  *
  * Notification = Notification envoyée à un utilisateur
  * Stocke les messages, actions, et tracking de lecture
  *
  * Fonctionnalités:
- * - CRUD notifications
+ * - CRUD notifications (filtrées par tenant)
  * - Types et catégories
  * - Priorité (low/medium/high/urgent)
  * - Actions avec URL et label
@@ -24,7 +26,15 @@ import type { Notification, Prisma } from '@prisma/client'
 export class NotificationPrismaService {
   private readonly logger = new Logger(NotificationPrismaService.name)
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly tenantPrisma: TenantPrismaService,
+    private readonly prismaRaw: PrismaService // Pour les opérations système sans filtrage
+  ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Créer une notification
@@ -361,12 +371,13 @@ export class NotificationPrismaService {
 
   /**
    * Supprimer les notifications expirées
+   * Note: Opération système - s'exécute sur TOUTES les sociétés
    */
   async deleteExpiredNotifications(): Promise<number> {
-    this.logger.log('Deleting expired notifications')
+    this.logger.log('Deleting expired notifications (all tenants)')
 
     try {
-      const result = await this.prisma.notification.deleteMany({
+      const result = await this.prismaRaw.notification.deleteMany({
         where: {
           expiresAt: {
             lt: new Date(),
@@ -385,15 +396,16 @@ export class NotificationPrismaService {
 
   /**
    * Supprimer les anciennes notifications lues
+   * Note: Opération système - s'exécute sur TOUTES les sociétés
    */
   async deleteOldReadNotifications(daysOld = 30): Promise<number> {
-    this.logger.log(`Deleting read notifications older than ${daysOld} days`)
+    this.logger.log(`Deleting read notifications older than ${daysOld} days (all tenants)`)
 
     try {
       const cutoffDate = new Date()
       cutoffDate.setDate(cutoffDate.getDate() - daysOld)
 
-      const result = await this.prisma.notification.deleteMany({
+      const result = await this.prismaRaw.notification.deleteMany({
         where: {
           readAt: {
             lt: cutoffDate,

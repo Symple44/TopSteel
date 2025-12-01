@@ -1,13 +1,12 @@
 'use client'
 
-import { Card } from '@erp/ui'
+import { Card, PageContainer, PageHeader, PageSection } from '@erp/ui'
 import { Building2, ListChecks, Plug, Search, Settings, Shield, Workflow } from 'lucide-react'
 import { useState } from 'react'
 import { AuthenticationSettings } from '../../../../components/admin/authentication-settings'
 import { CompanySettings } from '../../../../components/admin/company-settings'
 import { ElasticsearchAdmin } from '../../../../components/admin/elasticsearch-admin'
 import { UnitsAndListsSettings } from '../../../../components/admin/units-lists-settings'
-import { useAppearanceSettings } from '../../../../hooks/use-appearance-settings'
 import { useTranslation } from '../../../../lib/i18n'
 
 // Force dynamic rendering to avoid SSR issues
@@ -60,7 +59,6 @@ const getNavigationItems = (t: (key: string) => string) => [
 
 export default function AdminConfigurationPage() {
   const { t } = useTranslation('admin')
-  const { settings: _settings } = useAppearanceSettings()
   const [activeSection, setActiveSection] = useState('company')
   const navigationItems = getNavigationItems(t)
 
@@ -104,13 +102,16 @@ export default function AdminConfigurationPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">{t('title')}</h1>
-        <p className="text-muted-foreground mt-2">{t('subtitle')}</p>
-      </div>
+    <PageContainer maxWidth="full" padding="default">
+      <PageHeader
+        title={t('title')}
+        description={t('subtitle')}
+        icon={Settings}
+        iconBackground="bg-gradient-to-br from-slate-500 to-gray-600"
+      />
 
-      <div className="flex gap-6">
+      <PageSection spacing="default">
+        <div className="flex gap-6">
         {/* Sidebar Navigation */}
         <div className="w-96 flex-shrink-0">
           <Card className="p-4">
@@ -157,7 +158,8 @@ export default function AdminConfigurationPage() {
             <div className="min-h-[600px]">{renderContent()}</div>
           </Card>
         </div>
-      </div>
-    </div>
+        </div>
+      </PageSection>
+    </PageContainer>
   )
 }

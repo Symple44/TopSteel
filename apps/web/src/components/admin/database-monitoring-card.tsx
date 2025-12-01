@@ -204,7 +204,7 @@ export function DatabaseMonitoringCard({ metrics, variant = 'tenant' }: Monitori
 
         {/* Erreur */}
         {metrics.error && (
-          <div className="flex items-start space-x-2 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+          <div className="flex items-start space-x-2 p-3 bg-destructive/10 rounded-lg border border-destructive/30">
             <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
             <div className="space-y-1">
               <p className="text-sm font-medium text-red-800 dark:text-red-200">Erreur détectée</p>

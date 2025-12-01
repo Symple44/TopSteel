@@ -25,7 +25,7 @@ const pageContainerVariants = cva('w-full', {
     },
   },
   defaultVariants: {
-    maxWidth: 'xl',
+    maxWidth: 'full',
     padding: 'default',
     centered: true,
   },

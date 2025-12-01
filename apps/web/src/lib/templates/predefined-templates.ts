@@ -43,7 +43,7 @@ export const predefinedTemplates: Template[] = [
     category: 'business',
     preview: '/templates/sales-dashboard.png',
     settings: {
-      theme: 'vibrant',
+      theme: 'light',
       language: 'fr',
       fontSize: 'medium',
       sidebarWidth: 'normal',
@@ -188,7 +188,7 @@ export const predefinedTemplates: Template[] = [
     category: 'accessibility',
     preview: '/templates/comfort-reading.png',
     settings: {
-      theme: 'vibrant',
+      theme: 'light',
       language: 'fr',
       fontSize: 'large',
       sidebarWidth: 'normal',

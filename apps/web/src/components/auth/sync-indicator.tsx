@@ -45,7 +45,7 @@ export default function SyncIndicator() {
     <div
       className={cn(
         'flex items-center justify-center w-6 h-6 rounded-full transition-colors',
-        isOnline ? 'text-green-500 hover:bg-green-50' : 'text-red-500 hover:bg-red-50'
+        isOnline ? 'text-success hover:bg-success/10' : 'text-destructive hover:bg-destructive/10'
       )}
       title={getTitle()}
     >

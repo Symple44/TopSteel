@@ -86,8 +86,8 @@ export class GlobalErrorBoundary extends Component<Props, State> {
             <div className="max-w-lg w-full bg-white border border-gray-200 rounded-xl shadow-lg p-8">
               {/* Error Icon */}
               <div className="flex justify-center mb-6">
-                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-                  <AlertTriangle className="w-10 h-10 text-red-600" />
+                <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="w-10 h-10 text-destructive" />
                 </div>
               </div>
 
@@ -114,29 +114,29 @@ export class GlobalErrorBoundary extends Component<Props, State> {
 
               {/* Technical Details (Development only) */}
               {process.env.NODE_ENV === 'development' && this.state.error && (
-                <details className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <summary className="cursor-pointer font-semibold text-red-900 mb-2">
+                <details className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-lg">
+                  <summary className="cursor-pointer font-semibold text-destructive mb-2">
                     Détails techniques (développement uniquement)
                   </summary>
                   <div className="space-y-2 text-xs">
                     <div>
-                      <strong className="text-red-900">Erreur :</strong>
-                      <pre className="mt-1 p-2 bg-white rounded text-red-800 overflow-auto">
+                      <strong className="text-destructive">Erreur :</strong>
+                      <pre className="mt-1 p-2 bg-white rounded text-destructive overflow-auto">
                         {this.state.error.message}
                       </pre>
                     </div>
                     {this.state.error.stack && (
                       <div>
-                        <strong className="text-red-900">Stack trace :</strong>
-                        <pre className="mt-1 p-2 bg-white rounded text-red-800 overflow-auto max-h-48 text-xs">
+                        <strong className="text-destructive">Stack trace :</strong>
+                        <pre className="mt-1 p-2 bg-white rounded text-destructive overflow-auto max-h-48 text-xs">
                           {this.state.error.stack}
                         </pre>
                       </div>
                     )}
                     {this.state.errorInfo?.componentStack && (
                       <div>
-                        <strong className="text-red-900">Component stack :</strong>
-                        <pre className="mt-1 p-2 bg-white rounded text-red-800 overflow-auto max-h-32 text-xs">
+                        <strong className="text-destructive">Component stack :</strong>
+                        <pre className="mt-1 p-2 bg-white rounded text-destructive overflow-auto max-h-32 text-xs">
                           {this.state.errorInfo.componentStack}
                         </pre>
                       </div>
@@ -150,7 +150,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 <Button
                   type="button"
                   onClick={this.handleReload}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  className="w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground py-3 rounded-lg hover:bg-primary/90 transition-colors font-medium"
                 >
                   <RefreshCw className="w-5 h-5" />
                   Recharger la page
@@ -159,7 +159,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 <Button
                   type="button"
                   onClick={this.handleGoHome}
-                  className="w-full flex items-center justify-center gap-2 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                  className="w-full flex items-center justify-center gap-2 bg-secondary text-secondary-foreground py-3 rounded-lg hover:bg-secondary/80 transition-colors font-medium"
                 >
                   <Home className="w-5 h-5" />
                   Retour à l'accueil

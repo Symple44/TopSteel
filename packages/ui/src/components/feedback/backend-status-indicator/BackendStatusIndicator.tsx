@@ -60,28 +60,28 @@ export function BackendStatusIndicator({
   const getStatusIcon = () => {
     switch (health.status) {
       case 'online':
-        return <CheckCircle className="h-4 w-4 text-green-500" />
+        return <CheckCircle className="h-4 w-4 text-success" />
       case 'offline':
       case 'error':
-        return <XCircle className="h-4 w-4 text-red-500" />
+        return <XCircle className="h-4 w-4 text-destructive" />
       case 'checking':
-        return <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
+        return <Loader2 className="h-4 w-4 text-primary animate-spin" />
       default:
-        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+        return <AlertTriangle className="h-4 w-4 text-warning" />
     }
   }
 
   const getStatusColor = () => {
     switch (health.status) {
       case 'online':
-        return 'text-green-700 bg-green-50 border-green-200'
+        return 'text-success bg-success/10 border-success/30'
       case 'offline':
       case 'error':
-        return 'text-red-700 bg-red-50 border-red-200'
+        return 'text-destructive bg-destructive/10 border-destructive/30'
       case 'checking':
-        return 'text-blue-700 bg-blue-50 border-blue-200'
+        return 'text-primary bg-primary/10 border-primary/30'
       default:
-        return 'text-yellow-700 bg-yellow-50 border-yellow-200'
+        return 'text-warning bg-warning/10 border-warning/30'
     }
   }
 
@@ -183,7 +183,7 @@ export function BackendConnectionGuard({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-500" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" />
           <div className="text-lg font-medium text-gray-900">{t.connecting}</div>
           <div className="text-sm text-gray-600">{t.checkingAvailability}</div>
         </div>
@@ -195,7 +195,7 @@ export function BackendConnectionGuard({
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center space-y-4">
-        <XCircle className="h-12 w-12 text-red-500 mx-auto" />
+        <XCircle className="h-12 w-12 text-destructive mx-auto" />
 
         <div className="space-y-2">
           <h1 className="text-xl font-semibold text-gray-900">{t.serverUnavailable}</h1>

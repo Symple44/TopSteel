@@ -111,13 +111,23 @@ export function getAuthHeaders(request: Request): Record<string, string> {
   const cookieHeader = request?.headers?.get('cookie')
 
   let accessToken = null
+  let csrfToken = null
+
   if (cookieHeader) {
     const cookies = cookieHeader?.split(';').map((c) => c?.trim())
     const accessTokenCookie = cookies?.find((c) => c?.startsWith('accessToken='))
     if (accessTokenCookie) {
       accessToken = accessTokenCookie?.split('=')[1]
     }
+    // Extract CSRF token from cookies
+    const csrfTokenCookie = cookies?.find((c) => c?.startsWith('_csrf-token='))
+    if (csrfTokenCookie) {
+      csrfToken = csrfTokenCookie?.split('=')[1]
+    }
   }
+
+  // Also check for CSRF token in request headers
+  const csrfHeaderToken = request?.headers?.get('x-csrf-token') || request?.headers?.get('x-xsrf-token')
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -131,6 +141,13 @@ export function getAuthHeaders(request: Request): Record<string, string> {
 
   if (cookieHeader) {
     headers.Cookie = cookieHeader
+  }
+
+  // Add CSRF token to headers (priority: header > cookie)
+  if (csrfHeaderToken) {
+    headers['x-csrf-token'] = csrfHeaderToken
+  } else if (csrfToken) {
+    headers['x-csrf-token'] = csrfToken
   }
 
   return headers
@@ -182,6 +199,21 @@ export async function callHealthApi(
 }
 
 /**
+ * Get CSRF token from cookies (client-side)
+ */
+function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null
+  const cookies = document.cookie.split(';')
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=')
+    if (name === '_csrf-token') {
+      return value
+    }
+  }
+  return null
+}
+
+/**
  * Utilitaire pour les appels côté client (depuis les hooks/composants)
  * Utilise les routes API Next.js comme proxy
  */
@@ -211,9 +243,17 @@ export async function callClientApi(
     }
   }
 
+  // Get CSRF token for mutating requests
+  const csrfToken = getCsrfToken()
+
   const finalHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
     ...normalizedHeaders,
+  }
+
+  // Add CSRF token for POST, PUT, PATCH, DELETE requests
+  if (csrfToken && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method?.toUpperCase() || 'GET')) {
+    finalHeaders['x-csrf-token'] = csrfToken
   }
 
   const defaultOptions: RequestInit = {
@@ -221,11 +261,6 @@ export async function callClientApi(
     ...restOptions,
     headers: finalHeaders,
   }
-
-  // Debug logging
-  console.log('[callClientApi] URL:', url)
-  console.log('[callClientApi] Headers being sent:', finalHeaders)
-  console.log('[callClientApi] Authorization header:', finalHeaders['Authorization'] || finalHeaders['authorization'] || 'NOT SET')
 
   return safeFetch(url, defaultOptions)
 }

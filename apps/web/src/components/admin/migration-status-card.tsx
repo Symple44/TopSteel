@@ -71,7 +71,7 @@ export function MigrationStatusCard({
     }
   }
 
-  const getStatusBadgeVariant = () => {
+  const getStatusBadgeVariant = (): 'success' | 'warning' | 'destructive' => {
     switch (status) {
       case 'up-to-date':
         return 'success'
@@ -149,9 +149,7 @@ export function MigrationStatusCard({
             </div>
             <div className="flex items-center space-x-2">
               <Badge
-                variant={
-                  getStatusBadgeVariant() as 'default' | 'secondary' | 'destructive' | 'outline'
-                }
+                variant={getStatusBadgeVariant()}
                 className="text-xs"
               >
                 {status === 'up-to-date' && 'À jour'}
@@ -220,7 +218,7 @@ export function MigrationStatusCard({
                 size="sm"
                 onClick={onRunMigrations}
                 disabled={isLoading}
-                className="text-xs bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-sm"
+                className="text-xs font-semibold"
               >
                 <PlayCircle className={`w-3 h-3 mr-1 ${isLoading ? 'animate-spin' : ''}`} />
                 Exécuter ({pending.length})
@@ -230,7 +228,7 @@ export function MigrationStatusCard({
 
           {/* Erreur globale */}
           {error && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+            <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
               <div className="flex items-start space-x-2">
                 <XCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
                 <div>
@@ -256,7 +254,7 @@ export function MigrationStatusCard({
                     {pending?.map((migration) => (
                       <div
                         key={migration}
-                        className="flex items-center justify-between text-xs p-3 bg-yellow-50/80 dark:bg-yellow-950/50 rounded-lg hover:bg-yellow-100/80 dark:hover:bg-yellow-950/70 transition-colors border border-yellow-200/60 dark:border-yellow-800/60"
+                        className="flex items-center justify-between text-xs p-3 bg-warning/10 rounded-lg hover:bg-warning/20 transition-colors border border-warning/30"
                       >
                         <div className="flex items-center space-x-2 flex-1 min-w-0">
                           <AlertCircle className="w-3 h-3 text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
@@ -270,7 +268,7 @@ export function MigrationStatusCard({
                           size="sm"
                           variant="ghost"
                           onClick={() => handleViewMigration(migration)}
-                          className="h-6 w-6 p-0 flex-shrink-0 ml-2 hover:bg-yellow-200/60 dark:hover:bg-yellow-800/60"
+                          className="h-6 w-6 p-0 flex-shrink-0 ml-2 hover:bg-warning/20"
                         >
                           <Eye className="w-3 h-3 text-yellow-700 dark:text-yellow-300" />
                         </Button>
@@ -290,7 +288,7 @@ export function MigrationStatusCard({
                     {executed?.slice(-5).map((migration) => (
                       <div
                         key={migration}
-                        className="flex items-center justify-between text-xs p-3 bg-green-50/80 dark:bg-green-950/50 rounded-lg hover:bg-green-100/80 dark:hover:bg-green-950/70 transition-colors border border-green-200/60 dark:border-green-800/60"
+                        className="flex items-center justify-between text-xs p-3 bg-success/10 rounded-lg hover:bg-success/20 transition-colors border border-success/30"
                       >
                         <div className="flex items-center space-x-2 flex-1 min-w-0">
                           <CheckCircle2 className="w-3 h-3 text-green-600 dark:text-green-400 flex-shrink-0" />
@@ -306,7 +304,7 @@ export function MigrationStatusCard({
                             size="sm"
                             variant="ghost"
                             onClick={() => handleViewMigration(migration)}
-                            className="h-6 w-6 p-0 hover:bg-green-200/60 dark:hover:bg-green-800/60"
+                            className="h-6 w-6 p-0 hover:bg-success/20"
                           >
                             <Eye className="w-3 h-3 text-green-700 dark:text-green-300" />
                           </Button>

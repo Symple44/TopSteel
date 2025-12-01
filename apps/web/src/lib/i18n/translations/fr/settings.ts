@@ -243,11 +243,9 @@ export const settings = {
   settingsEnhanced: {
     appearance: {
       themes: {
-        vibrant: 'Coloré',
         light: 'Clair',
         dark: 'Sombre',
         system: 'Système',
-        vibrantDesc: 'Thème coloré moderne',
         lightDesc: 'Interface claire',
         darkDesc: 'Interface sombre',
         systemDesc: 'Suit les paramètres système',

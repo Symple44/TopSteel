@@ -1,5 +1,17 @@
 // Export principal du système DataTable
 
+// Preset System
+export {
+  applyPreset,
+  comparePresets,
+  createCustomPreset,
+  DATATABLE_PRESETS,
+  getEnabledFeatures,
+  getRecommendedPreset,
+  hasFeature,
+} from './presets'
+export type { DataTablePreset, PresetConfig } from './presets'
+
 // UI Components
 export { AdvancedFilters } from './AdvancedFilters'
 export { ColorRuleManager } from './ColorRuleManager'
@@ -15,7 +27,6 @@ export { DataTableEmpty } from './DataTableEmpty'
 export { DataTableError } from './DataTableError'
 export { DataTableExample } from './DataTableExample'
 export { DataTableSkeleton } from './DataTableSkeleton'
-export { DropdownPortal } from './DropdownPortal'
 export { DragDropUtils, useDragDropColumns } from './drag-drop-utils'
 export { ExportDialog } from './ExportDialog'
 export { ExportUtils } from './export-utils'
@@ -24,6 +35,67 @@ export { FormulaEngine } from './formula-engine'
 export { GenericCardEditor } from './GenericCardEditor'
 export { HierarchicalDataTable } from './HierarchicalDataTable'
 export { HierarchicalDataTableExample } from './HierarchicalDataTableExample'
+// Import System
+export {
+  ImportDialog,
+  parseCSV,
+  parseExcel,
+  parseFile,
+  detectFormat,
+  validateFile,
+  getSampleRows,
+  validateField,
+  validateRow,
+  validateImport,
+  getRowErrors,
+  getAllErrors,
+  getErrorsByField,
+  getValidationSummary,
+  filterValidRows,
+  filterInvalidRows,
+  useImport,
+} from './import'
+export type {
+  ImportFormat,
+  ImportConfig,
+  ParsedData,
+  ColumnMapping,
+  ColumnMappingConfig,
+  FieldValidationRule,
+  ValidationSchema,
+  ValidationResult,
+  ImportValidationResult,
+  ImportState,
+  ImportProgress,
+  ImportDialogProps,
+  UseImportOptions,
+  UseImportReturn,
+} from './import'
+// Data Adapter System
+export {
+  LocalAdapter,
+  RestAdapter,
+  GraphQLAdapter,
+  SupabaseAdapter,
+  useDataAdapter,
+  AdapterError,
+  NetworkError,
+  ValidationError,
+  AuthenticationError,
+  NotFoundError,
+} from './adapters'
+export type {
+  DataAdapter,
+  DataQuery,
+  DataResponse,
+  FilterValue,
+  SortQuery,
+  AdapterConfig,
+  RestAdapterConfig,
+  GraphQLAdapterConfig,
+  SupabaseAdapterConfig,
+  LocalAdapterConfig,
+} from './adapters'
 export { InlineEditor } from './InlineEditor'
 export { KanbanCardEditor } from './KanbanCardEditor'
 export { useKeyboardShortcuts } from './keyboard-shortcuts'
@@ -63,5 +135,7 @@ export { ValidationUtils } from './validation-utils'
 export { CalendarView } from './views/CalendarView'
 export { CardsView } from './views/CardsView'
 export { KanbanView } from './views/KanbanView'
-export { MobileDataCard, MobileDataCardList } from './views/MobileDataCard'
+export { MapView } from './views/MapView'
+export type { MapMarker } from './views/MapView'
+// MobileDataCard supprimé - pas de support mobile (app mobile séparée)
 export { TimelineView } from './views/TimelineView'

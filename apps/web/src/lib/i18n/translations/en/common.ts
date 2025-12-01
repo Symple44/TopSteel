@@ -23,7 +23,6 @@ export const common = {
   light: 'Light',
   dark: 'Dark',
   system: 'Auto',
-  vibrant: '🎨 Vibrant',
   logout: 'Logout',
   profile: 'Profile',
   settings: 'Settings',

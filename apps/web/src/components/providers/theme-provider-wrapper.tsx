@@ -16,11 +16,11 @@ export function ThemeProviderWrapper({ children }: ThemeProviderWrapperProps) {
   return (
     <DynamicThemeProvider
       attribute="class"
-      defaultTheme="vibrant" // Thème par défaut aligné sur useAppearanceSettings
+      defaultTheme="light"
       enableSystem={true}
       disableTransitionOnChange={false}
       storageKey="topsteel-theme"
-      themes={['light', 'dark', 'vibrant', 'system']}
+      themes={['light', 'dark', 'system']}
     >
       {children}
     </DynamicThemeProvider>

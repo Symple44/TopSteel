@@ -28,7 +28,7 @@ export interface DynamicMenuItem {
   icon?: string
   badge?: string
   gradient?: string
-  type?: string
+  type: 'M' | 'P' | 'L' | 'D' // M=Menu/Folder, P=Program, L=Link, D=DataView
   href?: string
   path?: string
   id?: string

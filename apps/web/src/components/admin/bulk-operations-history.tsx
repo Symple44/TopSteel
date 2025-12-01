@@ -70,14 +70,14 @@ const OPERATION_ICONS = {
 }
 
 const OPERATION_COLORS = {
-  assign_roles: 'bg-blue-100 text-blue-800',
-  remove_roles: 'bg-red-100 text-red-800',
-  assign_groups: 'bg-green-100 text-green-800',
-  remove_groups: 'bg-orange-100 text-orange-800',
-  activate: 'bg-emerald-100 text-emerald-800',
+  assign_roles: 'bg-info/20 text-info',
+  remove_roles: 'bg-destructive/20 text-destructive',
+  assign_groups: 'bg-success/20 text-success',
+  remove_groups: 'bg-warning/20 text-warning',
+  activate: 'bg-success/20 text-success',
   deactivate: 'bg-gray-100 text-gray-800',
-  reset_password: 'bg-purple-100 text-purple-800',
-  update_department: 'bg-yellow-100 text-yellow-800',
+  reset_password: 'bg-primary/20 text-primary',
+  update_department: 'bg-warning/20 text-warning',
 }
 
 interface BulkOperationsHistoryProps {
@@ -229,12 +229,12 @@ export function BulkOperationsHistory({ userId, limit = 20 }: BulkOperationsHist
                   <TableCell>
                     <div className="flex items-center space-x-2">
                       <div className="flex items-center space-x-1">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <CheckCircle className="h-4 w-4 text-success" />
                         <span className="text-sm font-medium">{operation.successCount}</span>
                       </div>
                       {operation.failedCount > 0 && (
                         <div className="flex items-center space-x-1">
-                          <XCircle className="h-4 w-4 text-red-600" />
+                          <XCircle className="h-4 w-4 text-destructive" />
                           <span className="text-sm font-medium">{operation.failedCount}</span>
                         </div>
                       )}
@@ -312,13 +312,13 @@ export function BulkOperationsHistory({ userId, limit = 20 }: BulkOperationsHist
                             </div>
                             <div>
                               <p className="text-sm font-medium text-muted-foreground">Réussies</p>
-                              <p className="text-2xl font-bold text-green-600">
+                              <p className="text-2xl font-bold text-success">
                                 {operation.successCount}
                               </p>
                             </div>
                             <div>
                               <p className="text-sm font-medium text-muted-foreground">Échecs</p>
-                              <p className="text-2xl font-bold text-red-600">
+                              <p className="text-2xl font-bold text-destructive">
                                 {operation.failedCount}
                               </p>
                             </div>

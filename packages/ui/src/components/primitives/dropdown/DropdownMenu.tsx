@@ -1,12 +1,21 @@
 /**
  * 🎯 DROPDOWN MENU UNIFIÉ - TOPSTEEL ERP
- * Fusion des 3 implémentations existantes en une version robuste
- * Basé sur Radix UI avec variants du design system et state management amélioré
+ * Composant DropdownMenu unique basé sur Radix UI
+ * Utilise les variants centralisés du design system
  */
 
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react'
 import * as React from 'react'
+import {
+  dropdownContentVariants,
+  dropdownItemVariants,
+  dropdownLabelVariants,
+  dropdownSeparatorVariants,
+  dropdownShortcutVariants,
+  type DropdownSize,
+  type DropdownVariant,
+} from '../../../variants'
 import { cn } from '../../../lib/utils'
 
 // ===== TYPES UNIFIÉS =====
@@ -26,8 +35,8 @@ export interface DropdownMenuTriggerProps
 
 export interface DropdownMenuContentProps
   extends React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> {
-  variant?: 'default' | 'elevated' | 'floating'
-  size?: 'sm' | 'default' | 'lg' | 'xl'
+  variant?: DropdownVariant
+  size?: DropdownSize
   sideOffset?: number
   alignOffset?: number
 }
@@ -68,7 +77,7 @@ const DropdownMenuTrigger = React.forwardRef<
 DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 
 /**
- * Contenu du DropdownMenu avec variants unifiés
+ * Contenu du DropdownMenu avec variants centralisés
  */
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
@@ -93,17 +102,7 @@ const DropdownMenuContent = React.forwardRef<
         align={align}
         sideOffset={sideOffset}
         alignOffset={alignOffset}
-        className={cn(
-          'z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-          variant === 'elevated' && 'shadow-lg',
-          variant === 'floating' && 'shadow-xl backdrop-blur-sm bg-popover/95',
-          size === 'sm' && 'min-w-[6rem] text-xs',
-          size === 'lg' && 'min-w-[12rem] text-base',
-          size === 'xl' && 'min-w-[16rem] text-base',
-          className
-        )}
+        className={cn(dropdownContentVariants({ variant, size }), className)}
         {...props}
       >
         {children}
@@ -114,7 +113,7 @@ const DropdownMenuContent = React.forwardRef<
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
 
 /**
- * Item du DropdownMenu avec variants unifiés
+ * Item du DropdownMenu avec variants centralisés
  */
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
@@ -122,18 +121,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, variant = 'default', size = 'default', inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={cn(
-      'relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors',
-      'focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground',
-      'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      variant === 'destructive' &&
-        'text-destructive hover:bg-destructive hover:text-destructive-foreground',
-      variant === 'success' && 'text-green-600 hover:bg-green-50 hover:text-green-700',
-      size === 'sm' && 'px-1 py-1 text-xs',
-      size === 'lg' && 'px-3 py-2 text-base',
-      inset && 'pl-8',
-      className
-    )}
+    className={cn(dropdownItemVariants({ variant, size, inset }), className)}
     {...props}
   />
 ))
@@ -150,7 +138,7 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn('-mx-1 my-1 h-px bg-muted', className)}
+    className={cn(dropdownSeparatorVariants(), className)}
     {...props}
   />
 ))
@@ -167,7 +155,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={cn('px-2 py-1.5 text-sm font-semibold text-foreground', inset && 'pl-8', className)}
+    className={cn(dropdownLabelVariants({ inset }), className)}
     {...props}
   />
 ))
@@ -177,7 +165,7 @@ DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
  * Raccourci clavier
  */
 const DropdownMenuShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => {
-  return <span className={cn('ml-auto text-xs tracking-widest opacity-60', className)} {...props} />
+  return <span className={cn(dropdownShortcutVariants(), className)} {...props} />
 }
 DropdownMenuShortcut.displayName = 'DropdownMenuShortcut'
 

@@ -1,17 +1,19 @@
 'use client'
 
-import { Columns, Download, Filter, Loader2, Plus, Search, Settings } from 'lucide-react'
+import { Columns, Download, Loader2, Plus, Search, X } from 'lucide-react'
 import type React from 'react'
+import { useCallback, useState } from 'react'
+import { cn } from '../../../../../lib/utils'
 import { Button } from '../../../../primitives/button'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../../../primitives/dropdown/DropdownMenu'
 import { Input } from '../../../../primitives/input'
+import { AdvancedFilters, type AdvancedFilterGroup } from '../../AdvancedFilters'
 import { useDataTableContext } from '../../contexts/DataTableContext'
 import type { ExportFormat } from '../../hooks/useDataExport'
 
@@ -41,7 +43,32 @@ export function DataTableHeader({
   onAddNew,
   customActions,
 }: DataTableHeaderProps) {
-  const { state, setSearchTerm, exportData, toggleColumnVisibility } = useDataTableContext()
+  const { state, setSearchTerm, setFilters, exportData, toggleColumnVisibility } = useDataTableContext()
+
+  // État local pour les filtres avancés
+  const [filterGroups, setFilterGroups] = useState<AdvancedFilterGroup[]>([])
+
+  // Callback pour mettre à jour les filtres
+  const handleFiltersChange = useCallback((newFilters: AdvancedFilterGroup[]) => {
+    setFilterGroups(newFilters)
+
+    // Convertir les filtres avancés en FilterConfig[] pour le contexte
+    const simpleFilters = newFilters.flatMap((group) =>
+      group.rules
+        .filter((rule) => rule.enabled && rule.value !== '')
+        .map((rule) => ({
+          field: rule.column,
+          // Convertir JsonValue en DataValue (string/number/boolean/Date/null)
+          value: typeof rule.value === 'string' || typeof rule.value === 'number' || typeof rule.value === 'boolean'
+            ? rule.value
+            : rule.value === null
+              ? null
+              : String(rule.value),
+          operator: rule.operator,
+        }))
+    )
+    setFilters(simpleFilters)
+  }, [setFilters])
 
   const handleExport = async (format: ExportFormat['format']) => {
     try {
@@ -52,146 +79,151 @@ export function DataTableHeader({
     } catch (_error) {}
   }
 
+  const handleClearSearch = () => {
+    setSearchTerm('')
+  }
+
+  const hasActiveFilters = state.filters.length > 0 || state.searchTerm.length > 0
+
   return (
-    <div className="flex flex-col gap-4 p-5 border-b border-border/50 bg-muted/20">
-      {/* Titre et actions principales */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          {title && <h2 className="text-xl font-bold tracking-tight">{title}</h2>}
-
-          {/* Indicateurs de filtres actifs */}
-          {state.isFiltered && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground font-medium">
-                {state.processedData.length} / {state.data.length} lignes
-              </span>
-              {state.filters.length > 0 && (
-                <span className="px-2.5 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full">
-                  {state.filters.length} filtre{state.filters.length > 1 ? 's' : ''}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Actions personnalisées */}
-          {customActions}
-
-          {/* Bouton Ajouter */}
-          {onAddNew && (
-            <Button type="button" onClick={onAddNew} size="sm">
-              <Plus className="h-4 w-4 mr-1.5" />
-              Ajouter
-            </Button>
-          )}
-
-          {/* Export */}
-          {showExport && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-1.5" />
-                  Exporter
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem onClick={() => handleExport('csv')} className="cursor-pointer">
-                  <span className="flex items-center gap-2">
-                    <span className="w-6 h-6 flex items-center justify-center rounded bg-green-100 text-green-700 text-xs font-bold">CSV</span>
-                    Export CSV
-                  </span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExport('excel')} className="cursor-pointer">
-                  <span className="flex items-center gap-2">
-                    <span className="w-6 h-6 flex items-center justify-center rounded bg-emerald-100 text-emerald-700 text-xs font-bold">XLS</span>
-                    Export Excel
-                  </span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleExport('json')} className="cursor-pointer">
-                  <span className="flex items-center gap-2">
-                    <span className="w-6 h-6 flex items-center justify-center rounded bg-amber-100 text-amber-700 text-xs font-bold">{ }</span>
-                    Export JSON
-                  </span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Toggle colonnes */}
-          {showColumnToggle && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="button" variant="outline" size="sm">
-                  <Columns className="h-4 w-4 mr-1.5" />
-                  Colonnes
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="px-3 py-2.5 border-b border-border/50">
-                  <div className="text-sm font-semibold">Colonnes visibles</div>
-                  <div className="text-xs text-muted-foreground mt-0.5">{state.visibleColumns.length} sur {state.columns.length}</div>
-                </div>
-                <div className="max-h-64 overflow-y-auto py-1">
-                  {state.columns.map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      checked={state.visibleColumns.some((c) => c.id === column.id)}
-                      onCheckedChange={() => toggleColumnVisibility(column.id)}
-                      className="cursor-pointer"
-                    >
-                      {column.title}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Paramètres */}
-          <Button type="button" variant="ghost" size="icon-sm" className="text-muted-foreground hover:text-foreground">
-            <Settings className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Barre de recherche et filtres */}
+    <div className="flex flex-col gap-3 px-4 py-3 border-b border-border/40 bg-muted/10">
+      {/* Ligne principale: recherche à gauche, actions à droite */}
       <div className="flex items-center gap-3">
-        {/* Recherche avec indicateur de debounce */}
+        {/* Recherche */}
         {showSearch && (
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/70" />
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" />
             <Input
               placeholder={searchPlaceholder}
               value={state.searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-10 bg-background"
+              className="h-9 pl-9 pr-9 bg-background border-border/50 text-sm placeholder:text-muted-foreground/50"
             />
-            {/* Indicateur de recherche en cours */}
-            {state.isSearchPending && (
-              <Loader2 className="absolute right-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary animate-spin" />
+            {/* Bouton effacer ou indicateur de chargement */}
+            {state.isSearchPending ? (
+              <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-primary animate-spin" />
+            ) : state.searchTerm && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 hover:text-foreground transition-colors"
+                aria-label="Effacer la recherche"
+              >
+                <X className="h-4 w-4" />
+              </button>
             )}
           </div>
         )}
 
-        {/* Bouton Filtres */}
+        {/* Filtres avancés */}
         {showFilters && (
-          <Button
-            type="button"
-            variant={state.filters.length > 0 ? 'default' : 'outline'}
-            size="sm"
-            className={state.filters.length > 0 ? '' : 'bg-background'}
-          >
-            <Filter className="h-4 w-4 mr-1.5" />
-            Filtres
-            {state.filters.length > 0 && (
-              <span className="ml-1.5 px-2 py-0.5 text-xs bg-white/25 rounded-full font-semibold">
-                {state.filters.length}
-              </span>
-            )}
+          <AdvancedFilters
+            columns={state.columns}
+            filters={filterGroups}
+            onFiltersChange={handleFiltersChange}
+          />
+        )}
+
+        {/* Séparateur */}
+        <div className="h-6 w-px bg-border/50 hidden sm:block" />
+
+        {/* Toggle colonnes */}
+        {showColumnToggle && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="sm" className="h-9 gap-1.5 text-muted-foreground">
+                <Columns className="h-4 w-4" />
+                <span className="hidden sm:inline">Colonnes</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <div className="px-3 py-2 border-b border-border/50">
+                <div className="text-sm font-medium">Colonnes visibles</div>
+                <div className="text-xs text-muted-foreground">{state.visibleColumns.length} sur {state.columns.length}</div>
+              </div>
+              <div className="max-h-64 overflow-y-auto py-1">
+                {state.columns.map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    checked={state.visibleColumns.some((c) => c.id === column.id)}
+                    onCheckedChange={() => toggleColumnVisibility(column.id)}
+                    className="cursor-pointer text-sm"
+                  >
+                    {column.title}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {/* Export */}
+        {showExport && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="sm" className="h-9 gap-1.5 text-muted-foreground">
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Exporter</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <DropdownMenuItem onClick={() => handleExport('csv')} className="cursor-pointer gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-green-500/10 text-green-600 text-[10px] font-bold">CSV</span>
+                <span>Export CSV</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('excel')} className="cursor-pointer gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-emerald-500/10 text-emerald-600 text-[10px] font-bold">XLS</span>
+                <span>Export Excel</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleExport('json')} className="cursor-pointer gap-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded bg-amber-500/10 text-amber-600 text-[10px] font-bold">{'{}'}</span>
+                <span>Export JSON</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* Actions personnalisées */}
+        {customActions}
+
+        {/* Bouton Ajouter */}
+        {onAddNew && (
+          <Button type="button" onClick={onAddNew} size="sm" className="h-9">
+            <Plus className="h-4 w-4" />
+            <span className="ml-1.5 hidden sm:inline">Ajouter</span>
           </Button>
         )}
       </div>
+
+      {/* Indicateur de résultats filtrés */}
+      {hasActiveFilters && (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span className="font-medium text-foreground">{state.processedData.length}</span>
+          <span>résultat{state.processedData.length > 1 ? 's' : ''}</span>
+          {state.data.length !== state.processedData.length && (
+            <>
+              <span>sur</span>
+              <span>{state.data.length}</span>
+            </>
+          )}
+          {(state.searchTerm || state.filters.length > 0) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('')
+                setFilters([])
+                setFilterGroups([])
+              }}
+              className="ml-2 text-primary hover:underline"
+            >
+              Effacer les filtres
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

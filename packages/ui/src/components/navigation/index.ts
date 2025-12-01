@@ -7,5 +7,5 @@ export * from './breadcrumb'
 export * from './command'
 export * from './dropdown-menu'
 export * from './language-selector'
-export * from './mobile-drawer'
+// mobile-drawer supprimé - pas de support mobile
 export * from './tabs'

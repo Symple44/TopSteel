@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { TopSteelLogger } from '../../../core/common/logger/structured-logger.service'
 import { SocieteRoleType } from '../core/constants/roles.constants'
 
@@ -17,9 +17,14 @@ import { SocieteRoleType } from '../core/constants/roles.constants'
 @Injectable()
 export class UserSocieteRolesPrismaService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly logger: TopSteelLogger
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Récupère tous les rôles d'un utilisateur

@@ -334,28 +334,28 @@ const getRoleStyleSync = (role: string, isSelected: boolean): string => {
         'bg-destructive/10 text-destructive/80 group-hover:bg-destructive/20 group-hover:text-destructive',
     },
     orange: {
-      selected: 'bg-orange-100 text-orange-700 border-orange-200',
-      hover: 'bg-orange-50 text-orange-600 group-hover:bg-orange-100 group-hover:text-orange-700',
+      selected: 'bg-warning/10 text-warning border-warning/30',
+      hover: 'bg-warning/10 text-warning group-hover:bg-warning/10 group-hover:text-warning',
     },
     purple: {
-      selected: 'bg-purple-100 text-purple-700 border-purple-200',
-      hover: 'bg-purple-50 text-purple-600 group-hover:bg-purple-100 group-hover:text-purple-700',
+      selected: 'bg-primary/10 text-primary border-primary/30',
+      hover: 'bg-primary/10 text-primary group-hover:bg-primary/10 group-hover:text-primary',
     },
     green: {
-      selected: 'bg-green-100 text-green-700 border-green-200',
-      hover: 'bg-green-50 text-green-600 group-hover:bg-green-100 group-hover:text-green-700',
+      selected: 'bg-success/10 text-success border-success/30',
+      hover: 'bg-success/10 text-success group-hover:bg-success/10 group-hover:text-success',
     },
     yellow: {
-      selected: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-      hover: 'bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100 group-hover:text-yellow-700',
+      selected: 'bg-warning/20 text-warning border-warning/30',
+      hover: 'bg-warning/20 text-warning group-hover:bg-warning/20 group-hover:text-warning',
     },
     cyan: {
-      selected: 'bg-cyan-100 text-cyan-700 border-cyan-200',
-      hover: 'bg-cyan-50 text-cyan-600 group-hover:bg-cyan-100 group-hover:text-cyan-700',
+      selected: 'bg-info/10 text-info border-info/30',
+      hover: 'bg-info/10 text-info group-hover:bg-info/10 group-hover:text-info',
     },
     blue: {
-      selected: 'bg-blue-100 text-blue-700 border-blue-200',
-      hover: 'bg-blue-50 text-blue-600 group-hover:bg-blue-100 group-hover:text-blue-700',
+      selected: 'bg-info/20 text-info border-info/30',
+      hover: 'bg-info/20 text-info group-hover:bg-info/20 group-hover:text-info',
     },
     gray: {
       selected: 'bg-gray-100 text-gray-700 border-gray-200',
@@ -619,8 +619,8 @@ export default function CompanySelector({
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs transition-all flex-shrink-0 border ${
                             selectedCompanyId === company.id
-                              ? 'bg-green-100 text-green-700 border-green-200'
-                              : 'bg-green-50 text-green-600 border-green-100 group-hover:bg-green-100 group-hover:text-green-700 group-hover:border-green-200'
+                              ? 'bg-success/10 text-success border-success/30'
+                              : 'bg-success/10 text-success border-success/30 group-hover:bg-success/10 group-hover:text-success group-hover:border-success/30'
                           }`}
                         >
                           {t('companies.active')}
@@ -654,16 +654,16 @@ export default function CompanySelector({
 
           {/* Avertissement multi-onglets optimisé */}
           {tabCount > 1 && (
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-lg p-3 shadow-sm">
+            <div className="bg-gradient-to-r from-warning/10 to-warning/20 border border-warning/30 rounded-lg p-3 shadow-sm">
               <div className="flex items-center space-x-2">
-                <div className="bg-amber-100 rounded-full p-1.5">
-                  <AlertTriangle className="h-3 w-3 text-amber-600" />
+                <div className="bg-warning/20 rounded-full p-1.5">
+                  <AlertTriangle className="h-3 w-3 text-warning" />
                 </div>
                 <div className="text-xs flex-1">
-                  <p className="font-medium text-amber-900">
+                  <p className="font-medium text-warning">
                     {t('companies.changeAffects', { count: tabCount })}
                   </p>
-                  <p className="text-amber-700 mt-0.5">
+                  <p className="text-warning mt-0.5">
                     {t('companies.changeAffectsMultiple', { count: tabCount })}
                   </p>
                 </div>

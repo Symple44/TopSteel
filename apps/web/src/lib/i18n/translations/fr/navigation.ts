@@ -43,6 +43,20 @@ export const navigation = {
   customizeMenuDescription: 'Personnalisez votre menu en ajoutant les éléments souhaités',
   customize: 'Personnaliser',
   queryBuilder: 'Constructeur de Requêtes',
+  // Settings menu
+  appearance: 'Apparence',
+  notifications: 'Notifications',
+  security: 'Sécurité',
+  menuCustomization: 'Personnalisation du Menu',
+  // Admin menu
+  companySettings: 'Configuration Entreprise',
+  usersManagement: 'Gestion des Utilisateurs',
+  rolesManagement: 'Gestion des Rôles',
+  groupsManagement: 'Gestion des Groupes',
+  societesManagement: 'Gestion des Sociétés',
+  databaseManagement: 'Base de Données',
+  menuConfiguration: 'Configuration des Menus',
+  adminSettings: 'Paramètres Admin',
 }
 
 export const navigationEnhanced = {

@@ -4,8 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
-import type { MenuConfiguration, MenuItem } from '@prisma/client'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
+import type { MenuConfiguration, MenuItem, Prisma, PrismaClient } from '@prisma/client'
+
+// Type pour le client transactionnel Prisma (compatible avec $extends)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TransactionClient = any
 
 // Enum for MenuItemType - keeping for backward compatibility
 // Note: Prisma schema doesn't have this enum, items are differentiated by presence of path, etc.
@@ -14,6 +18,29 @@ export enum MenuItemType {
   PROGRAM = 'PROGRAM',
   LINK = 'LINK',
   DATA_VIEW = 'DATA_VIEW',
+}
+
+// Compact menu type format for API responses (frontend expects this)
+export type CompactMenuType = 'M' | 'P' | 'L' | 'D'
+
+// Utility function to convert MenuItemType to compact format
+function toCompactType(type: MenuItemType | string): CompactMenuType {
+  switch (type) {
+    case MenuItemType.FOLDER:
+    case 'FOLDER':
+      return 'M' // M for Menu/Folder
+    case MenuItemType.PROGRAM:
+    case 'PROGRAM':
+      return 'P'
+    case MenuItemType.LINK:
+    case 'LINK':
+      return 'L'
+    case MenuItemType.DATA_VIEW:
+    case 'DATA_VIEW':
+      return 'D'
+    default:
+      return 'M' // Default to folder
+  }
 }
 
 // Interfaces for relations
@@ -87,14 +114,20 @@ export interface UpdateMenuConfigDto {
   items?: MenuItemDto[]
 }
 
-export interface MenuTreeNode extends MenuItemDto {
+export interface MenuTreeNode extends Omit<MenuItemDto, 'type' | 'children'> {
+  type: CompactMenuType // Use compact format in responses
   children: MenuTreeNode[]
   depth: number
 }
 
 @Injectable()
 export class MenuConfigurationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   // ===== GESTION DES CONFIGURATIONS =====
 
@@ -112,7 +145,11 @@ export class MenuConfigurationService {
           include: {
             children: true,
             permissions: true,
-            roles: true,
+            roles: {
+              include: {
+                role: true,
+              },
+            },
           },
         },
       },
@@ -127,7 +164,11 @@ export class MenuConfigurationService {
           include: {
             children: true,
             permissions: true,
-            roles: true,
+            roles: {
+              include: {
+                role: true,
+              },
+            },
           },
         },
       },
@@ -150,20 +191,25 @@ export class MenuConfigurationService {
       throw new ConflictException(`Une configuration avec le nom "${createDto.name}" existe déjà`)
     }
 
-    // Créer la configuration
-    const config = await this.prisma.menuConfiguration.create({
-      data: {
-        name: createDto.name,
-        description: createDto.description || createDto.name,
-        isActive: false,
-        isDefault: false,
-      },
-    })
+    // Transaction pour garantir l'atomicité : Config + Items + Permissions + Roles
+    const config = await this.prisma.$transaction(async (tx) => {
+      // Créer la configuration
+      const newConfig = await tx.menuConfiguration.create({
+        data: {
+          name: createDto.name,
+          description: createDto.description || createDto.name,
+          isActive: false,
+          isDefault: false,
+        },
+      })
 
-    // Créer les items de menu
-    if (createDto.items && createDto.items.length > 0) {
-      await this.createMenuItems(config.id, createDto.items)
-    }
+      // Créer les items de menu dans la même transaction
+      if (createDto.items && createDto.items.length > 0) {
+        await this.createMenuItemsWithTx(tx, newConfig.id, createDto.items)
+      }
+
+      return newConfig
+    })
 
     return await this.findConfigurationById(config.id)
   }
@@ -186,21 +232,24 @@ export class MenuConfigurationService {
       }
     }
 
-    // Mettre à jour la configuration
-    await this.prisma.menuConfiguration.update({
-      where: { id },
-      data: {
-        ...(updateDto.name && { name: updateDto.name }),
-        ...(updateDto.description && { description: updateDto.description }),
-        ...(updateDto.isActive !== undefined && { isActive: updateDto.isActive }),
-        updatedAt: new Date(),
-      },
-    })
+    // Transaction pour garantir l'atomicité : Update Config + Delete/Recreate Items
+    await this.prisma.$transaction(async (tx) => {
+      // Mettre à jour la configuration
+      await tx.menuConfiguration.update({
+        where: { id },
+        data: {
+          ...(updateDto.name && { name: updateDto.name }),
+          ...(updateDto.description && { description: updateDto.description }),
+          ...(updateDto.isActive !== undefined && { isActive: updateDto.isActive }),
+          updatedAt: new Date(),
+        },
+      })
 
-    // Mettre à jour les items si fournis
-    if (updateDto.items) {
-      await this.updateMenuItems(config.id, updateDto.items)
-    }
+      // Mettre à jour les items si fournis
+      if (updateDto.items) {
+        await this.updateMenuItemsWithTx(tx, config.id, updateDto.items)
+      }
+    })
 
     return await this.findConfigurationById(config.id)
   }
@@ -216,16 +265,19 @@ export class MenuConfigurationService {
   }
 
   async activateConfiguration(id: string): Promise<void> {
-    // Désactiver toutes les autres configurations
-    await this.prisma.menuConfiguration.updateMany({
-      where: { isActive: true },
-      data: { isActive: false },
-    })
+    // Transaction pour garantir qu'une seule configuration est active à la fois
+    await this.prisma.$transaction(async (tx) => {
+      // Désactiver toutes les autres configurations
+      await tx.menuConfiguration.updateMany({
+        where: { isActive: true },
+        data: { isActive: false },
+      })
 
-    // Activer la configuration sélectionnée
-    await this.prisma.menuConfiguration.update({
-      where: { id },
-      data: { isActive: true },
+      // Activer la configuration sélectionnée
+      await tx.menuConfiguration.update({
+        where: { id },
+        data: { isActive: true },
+      })
     })
   }
 
@@ -258,6 +310,9 @@ export class MenuConfigurationService {
         const children = allItems.filter((child) => child.parentId === item.id)
         const metadata = (item.metadata as Record<string, any>) || {}
 
+        // Determine the menu item type from metadata or infer from item properties
+        const itemType = (metadata.type as MenuItemType) || (item.path ? MenuItemType.PROGRAM : MenuItemType.FOLDER)
+
         return {
           id: item.id,
           parentId: item.parentId || undefined,
@@ -271,12 +326,12 @@ export class MenuConfigurationService {
           isVisible: item.isVisible,
           moduleId: metadata.moduleId as string | undefined,
           target: metadata.target as string | undefined,
-          type: (metadata.type as MenuItemType) || (item.path ? MenuItemType.PROGRAM : MenuItemType.FOLDER),
+          type: toCompactType(itemType), // Convert to compact format
           programId: (metadata.programId as string | undefined) || item.path || undefined,
           externalUrl: metadata.externalUrl as string | undefined,
           queryBuilderId: metadata.queryBuilderId as string | undefined,
           permissions: item.permissions?.map((p) => p.permissionId) || [],
-          roles: item.roles?.map((r) => r.roleId) || [],
+          roles: item.roles?.map((r: any) => r.role?.name || r.roleId) || [],
           children: this.buildMenuTree(children, allItems),
           depth: this.calculateDepth(item, allItems),
         }
@@ -348,14 +403,35 @@ export class MenuConfigurationService {
         })
       }
 
-      // Créer les rôles
+      // Créer les rôles - supporter à la fois les UUIDs et les noms de rôles
       if (itemDto.roles && itemDto.roles.length > 0) {
-        await this.prisma.menuItemRole.createMany({
-          data: itemDto.roles.map((roleId) => ({
-            menuItemId: savedItem.id,
-            roleId,
-          })),
-        })
+        // Vérifier si ce sont des UUIDs ou des noms de rôles
+        const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+
+        let roleIds: string[] = []
+
+        if (itemDto.roles.every(isUUID)) {
+          // Ce sont déjà des UUIDs
+          roleIds = itemDto.roles
+        } else {
+          // Ce sont des noms de rôles - les convertir en IDs
+          const roles = await this.prisma.role.findMany({
+            where: {
+              name: { in: itemDto.roles }
+            },
+            select: { id: true }
+          })
+          roleIds = roles.map((r: { id: string }) => r.id)
+        }
+
+        if (roleIds.length > 0) {
+          await this.prisma.menuItemRole.createMany({
+            data: roleIds.map((roleId) => ({
+              menuItemId: savedItem.id,
+              roleId,
+            })),
+          })
+        }
       }
 
       // Créer les enfants de manière récursive
@@ -373,6 +449,123 @@ export class MenuConfigurationService {
 
     // Recréer les items
     await this.createMenuItems(configId, items)
+  }
+
+  // ===== MÉTHODES TRANSACTIONNELLES =====
+
+  /**
+   * Crée les items de menu dans une transaction existante
+   * Garantit l'atomicité : Item + Permissions + Roles + Enfants
+   */
+  private async createMenuItemsWithTx(
+    tx: TransactionClient,
+    configId: string,
+    items: MenuItemDto[],
+    parentId?: string
+  ): Promise<void> {
+    for (const itemDto of items) {
+      // Préparer les métadonnées avec les propriétés étendues
+      const metadata: Record<string, any> = {
+        type: itemDto.type,
+        titleKey: itemDto.titleKey,
+        gradient: itemDto.gradient,
+        badge: itemDto.badge,
+        moduleId: itemDto.moduleId,
+        target: itemDto.target,
+      }
+
+      // Ajouter les champs spécifiques au type dans les métadonnées
+      switch (itemDto.type) {
+        case MenuItemType.PROGRAM:
+          metadata.programId = itemDto.programId || itemDto.href
+          break
+        case MenuItemType.LINK:
+          metadata.externalUrl = itemDto.externalUrl
+          break
+        case MenuItemType.DATA_VIEW:
+          metadata.queryBuilderId = itemDto.queryBuilderId
+          break
+      }
+
+      // Créer l'item avec le schéma Prisma
+      const itemData = {
+        menuConfigurationId: configId,
+        label: itemDto.title,
+        icon: itemDto.icon || null,
+        path: itemDto.href || itemDto.programId || null,
+        order: itemDto.orderIndex,
+        isVisible: itemDto.isVisible,
+        isActive: true,
+        parentId: parentId || itemDto.parentId || null,
+        metadata,
+      }
+
+      const savedItem = await tx.menuItem.create({ data: itemData })
+
+      // Créer les permissions
+      if (itemDto.permissions && itemDto.permissions.length > 0) {
+        await tx.menuItemPermission.createMany({
+          data: itemDto.permissions.map((permissionId) => ({
+            menuItemId: savedItem.id,
+            permissionId,
+          })),
+        })
+      }
+
+      // Créer les rôles - supporter à la fois les UUIDs et les noms de rôles
+      if (itemDto.roles && itemDto.roles.length > 0) {
+        // Vérifier si ce sont des UUIDs ou des noms de rôles
+        const isUUID = (str: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str)
+
+        let roleIds: string[] = []
+
+        if (itemDto.roles.every(isUUID)) {
+          // Ce sont déjà des UUIDs
+          roleIds = itemDto.roles
+        } else {
+          // Ce sont des noms de rôles - les convertir en IDs
+          const roles = await tx.role.findMany({
+            where: {
+              name: { in: itemDto.roles }
+            },
+            select: { id: true }
+          })
+          roleIds = roles.map((r: { id: string }) => r.id)
+        }
+
+        if (roleIds.length > 0) {
+          await tx.menuItemRole.createMany({
+            data: roleIds.map((roleId) => ({
+              menuItemId: savedItem.id,
+              roleId,
+            })),
+          })
+        }
+      }
+
+      // Créer les enfants de manière récursive
+      if (itemDto.children && itemDto.children.length > 0) {
+        await this.createMenuItemsWithTx(tx, configId, itemDto.children, savedItem.id)
+      }
+    }
+  }
+
+  /**
+   * Met à jour les items de menu dans une transaction existante
+   * Supprime puis recrée tous les items pour garantir la cohérence
+   */
+  private async updateMenuItemsWithTx(
+    tx: TransactionClient,
+    configId: string,
+    items: MenuItemDto[]
+  ): Promise<void> {
+    // Supprimer tous les items existants de cette config
+    await tx.menuItem.deleteMany({
+      where: { menuConfigurationId: configId },
+    })
+
+    // Recréer les items
+    await this.createMenuItemsWithTx(tx, configId, items)
   }
 
   // ===== FILTRAGE PAR PERMISSIONS =====

@@ -1,5 +1,5 @@
 import type { Prisma, NotificationRule } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
 import { type EventEmitter2, OnEvent } from '@nestjs/event-emitter'
 import { Cron, CronExpression } from '@nestjs/schedule'
@@ -95,7 +95,7 @@ export class NotificationRulesEngineService {
   private isProcessing = false
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly actionExecutor: NotificationActionExecutor,
     private readonly conditionEvaluator: NotificationConditionEvaluator,
     private readonly deliveryService: NotificationDeliveryService,
@@ -103,6 +103,11 @@ export class NotificationRulesEngineService {
     private readonly eventEmitter: EventEmitter2
   ) {
     this.startQueueProcessor()
+  }
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
   }
 
   /**

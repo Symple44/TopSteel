@@ -4,7 +4,7 @@ import type {
   ISocieteUserRepository,
 } from '../../../domains/auth/core/interfaces/societe-repository.interface'
 import type { Societe, SocieteUser } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 
 /**
  * Implémentation Prisma du repository société pour l'authentification
@@ -12,7 +12,12 @@ import { PrismaService } from '../../../core/database/prisma/prisma.service'
  */
 @Injectable()
 export class SocieteAuthRepositoryService implements ISocieteRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   async findById(id: string): Promise<Societe | null> {
     return (await this.prisma.societe.findUnique({
@@ -58,7 +63,12 @@ export class SocieteAuthRepositoryService implements ISocieteRepository {
  */
 @Injectable()
 export class SocieteUserAuthRepositoryService implements ISocieteUserRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   async findByUserId(userId: string): Promise<Array<SocieteUser & { societe: Societe }>> {
     return await this.prisma.societeUser.findMany({

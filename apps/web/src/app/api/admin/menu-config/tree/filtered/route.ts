@@ -1,168 +1,18 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import { callBackendFromApi } from '../../../../../../utils/backend-api'
 
-export async function GET(_request: NextRequest) {
+// GET /api/admin/menu-config/tree/filtered - Obtenir le menu filtré par permissions
+export async function GET(request: NextRequest) {
   try {
-    // Route stub pour éviter les erreurs 500 sur menu-config filtré
-    const standardMenuTree = [
-      {
-        id: 'dashboard',
-        title: 'Tableau de bord',
-        icon: 'dashboard',
-        url: '/dashboard',
-        visible: true,
-        order: 0,
-        level: 0,
-        parentId: null,
-        hasChildren: false,
-        isExpanded: true,
-      },
-      {
-        id: 'admin',
-        title: 'Administration',
-        icon: 'admin',
-        url: '/admin',
-        visible: true,
-        order: 1,
-        level: 0,
-        parentId: null,
-        hasChildren: true,
-        isExpanded: false,
-      },
-      {
-        id: 'admin-company',
-        title: 'Société',
-        icon: 'company',
-        url: '/admin/company',
-        visible: true,
-        order: 0,
-        level: 1,
-        parentId: 'admin',
-        hasChildren: false,
-        isExpanded: false,
-      },
-      {
-        id: 'admin-roles',
-        title: 'Rôles & Permissions',
-        icon: 'roles',
-        url: '/admin/roles',
-        visible: true,
-        order: 1,
-        level: 1,
-        parentId: 'admin',
-        hasChildren: false,
-        isExpanded: false,
-      },
-      {
-        id: 'admin-database',
-        title: 'Base de données',
-        icon: 'database',
-        url: '/admin/database',
-        visible: true,
-        order: 2,
-        level: 1,
-        parentId: 'admin',
-        hasChildren: false,
-        isExpanded: false,
-      },
-      {
-        id: 'admin-translations',
-        title: 'Traductions',
-        icon: 'translations',
-        url: '/admin/translations',
-        visible: true,
-        order: 3,
-        level: 1,
-        parentId: 'admin',
-        hasChildren: false,
-        isExpanded: false,
-      },
-      {
-        id: 'admin-notifications',
-        title: 'Notifications',
-        icon: 'notifications',
-        url: '/admin/notifications',
-        visible: true,
-        order: 4,
-        level: 1,
-        parentId: 'admin',
-        hasChildren: true,
-        isExpanded: false,
-      },
-      {
-        id: 'admin-notifications-rules',
-        title: 'Règles',
-        icon: 'rules',
-        url: '/admin/notifications/rules',
-        visible: true,
-        order: 0,
-        level: 2,
-        parentId: 'admin-notifications',
-        hasChildren: false,
-        isExpanded: false,
-      },
-      {
-        id: 'planning',
-        title: 'Planning',
-        icon: 'planning',
-        url: '/planning',
-        visible: true,
-        order: 2,
-        level: 0,
-        parentId: null,
-        hasChildren: true,
-        isExpanded: false,
-      },
-      {
-        id: 'planning-test',
-        title: 'Test Planning',
-        icon: 'test',
-        url: '/planning/test',
-        visible: true,
-        order: 0,
-        level: 1,
-        parentId: 'planning',
-        hasChildren: false,
-        isExpanded: false,
-      },
-      {
-        id: 'settings',
-        title: 'Paramètres',
-        icon: 'settings',
-        url: '/settings',
-        visible: true,
-        order: 3,
-        level: 0,
-        parentId: null,
-        hasChildren: true,
-        isExpanded: false,
-      },
-      {
-        id: 'settings-menu',
-        title: 'Menu',
-        icon: 'menu',
-        url: '/settings/menu',
-        visible: true,
-        order: 0,
-        level: 1,
-        parentId: 'settings',
-        hasChildren: false,
-        isExpanded: false,
-      },
-    ]
-
-    const response = {
-      success: true,
-      data: standardMenuTree,
-      message: 'Menu standard récupéré avec succès',
-    }
-
-    return NextResponse?.json(response, { status: 200 })
+    const response = await callBackendFromApi(request, 'admin/menu-config/tree/filtered')
+    const data = await response.json()
+    return NextResponse.json(data, { status: response.status })
   } catch (error) {
-    // Error loading menu tree (silenced)
-    return NextResponse?.json(
+    console.error('[menu-config] Error fetching filtered menu tree:', error)
+    return NextResponse.json(
       {
         success: false,
-        message: 'Error loading menu tree',
+        message: 'Erreur lors du chargement du menu filtré',
         error: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }

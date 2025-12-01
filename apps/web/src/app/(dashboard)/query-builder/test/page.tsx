@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
-import { Database, Package, Table, Users } from 'lucide-react'
+import { Button, Card, CardContent, CardHeader, CardTitle, PageContainer, PageHeader, PageSection } from '@erp/ui'
+import { Database, FlaskConical, Package, Table, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { callClientApi } from '../../../../utils/backend-api'
 
@@ -167,15 +167,15 @@ export default function QueryBuilderTestPage() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-4">Query Builder Test Environment</h1>
-          <p className="text-muted-foreground">
-            Créez un Query Builder de test avec des données d'exemple
-          </p>
-        </div>
+    <PageContainer maxWidth="full" padding="default">
+      <PageHeader
+        title="Query Builder Test Environment"
+        description="Créez un Query Builder de test avec des données d'exemple"
+        icon={FlaskConical}
+        iconBackground="bg-gradient-to-br from-emerald-500 to-teal-600"
+      />
 
+      <PageSection spacing="default">
         <div className="grid gap-6 md:grid-cols-2 mb-8">
           <Card>
             <CardHeader>
@@ -262,7 +262,7 @@ export default function QueryBuilderTestPage() {
             </p>
           </div>
         </div>
-      </div>
-    </div>
+      </PageSection>
+    </PageContainer>
   )
 }

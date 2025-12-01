@@ -6,8 +6,7 @@
 
 import * as TooltipPrimitive from '@radix-ui/react-tooltip'
 import * as React from 'react'
-import type { TooltipVariants } from '../../../lib/design-system'
-import { tooltipVariants } from '../../../lib/design-system'
+import { tooltipVariants, type TooltipVariants } from '../../../variants'
 import { cn } from '../../../lib/utils'
 
 // ===== TYPES UNIFIÉS =====

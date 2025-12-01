@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, PageHeader, useFormFieldIds } from '@erp/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, PageContainer, PageHeader, PageSection, useFormFieldIds } from '@erp/ui'
 import { Building2, Save, Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
@@ -99,8 +99,7 @@ export default function CompanySettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <PageContainer maxWidth="full" padding="default">
       <PageHeader
         title={t('company.title')}
         description={t('company.subtitle')}
@@ -108,7 +107,8 @@ export default function CompanySettingsPage() {
         iconBackground="bg-gradient-to-br from-indigo-500 to-purple-600"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <PageSection spacing="default">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Logo de l'entreprise */}
         <div className="lg:col-span-1">
           <Card>
@@ -369,7 +369,8 @@ export default function CompanySettingsPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </div>
+        </div>
+      </PageSection>
+    </PageContainer>
   )
 }

@@ -349,7 +349,7 @@ export default function SecuritySettingsPage() {
   }
 
   return (
-    <PageContainer maxWidth="xl" padding="default">
+    <PageContainer maxWidth="full" padding="default">
       <PageHeader
         title={ts('security.title')}
         description={ts('security.subtitle')}

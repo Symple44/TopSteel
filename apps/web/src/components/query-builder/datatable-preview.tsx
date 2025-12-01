@@ -13,7 +13,15 @@ import {
   DropdownMenuTrigger,
 } from '@erp/ui'
 import type { ColumnConfig } from '@erp/ui'
-import { Download, RefreshCw } from 'lucide-react'
+import {
+  Download,
+  Edit,
+  ExternalLink,
+  Eye,
+  RefreshCw,
+  Trash2,
+} from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import type {
   DataTablePreviewProps,
@@ -21,7 +29,23 @@ import type {
   PreviewDataRow,
   QueryBuilderCalculatedField,
   QueryBuilderColumn,
+  RowActionConfig,
 } from '../../types/query-builder.types'
+import { buildActionUrl, isActionDisabled } from '../../types/query-builder.types'
+
+// Icon mapping for row actions
+const ACTION_ICONS: Record<string, React.ReactNode> = {
+  Eye: <Eye className="h-4 w-4" />,
+  Edit: <Edit className="h-4 w-4" />,
+  Trash2: <Trash2 className="h-4 w-4" />,
+  ExternalLink: <ExternalLink className="h-4 w-4" />,
+}
+
+// Get icon component from string name
+const getActionIcon = (iconName?: string): React.ReactNode => {
+  if (!iconName) return null
+  return ACTION_ICONS[iconName] || <Eye className="h-4 w-4" />
+}
 
 // Convert query builder data types to DataTable types
 const getDataTableType = (dataType: string): PreviewColumn['type'] => {
@@ -63,7 +87,62 @@ export function DataTablePreview({
     },
   },
 }: DataTablePreviewProps) {
+  const router = useRouter()
   const [loading, setLoading] = useState(false)
+
+  // Build row actions from settings configuration
+  const dataTableActions = useMemo(() => {
+    const rowActionsConfig = settings?.settings?.rowActions
+    if (!rowActionsConfig?.enabled || !rowActionsConfig?.actions?.length) {
+      return undefined
+    }
+
+    return rowActionsConfig.actions.map((action: RowActionConfig) => ({
+      label: action.label,
+      icon: getActionIcon(action.icon),
+      variant: (action.variant || 'default') as 'default' | 'destructive' | 'outline',
+      onClick: (row: PreviewDataRow) => {
+        // Handle different action types
+        switch (action.type) {
+          case 'navigation':
+            if (action.target) {
+              const url = buildActionUrl(action.target, row)
+              router.push(url)
+            }
+            break
+          case 'external':
+            if (action.target) {
+              const url = buildActionUrl(action.target, row)
+              window.open(url, '_blank', 'noopener,noreferrer')
+            }
+            break
+          case 'delete':
+            if (action.confirmMessage) {
+              if (window.confirm(action.confirmMessage)) {
+                // Dispatch custom event for delete handling
+                window.dispatchEvent(
+                  new CustomEvent('query-builder-row-delete', { detail: { row, action } })
+                )
+              }
+            } else {
+              window.dispatchEvent(
+                new CustomEvent('query-builder-row-delete', { detail: { row, action } })
+              )
+            }
+            break
+          case 'edit':
+          case 'modal':
+          case 'callback':
+            // Dispatch custom event for parent component handling
+            window.dispatchEvent(
+              new CustomEvent('query-builder-row-action', { detail: { row, action } })
+            )
+            break
+        }
+      },
+      disabled: (row: PreviewDataRow) => isActionDisabled(action.disabled, row),
+    }))
+  }, [settings?.settings?.rowActions, router])
 
   const dataTableColumns = useMemo((): PreviewColumn[] => {
     // Si pas de colonnes définies, pas d'affichage
@@ -213,6 +292,8 @@ export function DataTablePreview({
               columns={dataTableColumns as ColumnConfig<PreviewDataRow>[]}
               keyField="id"
               tableId="query-preview"
+              // Row actions from query builder settings
+              actions={dataTableActions}
               // Configuration pour l'aperçu
               editable={false}
               selectable={false}

@@ -3,7 +3,12 @@
 import { Calendar, ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button } from '../../../primitives/button'
-import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../../primitives/dropdown'
 import { Badge } from '../..//badge'
 import type { CalendarEvent } from '../use-data-views'
 
@@ -188,14 +193,16 @@ export function CalendarView({
               {/* Événements */}
               <div className="space-y-1">
                 {day.events.slice(0, 3).map((event) => (
-                  <button
+                  <div
                     key={event.id}
-                    type="button"
+                    role="button"
+                    tabIndex={0}
                     className="group relative bg-background border border-border rounded px-2 py-1 cursor-pointer hover:shadow-sm transition-shadow w-full text-left"
                     onClick={(e) => {
                       e.stopPropagation()
                       onEventClick?.(event)
                     }}
+                    onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onEventClick?.(event)}
                   >
                     <div className="flex items-center gap-1">
                       <div
@@ -204,9 +211,8 @@ export function CalendarView({
                       />
                       <span className="text-xs font-medium truncate flex-1">{event.title}</span>
 
-                      <DropdownPortal
-                        align="end"
-                        trigger={
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                           <Button
                             type="button"
                             variant="ghost"
@@ -218,20 +224,21 @@ export function CalendarView({
                           >
                             <MoreHorizontal className="h-3 w-3" />
                           </Button>
-                        }
-                      >
-                        {onEventEdit && (
-                          <DropdownItem onClick={() => onEventEdit(event)}>Modifier</DropdownItem>
-                        )}
-                        {onEventDelete && (
-                          <DropdownItem
-                            onClick={() => onEventDelete(event)}
-                            className="text-red-600"
-                          >
-                            Supprimer
-                          </DropdownItem>
-                        )}
-                      </DropdownPortal>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {onEventEdit && (
+                            <DropdownMenuItem onClick={() => onEventEdit(event)}>Modifier</DropdownMenuItem>
+                          )}
+                          {onEventDelete && (
+                            <DropdownMenuItem
+                              onClick={() => onEventDelete(event)}
+                              className="text-red-600"
+                            >
+                              Supprimer
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
 
                     {event.category && (
@@ -239,7 +246,7 @@ export function CalendarView({
                         {event.category}
                       </div>
                     )}
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>

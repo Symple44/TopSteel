@@ -18,15 +18,12 @@ export * from './dialog'
 
 // Navigation Controls
 export * from './dropdown'
-export * from './dropdown-fixed'
-export * from './dropdown-portal'
 export * from './input'
 export * from './popover'
 export * from './progress'
 export * from './radio-group'
 export * from './select'
 // Form Controls Advanced
-export * from './select-portal'
 export * from './slider'
 export * from './switch'
 export * from './textarea'

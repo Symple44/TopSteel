@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import type { NotificationRule as PrismaNotificationRule, NotificationEvent as PrismaNotificationEvent, NotificationRuleExecution as PrismaNotificationRuleExecution, Notification } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
 
 
@@ -21,9 +21,14 @@ export class NotificationRuleEngineService {
   private readonly logger = new Logger(NotificationRuleEngineService.name)
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly ruleService: NotificationRuleService
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   // ===== TRAITEMENT DES ÉVÉNEMENTS =====
 

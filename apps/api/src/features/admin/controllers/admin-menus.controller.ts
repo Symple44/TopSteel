@@ -14,15 +14,16 @@ import {
 import { JwtAuthGuard } from '../../../domains/auth/security/guards/jwt-auth.guard'
 import { Public } from '../../../core/multi-tenant'
 import type { MenuConfiguration } from '@prisma/client'
+import { MenuConfigurationService } from '../services/menu-configuration.service'
 import type {
   CreateMenuConfigDto,
-  MenuConfigurationService,
   UpdateMenuConfigDto,
 } from '../services/menu-configuration.service'
 
 // Local enum definition for menu item types
+// Using compact format to match frontend expectations
 enum MenuItemType {
-  FOLDER = 'F',
+  FOLDER = 'M', // M for Menu/Folder
   PROGRAM = 'P',
   LINK = 'L',
   DATA_VIEW = 'D',

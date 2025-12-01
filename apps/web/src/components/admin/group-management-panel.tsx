@@ -105,9 +105,9 @@ const GROUP_TYPE_ICONS = {
 }
 
 const GROUP_TYPE_COLORS = {
-  DEPARTMENT: 'bg-blue-100 text-blue-800',
-  TEAM: 'bg-green-100 text-green-800',
-  PROJECT: 'bg-purple-100 text-purple-800',
+  DEPARTMENT: 'bg-info/20 text-info',
+  TEAM: 'bg-success/20 text-success',
+  PROJECT: 'bg-primary/20 text-primary',
   CUSTOM: 'bg-gray-100 text-gray-800',
 }
 

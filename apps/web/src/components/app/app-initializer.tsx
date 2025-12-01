@@ -44,8 +44,8 @@ export function AppInitializer({ children }: AppInitializerProps) {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="mb-8">
-            <Server className="h-16 w-16 mx-auto text-blue-600 mb-4" />
-            <Loader2 className="h-8 w-8 mx-auto animate-spin text-blue-600" />
+            <Server className="h-16 w-16 mx-auto text-primary mb-4" />
+            <Loader2 className="h-8 w-8 mx-auto animate-spin text-primary" />
           </div>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Initialisation de TopSteel ERP</h1>
@@ -63,11 +63,11 @@ export function AppInitializer({ children }: AppInitializerProps) {
             <div className="space-y-1 text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 {health.status === 'checking' ? (
-                  <Loader2 className="h-3 w-3 animate-spin text-blue-600" />
+                  <Loader2 className="h-3 w-3 animate-spin text-primary" />
                 ) : health.status === 'online' ? (
-                  <div className="h-3 w-3 rounded-full bg-green-500" />
+                  <div className="h-3 w-3 rounded-full bg-success" />
                 ) : (
-                  <div className="h-3 w-3 rounded-full bg-red-500" />
+                  <div className="h-3 w-3 rounded-full bg-destructive" />
                 )}
                 Connexion au serveur API
               </div>
@@ -91,7 +91,7 @@ export function AppInitializer({ children }: AppInitializerProps) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-lg mx-auto p-8">
-          <AlertTriangle className="h-16 w-16 mx-auto text-red-600 mb-4" />
+          <AlertTriangle className="h-16 w-16 mx-auto text-destructive mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Redirection en cours...</h1>
           <p className="text-gray-600">
             Le serveur n'est pas disponible. Redirection vers la page d'erreur.

@@ -2,8 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Button } from '@erp/ui'
-import { RotateCcw, Save } from 'lucide-react'
+import { Button, PageContainer, PageHeader, PageSection } from '@erp/ui'
+import { Menu, RotateCcw, Save } from 'lucide-react'
 import { useTranslation } from '../../../../lib/i18n/hooks'
 import { useMenuState } from './hooks/useMenuState'
 import { useMenuApi } from './hooks/useMenuApi'
@@ -62,25 +62,28 @@ export default function MenuDragDropPage() {
   }
 
   return (
-    <div className="container mx-auto py-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('menu.title')}</h1>
-          <p className="text-muted-foreground">{t('menu.subtitle')}</p>
-        </div>
-        <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={resetUserMenu}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            {t('menu.reset')}
-          </Button>
-          <Button type="button" onClick={() => saveUserMenu(userMenu)} disabled={saving}>
-            <Save className="h-4 w-4 mr-2" />
-            {saving ? t('menu.saving') : t('menu.save')}
-          </Button>
-        </div>
-      </div>
+    <PageContainer maxWidth="full" padding="default">
+      <PageHeader
+        title={t('menu.title')}
+        description={t('menu.subtitle')}
+        icon={Menu}
+        iconBackground="bg-gradient-to-br from-purple-500 to-pink-600"
+        actions={
+          <div className="flex gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={resetUserMenu}>
+              <RotateCcw className="h-4 w-4 mr-2" />
+              {t('menu.reset')}
+            </Button>
+            <Button type="button" size="sm" onClick={() => saveUserMenu(userMenu)} disabled={saving}>
+              <Save className="h-4 w-4 mr-2" />
+              {saving ? t('menu.saving') : t('menu.save')}
+            </Button>
+          </div>
+        }
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-12rem)]">
+      <PageSection spacing="default">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-16rem)]">
         {/* Panneau WYSIWYG - Menu Utilisateur */}
         <UserMenuPanel
           userMenu={userMenu}
@@ -108,7 +111,8 @@ export default function MenuDragDropPage() {
           onToggleStandardItemExpansion={toggleStandardItemExpansion}
           t={t}
         />
-      </div>
+        </div>
+      </PageSection>
 
       {/* Modale d'édition */}
       <MenuItemEditModal
@@ -118,6 +122,6 @@ export default function MenuDragDropPage() {
         userMenu={userMenu}
         onMenuUpdate={setUserMenu}
       />
-    </div>
+    </PageContainer>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import * as XLSX from 'xlsx'
 import type { SafeObject } from '../../../../types/common'
 import type { ColumnConfig } from '../types'
 
@@ -238,17 +239,46 @@ export function useDataExport<T extends Record<string, unknown>>({
     [prepareExportData, downloadFile]
   )
 
-  // Exporter vers Excel (utilise CSV pour simplifier)
+  // Exporter vers Excel avec xlsx
   const exportToExcel = useCallback(
     async (options: ExportOptions = {}) => {
-      // Pour une vraie implémentation Excel, utiliser une librairie comme SheetJS
-      // Ici on utilise CSV qui s'ouvre dans Excel
-      await exportToCSV({
-        ...options,
-        filename: options.filename || `export_${Date.now()}.xlsx`,
+      const exportData = prepareExportData(options)
+
+      if (exportData.length === 0) {
+        throw new Error('Aucune donnée à exporter')
+      }
+
+      // Créer une feuille de calcul à partir des données
+      const worksheet = XLSX.utils.json_to_sheet(exportData)
+
+      // Ajuster la largeur des colonnes automatiquement
+      const headers = Object.keys(exportData[0] as Record<string, unknown>)
+      const colWidths = headers.map((header) => {
+        const maxLength = Math.max(
+          header.length,
+          ...exportData.map((row) => {
+            const value = (row as Record<string, unknown>)[header]
+            return String(value ?? '').length
+          })
+        )
+        return { wch: Math.min(maxLength + 2, 50) }
       })
+      worksheet['!cols'] = colWidths
+
+      // Créer le workbook
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Export')
+
+      // Générer le fichier Excel
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+      const blob = new Blob([excelBuffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      })
+
+      const filename = options.filename || `export_${Date.now()}.xlsx`
+      downloadFile(blob, filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     },
-    [exportToCSV]
+    [prepareExportData, downloadFile]
   )
 
   // Exporter vers PDF

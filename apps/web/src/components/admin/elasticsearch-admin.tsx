@@ -102,15 +102,41 @@ export function ElasticsearchAdmin() {
       try {
         const response = await callClientApi('admin/elasticsearch?action=status')
         const data = await response?.json()
-        setStatus(data)
+
+        // Vérifier si c'est une réponse d'erreur
+        if (data?.error || data?.statusCode >= 400) {
+          setStatus({
+            connected: false,
+            error: data?.message || data?.error || 'Erreur de connexion',
+            indices: {},
+          })
+        } else if (data?.data) {
+          // Réponse enveloppée dans data.data
+          setStatus(data.data)
+        } else if (data?.connected !== undefined) {
+          // Réponse directe
+          setStatus(data)
+        } else {
+          setStatus({
+            connected: false,
+            error: 'Réponse invalide du serveur',
+            indices: {},
+          })
+        }
         setLastStatusCheck(now)
       } catch {
+        setStatus({
+          connected: false,
+          error: 'Erreur de connexion au serveur',
+          indices: {},
+        })
         toast?.error(t('elasticsearch.statusError'))
       } finally {
         setLoading(false)
       }
     },
-    [lastStatusCheck, status, t]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [lastStatusCheck] // Retirer status et t pour éviter les boucles infinies
   )
 
   const fetchConfig = useCallback(async () => {
@@ -133,8 +159,11 @@ export function ElasticsearchAdmin() {
         enableLogging: false,
       }
 
-      if (data?.length > 0) {
-        const configFromParams = data?.reduce(
+      // Extraire les données réelles (peut être dans data.data ou directement dans data)
+      const params = data?.data || data
+
+      if (Array.isArray(params) && params.length > 0) {
+        const configFromParams = params.reduce(
           (acc: ElasticsearchConfig, param: { key: string; value: string }) => {
             switch (param.key) {
               case 'elasticsearch.url':
@@ -268,10 +297,24 @@ export function ElasticsearchAdmin() {
     }
   }
 
+  // Charger les données une seule fois au montage
   useEffect(() => {
-    fetchStatus()
-    fetchConfig()
-  }, [fetchConfig, fetchStatus])
+    let mounted = true
+
+    const loadData = async () => {
+      if (!mounted) return
+      await fetchStatus()
+      if (!mounted) return
+      await fetchConfig()
+    }
+
+    loadData()
+
+    return () => {
+      mounted = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Exécuter une seule fois au montage
 
   const runMigrations = async () => {
     setOperationLoading('migrate')
@@ -326,7 +369,7 @@ export function ElasticsearchAdmin() {
   const getStatusBadge = (connected: boolean) => {
     if (connected) {
       return (
-        <Badge variant="default" className="bg-green-100 text-green-800">
+        <Badge variant="default" className="bg-success/10 text-success">
           <CheckCircle className="h-3 w-3 mr-1" />
           {t('elasticsearch.connected')}
         </Badge>
@@ -358,7 +401,7 @@ export function ElasticsearchAdmin() {
 
     if (index.status === 'healthy') {
       return (
-        <Badge variant="default" className="bg-green-100 text-green-800">
+        <Badge variant="default" className="bg-success/10 text-success">
           <CheckCircle className="h-3 w-3 mr-1" />
           {t('elasticsearch.indexActive')} ({index.docsCount || 0} docs)
         </Badge>
@@ -438,7 +481,7 @@ export function ElasticsearchAdmin() {
                   </p>
                 )}
                 {status?.error && !status.connected && (
-                  <p className="text-xs text-red-600">
+                  <p className="text-xs text-destructive">
                     {t('elasticsearch.error')}: {status.error}
                   </p>
                 )}
@@ -592,10 +635,10 @@ export function ElasticsearchAdmin() {
                   className="sr-only"
                 />
                 <div
-                  className={`w-11 h-6 rounded-full transition-colors ${config.enableAuth ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  className={`w-11 h-6 rounded-full transition-colors ${config.enableAuth ? 'bg-primary' : 'bg-muted'}`}
                 >
                   <div
-                    className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${config.enableAuth ? 'translate-x-5' : 'translate-x-0'} mt-0.5`}
+                    className={`w-5 h-5 rounded-full bg-background shadow-md transform transition-transform ${config.enableAuth ? 'translate-x-5' : 'translate-x-0'} mt-0.5`}
                   />
                 </div>
               </label>
@@ -709,10 +752,10 @@ export function ElasticsearchAdmin() {
                   className="sr-only"
                 />
                 <div
-                  className={`w-11 h-6 rounded-full transition-colors ${config.enableLogging ? 'bg-blue-600' : 'bg-gray-300'}`}
+                  className={`w-11 h-6 rounded-full transition-colors ${config.enableLogging ? 'bg-primary' : 'bg-muted'}`}
                 >
                   <div
-                    className={`w-5 h-5 rounded-full bg-white shadow-md transform transition-transform ${config.enableLogging ? 'translate-x-5' : 'translate-x-0'} mt-0.5`}
+                    className={`w-5 h-5 rounded-full bg-background shadow-md transform transition-transform ${config.enableLogging ? 'translate-x-5' : 'translate-x-0'} mt-0.5`}
                   />
                 </div>
               </label>
@@ -722,7 +765,7 @@ export function ElasticsearchAdmin() {
 
           {/* Unsaved changes indicator */}
           {hasConfigChanges && (
-            <div className="text-sm text-orange-600">{t('elasticsearch.unsavedChanges')}</div>
+            <div className="text-sm text-warning">{t('elasticsearch.unsavedChanges')}</div>
           )}
         </CardContent>
       </Card>

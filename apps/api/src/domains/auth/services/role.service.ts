@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import type { Role, RolePermission, UserRole } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 
 
 // Types déjà définis dans le service
@@ -40,7 +40,12 @@ export interface RoleWithStats {
 
 @Injectable()
 export class RoleService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   // ===== GESTION DES RÔLES =====
 
@@ -119,24 +124,35 @@ export class RoleService {
       throw new ConflictException(`Un rôle avec le nom "${createRoleDto.name}" existe déjà`)
     }
 
-    // Créer le rôle avec Prisma
-    const savedRole = await this.prisma.role.create({
-      data: {
-        name: createRoleDto.name,
-        description: createRoleDto.description,
-        isSystem: false,
-        isActive: createRoleDto.isActive ?? true,
-        level: 0,
-        label: createRoleDto.name,
-      },
+    // Transaction pour garantir l'atomicité : Role + Permissions
+    return await this.prisma.$transaction(async (tx) => {
+      // Créer le rôle avec Prisma
+      const savedRole = await tx.role.create({
+        data: {
+          name: createRoleDto.name,
+          description: createRoleDto.description,
+          isSystem: false,
+          isActive: createRoleDto.isActive ?? true,
+          level: 0,
+          label: createRoleDto.name,
+        },
+      })
+
+      // Ajouter les permissions si spécifiées (dans la même transaction)
+      if (createRoleDto.permissions && createRoleDto.permissions.length > 0) {
+        await tx.rolePermission.createMany({
+          data: createRoleDto.permissions.map((p) => ({
+            roleId: savedRole.id,
+            permissionId: p.permissionId,
+            isGranted: true,
+            isActive: true,
+            accessLevel: 'ADMIN' as const,
+          })),
+        })
+      }
+
+      return savedRole
     })
-
-    // Ajouter les permissions si spécifiées
-    if (createRoleDto.permissions && createRoleDto.permissions.length > 0) {
-      await this.updateRolePermissions(savedRole.id, createRoleDto.permissions, createdBy)
-    }
-
-    return savedRole
   }
 
   async updateRole(id: string, updateRoleDto: UpdateRoleDto, _updatedBy: string): Promise<Role> {
@@ -223,21 +239,24 @@ export class RoleService {
   ): Promise<void> {
     const role = await this.findRoleById(roleId)
 
-    // Supprimer les permissions existantes
-    await this.prisma.rolePermission.deleteMany({ where: { roleId: role.id } })
+    // Transaction pour garantir l'atomicité : Delete + Create
+    await this.prisma.$transaction(async (tx) => {
+      // Supprimer les permissions existantes
+      await tx.rolePermission.deleteMany({ where: { roleId: role.id } })
 
-    // Ajouter les nouvelles permissions
-    if (permissions.length > 0) {
-      await this.prisma.rolePermission.createMany({
-        data: permissions.map((p) => ({
-          roleId: role.id,
-          permissionId: p.permissionId,
-          isGranted: true,
-          isActive: true,
-          accessLevel: 'ADMIN' as const,
-        })),
-      })
-    }
+      // Ajouter les nouvelles permissions
+      if (permissions.length > 0) {
+        await tx.rolePermission.createMany({
+          data: permissions.map((p) => ({
+            roleId: role.id,
+            permissionId: p.permissionId,
+            isGranted: true,
+            isActive: true,
+            accessLevel: 'ADMIN' as const,
+          })),
+        })
+      }
+    })
   }
 
   // ===== GESTION DES UTILISATEURS =====

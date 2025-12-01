@@ -118,7 +118,7 @@ export function AuthGuardOLD({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-gray-600">{t('verifyingAuthentication')}</p>
         </div>
       </div>
@@ -169,12 +169,12 @@ export function AuthGuardOLD({
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
-            <div className="text-red-600 text-6xl mb-4">🚫</div>
+            <div className="text-destructive text-6xl mb-4">🚫</div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('accessDenied')}</h1>
             <p className="text-gray-600 mb-4">{t('insufficientPermissionsText')}</p>
             <button
               onClick={() => router?.back()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90"
             >
               {t('back')}
             </button>

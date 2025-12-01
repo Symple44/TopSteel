@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { TopSteelLogger } from '../../../core/common/logger/structured-logger.service'
 import {
   GlobalUserRole,
@@ -25,9 +25,14 @@ import type { UserSocieteRole } from '@prisma/client'
 @Injectable()
 export class UnifiedRolesPrismaService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly logger: TopSteelLogger
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Récupère le rôle global d'un utilisateur
@@ -259,6 +264,66 @@ export class UnifiedRolesPrismaService {
           : undefined,
       }
     })
+  }
+
+  /**
+   * OPTIMIZED: Récupère tous les utilisateurs avec leurs rôles pour une société donnée
+   * Évite le problème N+1 en utilisant une seule requête avec JOINs
+   * @param societeId - ID de la société
+   * @returns Map des userId vers leurs informations de rôle
+   */
+  async getAllUsersRolesForSociete(societeId: string): Promise<Map<string, UserSocieteInfo>> {
+    // Récupérer tous les utilisateurs avec leurs rôles pour cette société en une seule requête
+    const userSocieteRoles = await this.prisma.userSocieteRole.findMany({
+      where: {
+        societeId,
+        isActive: true,
+      },
+      include: {
+        role: true,
+        user: {
+          select: {
+            id: true,
+            role: true,
+          },
+        },
+      },
+    })
+
+    // Créer une map pour un accès O(1)
+    const rolesMap = new Map<string, UserSocieteInfo>()
+
+    for (const usr of userSocieteRoles) {
+      const globalRole = usr.user.role as GlobalUserRole
+      const globalAsSocieteRole = GLOBAL_TO_SOCIETE_ROLE_MAPPING[globalRole]
+      const societeRole = usr.role.name as SocieteRoleType
+      const effectiveRole = this.getHigherRole(globalAsSocieteRole, societeRole)
+
+      const permissions = usr.permissions
+        ? Array.isArray(usr.permissions)
+          ? (usr.permissions as string[])
+          : []
+        : []
+
+      rolesMap.set(usr.userId, {
+        id: usr.id,
+        userId: usr.userId,
+        societeId: usr.societeId,
+        societeRole,
+        effectiveRole,
+        isActive: usr.isActive,
+        isDefaultSociete: false, // TODO: Implement default societe logic
+        additionalPermissions: permissions,
+        restrictedPermissions: [],
+        grantedAt: usr.createdAt,
+        grantedBy: null,
+        expiresAt: null,
+        globalRole: globalRole,
+        permissions: permissions,
+      })
+    }
+
+    return rolesMap
   }
 
   /**

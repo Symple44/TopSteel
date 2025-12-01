@@ -1,3 +1,20 @@
+/**
+ * FICHIER DE DÉMONSTRATION - NE PAS INCLURE EN PRODUCTION
+ *
+ * Ce fichier contient des styles décoratifs utilisés uniquement pour la page de démonstration
+ * du DataTable (/admin/datatable-test). Ces styles incluent:
+ * - Animations visuelles (float, pulse-glow, fade-in-up)
+ * - Effets glassmorphism et gradient text
+ * - Backgrounds avec motifs et particules
+ * - Effets de hover avancés
+ *
+ * Ces styles ne sont PAS nécessaires pour le fonctionnement du DataTable.
+ * Le DataTable fonctionne avec les styles du design system (@erp/ui).
+ *
+ * @usage Importé uniquement dans apps/web/src/app/(dashboard)/admin/datatable-test/page.tsx
+ * @production À ne pas inclure dans le bundle de production si la page de démo est supprimée
+ */
+
 /* Styles spéciaux pour la page de démonstration du DataTable */
 
 .bg-grid-pattern {
@@ -130,20 +147,7 @@
   left: 100%;
 }
 
-/* Responsive design pour mobiles */
-@media (max-width: 768px) {
-  .feature-card {
-    transform: none;
-  }
-
-  .feature-card:hover {
-    transform: none;
-  }
-
-  .bg-grid-pattern {
-    background-size: 15px 15px;
-  }
-}
+/* Media queries mobile supprimées - pas de support mobile */
 
 /* Animation pour l'apparition des éléments */
 .fade-in-up {
@@ -232,16 +236,6 @@
 .inline-editor-select-content {
   z-index: 10000;
   position: fixed;
-}
-
-/* Styles pour les select portals */
-[data-select-portal] {
-  background-color: white;
-  border: 1px solid #e5e7eb;
-  color: #1f2937;
-  box-shadow:
-    0 10px 38px -10px rgba(22, 23, 24, 0.35),
-    0 10px 20px -15px rgba(22, 23, 24, 0.2);
 }
 
 /* Styles pour les dropdowns avec portal */

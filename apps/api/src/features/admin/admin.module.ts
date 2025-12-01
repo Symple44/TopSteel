@@ -16,11 +16,13 @@ import { MenuModule } from '../menu/menu.module'
 import { SocietesModule } from '../societes/societes.module'
 
 // Controllers
+import { AdminMenusController } from './controllers/admin-menus.controller'
 import { AdminRolesController } from './controllers/admin-roles.controller'
 import { AdminUsersController } from './controllers/admin-users.controller'
 import { AdminCompanyController } from './controllers/admin-company.controller'
 import { AuthPerformanceController } from './controllers/auth-performance.controller'
 import { DatabaseIntegrityController } from './controllers/database-integrity.controller'
+import { MenuConfigurationController } from './controllers/menu-configuration.controller'
 import { MenuRawController } from './controllers/menu-raw.controller'
 import { SystemParametersController } from './system-parameters.controller'
 
@@ -32,6 +34,8 @@ import { DatabaseIntegrityService } from './services/database-integrity.service'
 import { DatabaseStatsService } from './services/database-stats.service'
 import { MenuConfigurationService } from './services/menu-configuration.service'
 import { MenuRawService } from './services/menu-raw.service'
+import { MenuStartupSyncService } from './services/menu-startup-sync.service'
+import { MenuSyncService } from './services/menu-sync.service'
 import { UserMenuPreferencesService } from './services/user-menu-preferences.service'
 import { SystemParametersService } from './system-parameters.service'
 
@@ -45,11 +49,13 @@ import { SystemParametersService } from './system-parameters.service'
     AdminPrismaModule,
   ],
   controllers: [
+    AdminMenusController,
     AdminUsersController,
     AdminRolesController,
     AdminCompanyController,
     AuthPerformanceController,
     DatabaseIntegrityController,
+    MenuConfigurationController,
     MenuRawController,
     SystemParametersController,
   ],
@@ -62,6 +68,8 @@ import { SystemParametersService } from './system-parameters.service'
     DatabaseStatsService,
     MenuConfigurationService,
     MenuRawService,
+    MenuStartupSyncService,
+    MenuSyncService,
     UserMenuPreferencesService,
     SystemParametersService,
     OptimizedCacheService,
@@ -74,6 +82,7 @@ import { SystemParametersService } from './system-parameters.service'
     DatabaseStatsService,
     MenuConfigurationService,
     MenuRawService,
+    MenuSyncService,
     UserMenuPreferencesService,
     SystemParametersService,
   ],

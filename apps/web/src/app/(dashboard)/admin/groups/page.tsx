@@ -2,7 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { GroupManagementPanel } from '../../../../components/admin/group-management-panel'
+import { PageContainer, PageSection } from '@erp/ui'
+import { GroupsDataTable } from '../../../../components/admin/groups-datatable'
 import { AdminGuard } from '../../../../components/auth/admin-guard'
 
 export default function GroupManagementPage() {
@@ -12,7 +13,11 @@ export default function GroupManagementPage() {
       requiredPermissions={['SYSTEM_ADMIN', 'USER_CREATE']}
       showUnauthorized={true}
     >
-      <GroupManagementPanel />
+      <PageContainer maxWidth="full" padding="default">
+        <PageSection spacing="default">
+          <GroupsDataTable />
+        </PageSection>
+      </PageContainer>
     </AdminGuard>
   )
 }

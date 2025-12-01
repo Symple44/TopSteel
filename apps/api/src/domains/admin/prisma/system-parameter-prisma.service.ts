@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import type { SystemParameter } from '@prisma/client'
 
 /**
@@ -19,7 +19,12 @@ import type { SystemParameter } from '@prisma/client'
 export class SystemParameterPrismaService {
   private readonly logger = new Logger(SystemParameterPrismaService.name)
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Créer un paramètre

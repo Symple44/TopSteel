@@ -10,7 +10,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  PageContainer,
   PageHeader,
+  PageSection,
   Tabs,
   TabsContent,
   TabsList,
@@ -239,14 +241,14 @@ export default function DatabaseManagementPage() {
 
   const getStatusBadgeVariant = (
     status: string
-  ): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  ): 'success' | 'warning' | 'destructive' | 'default' => {
     switch (status) {
       case 'healthy':
       case 'up-to-date':
-        return 'secondary' // Badge doesn't have 'success', use 'secondary' for good status
+        return 'success'
       case 'degraded':
       case 'pending':
-        return 'outline' // Use 'outline' for warning-like status
+        return 'warning'
       case 'unhealthy':
       case 'error':
         return 'destructive'
@@ -269,7 +271,7 @@ export default function DatabaseManagementPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PageContainer maxWidth="full" padding="default">
       <PageHeader
         title={tDb('database.title')}
         description={tDb('database.subtitle')}
@@ -283,7 +285,8 @@ export default function DatabaseManagementPage() {
         }
       />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <PageSection spacing="default">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="grid grid-cols-4 w-full max-w-2xl bg-muted p-1 rounded-lg">
           <TabsTrigger value="overview">{tDb('database.overview')}</TabsTrigger>
           <TabsTrigger value="migrations">{tDb('database.migrations')}</TabsTrigger>
@@ -787,6 +790,7 @@ export default function DatabaseManagementPage() {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </PageSection>
+    </PageContainer>
   )
 }

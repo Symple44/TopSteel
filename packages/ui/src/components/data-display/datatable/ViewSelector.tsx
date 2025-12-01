@@ -1,11 +1,17 @@
 'use client'
 
-import { Calendar, Clock, Grid3x3, Kanban, Settings, Table } from 'lucide-react'
+import { Calendar, Clock, Grid3x3, Kanban, Map, Settings, Table } from 'lucide-react'
 import React, { useState } from 'react'
 import { cn } from '../../../lib/utils'
 import { Label, Separator } from '../../primitives'
 import { Button } from '../../primitives/button'
-import { DropdownItem, DropdownPortal, DropdownSeparator } from '../../primitives/dropdown-portal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '../../primitives/dropdown'
 import { SimpleTooltip } from '../../primitives/tooltip'
 import { CustomSelect } from './CustomSelect'
 import { SimpleModal } from './SimpleModal'
@@ -18,6 +24,7 @@ const VIEW_ICONS: Record<ViewType, React.ComponentType<{ className?: string }>> 
   cards: Grid3x3,
   timeline: Clock,
   calendar: Calendar,
+  map: Map,
 }
 
 interface ViewSelectorProps<T = Record<string, unknown>> {
@@ -53,9 +60,8 @@ export function ViewSelector<T = Record<string, unknown>>({
   return (
     <>
       {/* Sélecteur de vue compact */}
-      <DropdownPortal
-        align="end"
-        trigger={
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <SimpleTooltip
             content={`Mode d'affichage: ${availableViews.find((v) => v.type === currentView)?.name || 'Tableau'}`}
             triggerAsChild={true}
@@ -68,49 +74,50 @@ export function ViewSelector<T = Record<string, unknown>>({
               })()}
             </Button>
           </SimpleTooltip>
-        }
-      >
-        {availableViews.map((view) => {
-          const IconComponent = VIEW_ICONS[view.type]
-          const isActive = currentView === view.type
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {availableViews.map((view) => {
+            const IconComponent = VIEW_ICONS[view.type]
+            const isActive = currentView === view.type
 
-          return (
-            <React.Fragment key={view.type}>
-              <DropdownItem
-                onClick={() => onViewChange(view.type)}
-                className={
-                  isActive
-                    ? 'bg-accent text-accent-foreground font-semibold'
-                    : 'text-foreground font-medium hover:bg-accent/50 hover:text-accent-foreground'
-                }
-              >
-                <IconComponent
-                  className={cn(
-                    'h-4 w-4 mr-2',
-                    isActive ? 'text-accent-foreground' : 'text-muted-foreground'
-                  )}
-                />
-                <span className="flex-1">{view.name}</span>
-                {isActive && <div className="ml-auto w-2 h-2 bg-accent-foreground rounded-full" />}
-              </DropdownItem>
-
-              {view.type !== 'table' && (
-                <DropdownItem
-                  onClick={() => handleOpenSettings(view.type)}
-                  className="text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
+            return (
+              <React.Fragment key={view.type}>
+                <DropdownMenuItem
+                  onClick={() => onViewChange(view.type)}
+                  className={
+                    isActive
+                      ? 'bg-accent text-accent-foreground font-semibold'
+                      : 'text-foreground font-medium hover:bg-accent/50 hover:text-accent-foreground'
+                  }
                 >
-                  <Settings className="h-4 w-4 mr-2 text-muted-foreground" />
-                  <span className="text-sm">Configurer {view.name}</span>
-                </DropdownItem>
-              )}
+                  <IconComponent
+                    className={cn(
+                      'h-4 w-4 mr-2',
+                      isActive ? 'text-accent-foreground' : 'text-muted-foreground'
+                    )}
+                  />
+                  <span className="flex-1">{view.name}</span>
+                  {isActive && <div className="ml-auto w-2 h-2 bg-accent-foreground rounded-full" />}
+                </DropdownMenuItem>
 
-              {view.type !== availableViews[availableViews.length - 1].type && (
-                <DropdownSeparator />
-              )}
-            </React.Fragment>
-          )
-        })}
-      </DropdownPortal>
+                {view.type !== 'table' && (
+                  <DropdownMenuItem
+                    onClick={() => handleOpenSettings(view.type)}
+                    className="text-muted-foreground font-medium hover:bg-muted hover:text-foreground"
+                  >
+                    <Settings className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span className="text-sm">Configurer {view.name}</span>
+                  </DropdownMenuItem>
+                )}
+
+                {view.type !== availableViews[availableViews.length - 1].type && (
+                  <DropdownMenuSeparator />
+                )}
+              </React.Fragment>
+            )
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {/* Dialog de configuration */}
       <SimpleModal

@@ -2,7 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { SocietesManagementPanel } from '../../../../components/admin/societes-management-panel'
+import { PageContainer, PageSection } from '@erp/ui'
+import { SocietesDataTable } from '../../../../components/admin/societes-datatable'
 import { AdminGuard } from '../../../../components/auth/admin-guard'
 
 export default function SocietesManagementPage() {
@@ -12,7 +13,11 @@ export default function SocietesManagementPage() {
       requiredPermissions={['SYSTEM_ADMIN']}
       showUnauthorized={true}
     >
-      <SocietesManagementPanel />
+      <PageContainer maxWidth="full" padding="default">
+        <PageSection spacing="default">
+          <SocietesDataTable />
+        </PageSection>
+      </PageContainer>
     </AdminGuard>
   )
 }

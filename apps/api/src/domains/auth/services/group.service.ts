@@ -39,8 +39,21 @@ export class GroupService {
 
   // ===== GESTION DES GROUPES =====
 
-  async findAllGroups(): Promise<GroupWithStats[]> {
+  async findAllGroups(options?: {
+    page?: number
+    limit?: number
+  }): Promise<{ groups: GroupWithStats[]; total: number }> {
+    const page = options?.page || 1
+    const limit = options?.limit || 20
+    const skip = (page - 1) * limit
+
+    // Get total count
+    const total = await this.prisma.group.count()
+
+    // Get paginated groups
     const groups = await this.prisma.group.findMany({
+      skip,
+      take: limit,
       orderBy: [{ name: 'asc' }],
     })
 
@@ -63,7 +76,7 @@ export class GroupService {
       })
     )
 
-    return groupsWithStats
+    return { groups: groupsWithStats, total }
   }
 
   async findGroupById(id: string, includeUsers: boolean = false): Promise<Group> {

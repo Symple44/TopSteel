@@ -2,7 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@erp/ui'
+import { Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, PageContainer, PageHeader, PageSection } from '@erp/ui'
+import { Calendar } from 'lucide-react'
 import { useState } from 'react'
 
 // Données fictives de planning
@@ -144,39 +145,40 @@ export default function TestPlanningPage() {
   }
 
   return (
-    <div className="py-8 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Planning de Production - Test</h1>
-          <p className="text-muted-foreground mt-2">
-            Visualisation des projets en cours et planifiés
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant={viewMode === 'list' ? 'default' : 'outline'}
-            onClick={() => setViewMode('list')}
-          >
-            Liste
-          </Button>
-          <Button
-            type="button"
-            variant={viewMode === 'gantt' ? 'default' : 'outline'}
-            onClick={() => setViewMode('gantt')}
-          >
-            Gantt
-          </Button>
-          <Button
-            type="button"
-            variant={viewMode === 'calendar' ? 'default' : 'outline'}
-            onClick={() => setViewMode('calendar')}
-          >
-            Calendrier
-          </Button>
-        </div>
-      </div>
+    <PageContainer maxWidth="full" padding="default">
+      <PageHeader
+        title="Planning de Production - Test"
+        description="Visualisation des projets en cours et planifiés"
+        icon={Calendar}
+        iconBackground="bg-gradient-to-br from-violet-500 to-purple-600"
+        actions={
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              onClick={() => setViewMode('list')}
+            >
+              Liste
+            </Button>
+            <Button
+              type="button"
+              variant={viewMode === 'gantt' ? 'default' : 'outline'}
+              onClick={() => setViewMode('gantt')}
+            >
+              Gantt
+            </Button>
+            <Button
+              type="button"
+              variant={viewMode === 'calendar' ? 'default' : 'outline'}
+              onClick={() => setViewMode('calendar')}
+            >
+              Calendrier
+            </Button>
+          </div>
+        }
+      />
 
+      <PageSection spacing="default">
       {/* Statistiques globales */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
@@ -409,6 +411,7 @@ export default function TestPlanningPage() {
           </CardContent>
         </Card>
       )}
+      </PageSection>
 
       {/* Modal de détails (simple) */}
       {selectedProject && (
@@ -427,6 +430,6 @@ export default function TestPlanningPage() {
           </Card>
         </div>
       )}
-    </div>
+    </PageContainer>
   )
 }

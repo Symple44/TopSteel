@@ -16,7 +16,9 @@ import {
   DialogTitle,
   Input,
   Label,
+  PageContainer,
   PageHeader,
+  PageSection,
   Progress,
   Separator,
   Textarea,
@@ -296,8 +298,7 @@ export function TranslationAdmin() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
+    <PageContainer maxWidth="full" padding="default">
       <PageHeader
         title={t('modules.translations.title') || 'Gestion des Traductions'}
         description={t('modules.translations.description') || "Gérez et modifiez toutes les traductions de l'application"}
@@ -317,6 +318,7 @@ export function TranslationAdmin() {
         }
       />
 
+      <PageSection spacing="default">
       {/* {t('modules.translations.statistics')} */}
       {memoizedStats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -411,6 +413,7 @@ export function TranslationAdmin() {
           />
         </CardContent>
       </Card>
+      </PageSection>
 
       {/* Dialog d'édition - Version personnalisée fonctionnelle */}
       {editingEntry && (
@@ -682,6 +685,6 @@ export function TranslationAdmin() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   )
 }

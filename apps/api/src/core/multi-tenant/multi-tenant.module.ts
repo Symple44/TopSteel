@@ -2,6 +2,7 @@ import { Module, Global } from '@nestjs/common'
 import { TenantContextService } from './tenant-context.service'
 import { TenantRLSInterceptor } from './tenant-rls.interceptor'
 import { TenantGuard } from './tenant.guard'
+import { TenantPrismaService } from './tenant-prisma.service'
 
 /**
  * MultiTenantModule
@@ -10,8 +11,8 @@ import { TenantGuard } from './tenant.guard'
  *
  * Fournit:
  * - TenantContextService: Gestion du contexte tenant (AsyncLocalStorage)
- * - PrismaTenantMiddleware: Injection automatique societeId dans Prisma
- * - TenantRLSInterceptor: Configuration des variables PostgreSQL RLS
+ * - TenantPrismaService: Client Prisma avec filtrage automatique par societeId
+ * - TenantRLSInterceptor: Configuration des variables PostgreSQL RLS (optionnel)
  * - TenantGuard: Validation et injection du contexte tenant
  *
  * Usage:
@@ -26,23 +27,26 @@ import { TenantGuard } from './tenant.guard'
  *       provide: APP_GUARD,
  *       useClass: TenantGuard,
  *     },
- *     {
- *       provide: APP_INTERCEPTOR,
- *       useClass: TenantRLSInterceptor,
- *     },
  *   ]
+ *
+ *   // Dans vos services, utiliser TenantPrismaService:
+ *   constructor(private readonly tenantPrisma: TenantPrismaService) {}
+ *
+ *   async getData() {
+ *     return this.tenantPrisma.client.notification.findMany() // Filtré automatiquement
+ *   }
  */
 @Global()
 @Module({
   providers: [
     TenantContextService,
-    // PrismaTenantMiddleware, // DISABLED: Needs migration to $extends
+    TenantPrismaService,
     TenantRLSInterceptor,
     TenantGuard,
   ],
   exports: [
     TenantContextService,
-    // PrismaTenantMiddleware, // DISABLED: Needs migration to $extends
+    TenantPrismaService,
     TenantRLSInterceptor,
     TenantGuard,
   ],

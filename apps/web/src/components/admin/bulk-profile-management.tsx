@@ -726,9 +726,9 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
 
                     <Separator />
 
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <p className="font-medium text-yellow-800">⚠️ {t('bulk.review.warning')}</p>
-                      <p className="text-sm text-yellow-700 mt-1">
+                    <div className="bg-warning/10 border border-warning/30 rounded-lg p-4">
+                      <p className="font-medium text-warning">⚠️ {t('bulk.review.warning')}</p>
+                      <p className="text-sm text-warning mt-1">
                         {t('bulk.review.warningMessagePrefix')} {selectedUsers.length} {t('bulk.review.warningMessageSuffix')}
                         {sendNotification && ` ${t('bulk.review.notificationNote')}`}
                       </p>
@@ -772,7 +772,7 @@ export function BulkProfileManagement({ isOpen, onClose, onComplete }: BulkProfi
                 type="button"
                 onClick={handleBulkOperation}
                 disabled={loading}
-                className="bg-red-600 hover:bg-red-700 text-white"
+                variant="destructive"
               >
                 {loading ? (
                   <>

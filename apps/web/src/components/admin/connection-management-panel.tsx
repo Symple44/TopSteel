@@ -55,18 +55,18 @@ export function ConnectionManagementPanel({
 
   const getStatusIcon = (connection: ConnectionInfo) => {
     if (!connection.isInitialized) {
-      return <WifiOff className="w-4 h-4 text-red-600" />
+      return <WifiOff className="w-4 h-4 text-destructive" />
     }
 
     switch (connection.status) {
       case 'active':
-        return <Wifi className="w-4 h-4 text-green-600" />
+        return <Wifi className="w-4 h-4 text-success" />
       case 'idle':
-        return <Wifi className="w-4 h-4 text-yellow-600" />
+        return <Wifi className="w-4 h-4 text-warning" />
       case 'error':
-        return <WifiOff className="w-4 h-4 text-red-600" />
+        return <WifiOff className="w-4 h-4 text-destructive" />
       default:
-        return <Wifi className="w-4 h-4 text-blue-600" />
+        return <Wifi className="w-4 h-4 text-info" />
     }
   }
 
@@ -136,9 +136,9 @@ export function ConnectionManagementPanel({
   })
 
   const getStatsColor = (value: number, threshold: number) => {
-    if (value >= threshold) return 'text-red-600'
-    if (value >= threshold * 0.7) return 'text-yellow-600'
-    return 'text-green-600'
+    if (value >= threshold) return 'text-destructive'
+    if (value >= threshold * 0.7) return 'text-warning'
+    return 'text-success'
   }
 
   return (
@@ -200,7 +200,7 @@ export function ConnectionManagementPanel({
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <Server className="w-4 h-4 text-blue-600" />
+              <Server className="w-4 h-4 text-info" />
               <div>
                 <div className="text-2xl font-bold">
                   {connections?.filter((c) => c.isInitialized).length}
@@ -214,7 +214,7 @@ export function ConnectionManagementPanel({
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
-              <Activity className="w-4 h-4 text-green-600" />
+              <Activity className="w-4 h-4 text-success" />
               <div>
                 <div className="text-2xl font-bold">
                   {connections?.filter((c) => c.status === 'active').length}
@@ -267,8 +267,8 @@ export function ConnectionManagementPanel({
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
-                      <Database className="w-5 h-5 text-blue-600" />
+                    <div className="p-2 bg-info/10 dark:bg-info/20 rounded-lg">
+                      <Database className="w-5 h-5 text-info" />
                     </div>
 
                     <div className="space-y-1">
@@ -359,7 +359,7 @@ export function ConnectionManagementPanel({
                         size="sm"
                         variant="outline"
                         onClick={() => onCloseConnection?.(connection.tenant)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -375,13 +375,13 @@ export function ConnectionManagementPanel({
                         <h5 className="font-medium text-sm">{t('connections.details.healthStatus')}</h5>
                         <div className="flex items-center space-x-2">
                           {getConnectionHealth(connection) === 'healthy' && (
-                            <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            <CheckCircle2 className="w-4 h-4 text-success" />
                           )}
                           {getConnectionHealth(connection) === 'degraded' && (
-                            <AlertTriangle className="w-4 h-4 text-yellow-600" />
+                            <AlertTriangle className="w-4 h-4 text-warning" />
                           )}
                           {getConnectionHealth(connection) === 'unhealthy' && (
-                            <AlertTriangle className="w-4 h-4 text-red-600" />
+                            <AlertTriangle className="w-4 h-4 text-destructive" />
                           )}
                           <span className="text-sm">
                             {getConnectionHealth(connection) === 'healthy' && t('connections.details.healthy')}

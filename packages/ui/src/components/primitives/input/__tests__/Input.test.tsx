@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import React from 'react'
 import '@testing-library/jest-dom'
 import { describe, expect, it, vi } from 'vitest'
-import { CheckboxInput, Input, NumberInput, PasswordInput, RadioInput, SearchInput } from '../Input'
+import { CheckboxInput, Input, NumberInput, PasswordInput, RadioInput, SearchInput } from '../index'
 
 // Mock the design system utilities
 vi.mock('../../../../lib/design-system', () => ({

@@ -34,44 +34,28 @@ function getAuthHeaders(request: NextRequest): Record<string, string> {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams: _ } = new URL(request.url)
+    const headers = getAuthHeaders(request)
 
-    // Pour l'instant, retournons des données mock en attendant l'implémentation backend
-    const mockQueryBuilders = [
-      {
-        id: '1',
-        name: 'Users Analysis',
-        description: 'Analyse des utilisateurs actifs',
-        database: 'topsteel_auth',
-        table: 'users',
-        isPublic: false,
-        maxRows: 1000,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy: 'admin@topsteel.fr',
-        columns: ['id', 'email', 'nom', 'prenom', 'created_at'],
-        query:
-          'SELECT id, email, nom, prenom, created_at FROM users WHERE created_at >= NOW() - INTERVAL 30 DAY',
-      },
-      {
-        id: '2',
-        name: 'Menu Configuration Report',
-        description: 'Rapport des configurations de menu',
-        database: 'topsteel_auth',
-        table: 'menu_configurations',
-        isPublic: true,
-        maxRows: 500,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        createdBy: 'admin@topsteel.fr',
-        columns: ['id', 'name', 'is_active', 'created_at'],
-        query:
-          'SELECT id, name, is_active, created_at FROM menu_configurations ORDER BY created_at DESC',
-      },
-    ]
+    // Call the backend API to get query builders
+    const response = await callBackendFromApi(request, 'query-builder', {
+      method: 'GET',
+      headers,
+    })
 
-    return NextResponse?.json(mockQueryBuilders)
+    if (response?.ok) {
+      const responseData = await response?.json()
+      const actualData = responseData?.data || responseData
+      return NextResponse?.json(actualData)
+    } else {
+      // If backend returns an error, return it
+      const errorData = await response?.json().catch(() => ({}))
+      return NextResponse?.json(
+        { error: errorData?.message || `Backend responded with ${response?.status}` },
+        { status: response.status }
+      )
+    }
   } catch (error) {
+    console.error('[query-builder/GET] Error:', error)
     return NextResponse?.json(
       { error: error instanceof Error ? error.message : 'Connection failed' },
       { status: 503 }

@@ -179,7 +179,7 @@ export function RoleManagementPanel() {
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-4">
-                      <div className="p-2 bg-blue-100 rounded-lg">
+                      <div className="p-2 bg-info/10 rounded-lg">
                         <Shield className="h-6 w-6 text-blue-600" />
                       </div>
                       <div className="flex-1">

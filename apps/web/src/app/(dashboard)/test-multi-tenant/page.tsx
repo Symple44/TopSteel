@@ -13,13 +13,16 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  PageContainer,
+  PageHeader,
+  PageSection,
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
   Textarea,
 } from '@erp/ui'
-import { Database, Lock, ShieldAlert, ShieldCheck } from 'lucide-react'
+import { Database, Lock, Shield, ShieldAlert, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { callClientApi } from '../../../utils/backend-api'
 
@@ -207,19 +210,16 @@ export default function TestMultiTenantPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Test Sécurité Multi-Tenant</h1>
-            <p className="text-muted-foreground">
-              Vérification de l'isolation des données et de la sécurité multi-tenant
-            </p>
-          </div>
-        </div>
-      </div>
+    <PageContainer maxWidth="full" padding="default">
+      <PageHeader
+        title="Test Sécurité Multi-Tenant"
+        description="Vérification de l'isolation des données et de la sécurité multi-tenant"
+        icon={Shield}
+        iconBackground="bg-gradient-to-br from-red-500 to-orange-600"
+      />
 
-      <Tabs defaultValue="manual" className="space-y-4">
+      <PageSection spacing="default">
+        <Tabs defaultValue="manual" className="space-y-4">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="manual">Test Manuel</TabsTrigger>
           <TabsTrigger value="automated">Tests Automatisés</TabsTrigger>
@@ -541,7 +541,8 @@ export default function TestMultiTenantPage() {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
-    </div>
+        </Tabs>
+      </PageSection>
+    </PageContainer>
   )
 }

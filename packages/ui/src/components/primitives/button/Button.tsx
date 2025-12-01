@@ -8,8 +8,7 @@
 
 import { Slot } from '@radix-ui/react-slot'
 import * as React from 'react'
-import type { ButtonVariants } from '../../../lib/design-system'
-import { buttonVariants } from '../../../lib/design-system'
+import { buttonVariants, type ButtonVariants } from '../../../variants'
 import { cn } from '../../../lib/utils'
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, ButtonVariants {

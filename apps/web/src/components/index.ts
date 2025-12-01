@@ -47,8 +47,7 @@ export * from './search/command-palette'
 // Security
 export * from './security/csp-style'
 
-// Settings
-export * from './settings'
+// Settings - supprimé (template-selector retiré)
 
 // UI components
 export * from './ui/optimized-image'

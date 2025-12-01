@@ -2,8 +2,9 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import type { ColumnConfig } from './types'
+import type { MapMarker } from './views/MapView'
 
-export type ViewType = 'table' | 'kanban' | 'cards' | 'timeline' | 'calendar'
+export type ViewType = 'table' | 'kanban' | 'cards' | 'timeline' | 'calendar' | 'map'
 
 export interface ViewConfig {
   type: ViewType
@@ -49,6 +50,17 @@ export interface ViewSettings {
     endDateColumn?: string
     titleColumn: string
     categoryColumn?: string
+  }
+
+  // Map specific
+  map?: {
+    latColumn: string
+    lngColumn: string
+    titleColumn: string
+    subtitleColumn?: string
+    descriptionColumn?: string
+    categoryColumn?: string
+    metaColumns?: string[]
   }
 }
 
@@ -156,6 +168,21 @@ export function useDataViews<T = Record<string, unknown>>(
         },
       },
     },
+    map: {
+      type: 'map',
+      name: 'Carte',
+      icon: 'Map',
+      settings: {
+        map: {
+          latColumn: columns.find((c) => c.id === 'lat' || c.key === 'lat' || c.id === 'latitude' || c.key === 'latitude')?.id || '',
+          lngColumn: columns.find((c) => c.id === 'lng' || c.key === 'lng' || c.id === 'longitude' || c.key === 'longitude')?.id || '',
+          titleColumn: columns[0]?.id || '',
+          subtitleColumn: columns[1]?.id,
+          categoryColumn: columns.find((c) => c.type === 'select')?.id,
+          metaColumns: [],
+        },
+      },
+    },
   })
 
   // Transformer une ligne en carte
@@ -163,7 +190,8 @@ export function useDataViews<T = Record<string, unknown>>(
     (
       item: T,
       config: ViewSettings['kanban'] | ViewSettings['cards'] | Record<string, unknown> | undefined,
-      columns: ColumnConfig<T>[]
+      columns: ColumnConfig<T>[],
+      index: number
     ): Card => {
       // Handle different config structures (kanban vs cards vs other views)
       const configObj = config as Record<string, unknown>
@@ -296,7 +324,7 @@ export function useDataViews<T = Record<string, unknown>>(
       }
 
       return {
-        id: String((item as Record<string, unknown>)[keyField] || crypto.randomUUID()),
+        id: String((item as Record<string, unknown>)[keyField] || `item-${index}`),
         title,
         subtitle,
         description,
@@ -336,7 +364,7 @@ export function useDataViews<T = Record<string, unknown>>(
     }))
 
     // Répartir les éléments dans les colonnes
-    data.forEach((item) => {
+    data.forEach((item, index) => {
       const statusValue = statusColumn.getValue
         ? statusColumn.getValue(item)
         : (item as Record<string, unknown>)[statusColumn.key]
@@ -345,7 +373,7 @@ export function useDataViews<T = Record<string, unknown>>(
 
       const column = kanbanColumns.find((col) => col.id === normalizedStatus)
       if (column) {
-        column.items.push(transformToCard(item, config, columns))
+        column.items.push(transformToCard(item, config, columns, index))
       }
     })
 
@@ -357,7 +385,7 @@ export function useDataViews<T = Record<string, unknown>>(
     const config = viewConfigs.cards.settings.cards
     if (!config) return []
 
-    return data.map((item) => transformToCard(item, config, columns))
+    return data.map((item, index) => transformToCard(item, config, columns, index))
   }, [data, columns, viewConfigs.cards, transformToCard])
 
   // Transformer les données pour le mode Timeline
@@ -491,6 +519,100 @@ export function useDataViews<T = Record<string, unknown>>(
       .sort((a, b) => a.start.getTime() - b.start.getTime())
   }, [data, columns, viewConfigs.calendar, keyField])
 
+  // Transformer les données pour le mode Map
+  const mapData = useMemo((): MapMarker[] => {
+    const config = viewConfigs.map.settings.map
+    if (!config || !config.latColumn || !config.lngColumn) return []
+
+    const latColumn = columns.find((c) => c.id === config.latColumn)
+    const lngColumn = columns.find((c) => c.id === config.lngColumn)
+    const titleColumn = columns.find((c) => c.id === config.titleColumn)
+
+    if (!latColumn || !lngColumn) return []
+
+    return data
+      .map((item, index) => {
+        const latValue = latColumn.getValue
+          ? latColumn.getValue(item)
+          : (item as Record<string, unknown>)[latColumn.key]
+        const lngValue = lngColumn.getValue
+          ? lngColumn.getValue(item)
+          : (item as Record<string, unknown>)[lngColumn.key]
+
+        const lat = typeof latValue === 'number' ? latValue : parseFloat(String(latValue))
+        const lng = typeof lngValue === 'number' ? lngValue : parseFloat(String(lngValue))
+
+        // Skip items without valid coordinates
+        if (isNaN(lat) || isNaN(lng)) return null
+
+        const titleValue = titleColumn
+          ? (titleColumn.getValue
+              ? titleColumn.getValue(item)
+              : (item as Record<string, unknown>)[titleColumn.key])
+          : 'Sans titre'
+
+        const subtitleColumn = config.subtitleColumn
+          ? columns.find((c) => c.id === config.subtitleColumn)
+          : null
+        const subtitleValue = subtitleColumn
+          ? (subtitleColumn.getValue
+              ? subtitleColumn.getValue(item)
+              : (item as Record<string, unknown>)[subtitleColumn.key])
+          : undefined
+
+        const descriptionColumn = config.descriptionColumn
+          ? columns.find((c) => c.id === config.descriptionColumn)
+          : null
+        const descriptionValue = descriptionColumn
+          ? (descriptionColumn.getValue
+              ? descriptionColumn.getValue(item)
+              : (item as Record<string, unknown>)[descriptionColumn.key])
+          : undefined
+
+        const categoryColumn = config.categoryColumn
+          ? columns.find((c) => c.id === config.categoryColumn)
+          : null
+        const categoryValue = categoryColumn
+          ? (categoryColumn.getValue
+              ? categoryColumn.getValue(item)
+              : (item as Record<string, unknown>)[categoryColumn.key])
+          : undefined
+
+        // Créer les méta-données
+        const meta: { label: string; value: string }[] = []
+        const metaColumns = config.metaColumns || []
+        metaColumns.forEach((colId: string) => {
+          if (colId) {
+            const column = columns.find((c) => c.id === colId)
+            if (column) {
+              const value = column.getValue
+                ? column.getValue(item)
+                : (item as Record<string, unknown>)[column.key]
+              if (value !== null && value !== undefined && value !== '') {
+                meta.push({
+                  label: column.title,
+                  value: String(value),
+                })
+              }
+            }
+          }
+        })
+
+        return {
+          id: String((item as Record<string, unknown>)[keyField] || `marker-${index}`),
+          lat,
+          lng,
+          title: String(titleValue || 'Sans titre'),
+          subtitle: subtitleValue ? String(subtitleValue) : undefined,
+          description: descriptionValue ? String(descriptionValue) : undefined,
+          category: categoryValue ? String(categoryValue) : undefined,
+          color: getColorForCategory(categoryValue ? String(categoryValue) : undefined),
+          meta,
+        } as MapMarker
+      })
+      .filter((marker): marker is MapMarker => marker !== null)
+  }, [data, columns, viewConfigs.map, keyField])
+
   // Fonctions utilitaires
   const updateViewConfig = useCallback((viewType: ViewType, settings: ViewSettings) => {
     setViewConfigs((prev) => ({
@@ -523,6 +645,7 @@ export function useDataViews<T = Record<string, unknown>>(
     cardsData,
     timelineData,
     calendarData,
+    mapData,
 
     // Fonctions utilitaires
     transformToCard,

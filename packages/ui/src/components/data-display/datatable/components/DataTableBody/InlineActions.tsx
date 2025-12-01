@@ -2,6 +2,7 @@
 
 import { MoreHorizontal } from 'lucide-react'
 import React from 'react'
+import { cn } from '../../../../../lib/utils'
 import { Button } from '../../../../primitives/button'
 import {
   DropdownMenu,
@@ -45,15 +46,19 @@ export function InlineActions<T>({ row, actions }: InlineActionsProps<T>) {
     return (
       <Button
         type="button"
-        variant={action.variant || 'outline'}
+        variant="ghost"
         size="sm"
+        className={cn(
+          'h-7 px-2.5 text-xs font-medium',
+          action.variant === 'destructive' && 'text-destructive hover:text-destructive hover:bg-destructive/10'
+        )}
         onClick={(e) => {
           e.stopPropagation()
           action.onClick(row)
         }}
         disabled={action.disabled?.(row)}
       >
-        {action.icon}
+        {action.icon && <span className="mr-1.5">{action.icon}</span>}
         {action.label}
       </Button>
     )
@@ -67,13 +72,14 @@ export function InlineActions<T>({ row, actions }: InlineActionsProps<T>) {
           type="button"
           variant="ghost"
           size="sm"
-          className="h-8 w-8 p-0"
+          className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100"
           onClick={(e) => e.stopPropagation()}
+          aria-label="Actions"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-40">
         {actions.map((action, index) => (
           <React.Fragment key={index}>
             {action.separator && index > 0 && <DropdownMenuSeparator />}
@@ -83,12 +89,13 @@ export function InlineActions<T>({ row, actions }: InlineActionsProps<T>) {
                 action.onClick(row)
               }}
               disabled={action.disabled?.(row)}
-              className={
-                action.variant === 'destructive' ? 'text-destructive focus:text-destructive' : ''
-              }
+              className={cn(
+                'cursor-pointer text-sm gap-2',
+                action.variant === 'destructive' && 'text-destructive focus:text-destructive focus:bg-destructive/10'
+              )}
             >
-              {action.icon && <span className="mr-2">{action.icon}</span>}
-              {action.label}
+              {action.icon}
+              <span>{action.label}</span>
             </DropdownMenuItem>
           </React.Fragment>
         ))}

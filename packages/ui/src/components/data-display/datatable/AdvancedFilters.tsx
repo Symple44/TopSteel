@@ -1,15 +1,44 @@
 'use client'
 
-import { Filter, Plus, RotateCcw, ToggleLeft, Trash2, X } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { ChevronDown, Filter, Layers, Plus, Trash2, X } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
 import { cn } from '../../../lib/utils'
 import type { JsonValue, SafeObject } from '../../../types/common'
 import { Button } from '../../primitives/button'
-import { DropdownPortal } from '../../primitives/dropdown-portal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '../../primitives/dropdown'
 import { Input } from '../../primitives/input'
-import { SelectPortal } from '../../primitives/select-portal'
-import { Badge } from '../badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../primitives/select'
+import { Switch } from '../../primitives/switch/switch'
 import type { ColumnConfig } from './types'
+
+// Styles pour scrollbar visible
+const scrollbarStyles = `
+  .filter-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .filter-scroll::-webkit-scrollbar-track {
+    background: hsl(var(--muted) / 0.5);
+    border-radius: 3px;
+  }
+  .filter-scroll::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.5);
+    border-radius: 3px;
+  }
+  .filter-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.7);
+  }
+`
 
 export type FilterOperator =
   | 'equals'
@@ -33,7 +62,7 @@ export interface AdvancedFilterRule {
   column: string
   operator: FilterOperator
   value: JsonValue
-  value2?: JsonValue // Pour l'opérateur "between"
+  value2?: JsonValue
   enabled: boolean
 }
 
@@ -47,97 +76,225 @@ interface AdvancedFiltersProps<T = SafeObject> {
   columns: ColumnConfig<T>[]
   filters: AdvancedFilterGroup[]
   onFiltersChange: (filters: AdvancedFilterGroup[]) => void
+  groupsLogic?: 'AND' | 'OR'
+  onGroupsLogicChange?: (logic: 'AND' | 'OR') => void
   className?: string
 }
 
 const OPERATORS: Record<
   string,
-  { label: string; needsValue: boolean; needsValue2: boolean; types: string[] }
+  { label: string; shortLabel: string; needsValue: boolean; needsValue2: boolean; types: string[] }
 > = {
   equals: {
-    label: 'Égal à',
+    label: 'est égal à',
+    shortLabel: '=',
     needsValue: true,
     needsValue2: false,
-    types: ['text', 'number', 'date', 'select', 'richtext'],
+    types: ['text', 'number', 'date', 'select', 'richtext', 'boolean', 'datetime', 'multiselect', 'custom', 'formula'],
   },
   not_equals: {
-    label: 'Différent de',
+    label: 'est différent de',
+    shortLabel: '≠',
     needsValue: true,
     needsValue2: false,
-    types: ['text', 'number', 'date', 'select', 'richtext'],
+    types: ['text', 'number', 'date', 'select', 'richtext', 'boolean', 'datetime', 'multiselect', 'custom', 'formula'],
   },
   contains: {
-    label: 'Contient',
+    label: 'contient',
+    shortLabel: '∋',
     needsValue: true,
     needsValue2: false,
     types: ['text', 'richtext'],
   },
   not_contains: {
-    label: 'Ne contient pas',
+    label: 'ne contient pas',
+    shortLabel: '∌',
     needsValue: true,
     needsValue2: false,
     types: ['text', 'richtext'],
   },
   starts_with: {
-    label: 'Commence par',
+    label: 'commence par',
+    shortLabel: 'A..',
     needsValue: true,
     needsValue2: false,
     types: ['text', 'richtext'],
   },
   ends_with: {
-    label: 'Se termine par',
+    label: 'se termine par',
+    shortLabel: '..Z',
     needsValue: true,
     needsValue2: false,
     types: ['text', 'richtext'],
   },
-  gt: { label: 'Supérieur à', needsValue: true, needsValue2: false, types: ['number', 'date'] },
+  gt: {
+    label: 'est supérieur à',
+    shortLabel: '>',
+    needsValue: true,
+    needsValue2: false,
+    types: ['number', 'date', 'datetime'],
+  },
   gte: {
-    label: 'Supérieur ou égal à',
+    label: 'est supérieur ou égal à',
+    shortLabel: '≥',
     needsValue: true,
     needsValue2: false,
-    types: ['number', 'date'],
+    types: ['number', 'date', 'datetime'],
   },
-  lt: { label: 'Inférieur à', needsValue: true, needsValue2: false, types: ['number', 'date'] },
+  lt: {
+    label: 'est inférieur à',
+    shortLabel: '<',
+    needsValue: true,
+    needsValue2: false,
+    types: ['number', 'date', 'datetime'],
+  },
   lte: {
-    label: 'Inférieur ou égal à',
+    label: 'est inférieur ou égal à',
+    shortLabel: '≤',
     needsValue: true,
     needsValue2: false,
-    types: ['number', 'date'],
+    types: ['number', 'date', 'datetime'],
   },
-  between: { label: 'Entre', needsValue: true, needsValue2: true, types: ['number', 'date'] },
-  in: {
-    label: 'Dans la liste',
+  between: {
+    label: 'est entre',
+    shortLabel: '↔',
     needsValue: true,
-    needsValue2: false,
-    types: ['text', 'number', 'select'],
-  },
-  not_in: {
-    label: 'Pas dans la liste',
-    needsValue: true,
-    needsValue2: false,
-    types: ['text', 'number', 'select'],
+    needsValue2: true,
+    types: ['number', 'date', 'datetime'],
   },
   is_empty: {
-    label: 'Est vide',
+    label: 'est vide',
+    shortLabel: '∅',
     needsValue: false,
     needsValue2: false,
-    types: ['text', 'number', 'date'],
+    types: ['text', 'number', 'date', 'datetime', 'select', 'multiselect'],
   },
   is_not_empty: {
-    label: "N'est pas vide",
+    label: "n'est pas vide",
+    shortLabel: '≠∅',
     needsValue: false,
     needsValue2: false,
-    types: ['text', 'number', 'date'],
+    types: ['text', 'number', 'date', 'datetime', 'select', 'multiselect'],
   },
+}
+
+// Composant LogicToggle réutilisable
+function LogicToggle({
+  value,
+  onChange,
+  size = 'default',
+}: {
+  value: 'AND' | 'OR'
+  onChange: (value: 'AND' | 'OR') => void
+  size?: 'sm' | 'default'
+}) {
+  const isSmall = size === 'sm'
+  return (
+    <div
+      className={cn(
+        'inline-flex items-center rounded-md bg-muted/50 p-0.5',
+        isSmall ? 'text-[10px]' : 'text-xs'
+      )}
+    >
+      <button
+        type="button"
+        onClick={() => onChange('AND')}
+        className={cn(
+          'font-medium rounded transition-all',
+          isSmall ? 'px-1.5 py-0.5' : 'px-2 py-1',
+          value === 'AND'
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
+        )}
+      >
+        ET
+      </button>
+      <button
+        type="button"
+        onClick={() => onChange('OR')}
+        className={cn(
+          'font-medium rounded transition-all',
+          isSmall ? 'px-1.5 py-0.5' : 'px-2 py-1',
+          value === 'OR'
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
+        )}
+      >
+        OU
+      </button>
+    </div>
+  )
+}
+
+// Composant FilterChip pour afficher un filtre actif de manière compacte
+function FilterChip({
+  rule,
+  columnTitle,
+  onRemove,
+  onToggle,
+}: {
+  rule: AdvancedFilterRule
+  columnTitle: string
+  onRemove: () => void
+  onToggle: () => void
+}) {
+  const operator = OPERATORS[rule.operator]
+  const displayValue = rule.value === '' ? '...' : String(rule.value)
+
+  return (
+    <div
+      className={cn(
+        'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] transition-all',
+        rule.enabled
+          ? 'bg-primary/10 text-primary border border-primary/20'
+          : 'bg-muted/50 text-muted-foreground border border-transparent line-through'
+      )}
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="font-medium hover:underline"
+      >
+        {columnTitle}
+      </button>
+      <span className="text-muted-foreground">{operator?.shortLabel}</span>
+      {operator?.needsValue && (
+        <span className="font-medium max-w-[60px] truncate">{displayValue}</span>
+      )}
+      <button
+        type="button"
+        onClick={onRemove}
+        className="p-0.5 rounded hover:bg-primary/20 transition-colors"
+      >
+        <X className="h-2.5 w-2.5" />
+      </button>
+    </div>
+  )
 }
 
 export function AdvancedFilters<T>({
   columns,
   filters,
   onFiltersChange,
+  groupsLogic: externalGroupsLogic,
+  onGroupsLogicChange,
   className,
 }: AdvancedFiltersProps<T>) {
   const [isOpen, setIsOpen] = useState(false)
+  const [internalGroupsLogic, setInternalGroupsLogic] = useState<'AND' | 'OR'>('AND')
+  const [showAdvanced, setShowAdvanced] = useState(false)
+
+  const groupsLogic = externalGroupsLogic ?? internalGroupsLogic
+  const handleGroupsLogicChange = useCallback(
+    (logic: 'AND' | 'OR') => {
+      if (onGroupsLogicChange) {
+        onGroupsLogicChange(logic)
+      } else {
+        setInternalGroupsLogic(logic)
+      }
+    },
+    [onGroupsLogicChange]
+  )
 
   const activeFiltersCount = useMemo(() => {
     return filters.reduce((count, group) => {
@@ -145,380 +302,605 @@ export function AdvancedFilters<T>({
     }, 0)
   }, [filters])
 
-  const addFilterGroup = () => {
+  const allRules = useMemo(() => {
+    return filters.flatMap((group) =>
+      group.rules.map((rule) => ({ ...rule, groupId: group.id }))
+    )
+  }, [filters])
+
+  // Assure qu'il y a toujours au moins un groupe
+  const ensureDefaultGroup = useCallback(() => {
+    if (filters.length === 0) {
+      return [{ id: `group_${Date.now()}`, logic: 'AND' as const, rules: [] }]
+    }
+    return filters
+  }, [filters])
+
+  const addQuickFilter = useCallback(() => {
+    const updatedFilters = ensureDefaultGroup()
+    const firstColumn = columns[0]
+    if (!firstColumn) return
+
+    const targetGroup = updatedFilters[0]
+    const newRule: AdvancedFilterRule = {
+      id: `rule_${Date.now()}`,
+      column: firstColumn.id,
+      operator: 'contains',
+      value: '',
+      enabled: true,
+    }
+
+    const newFilters = updatedFilters.map((group, index) =>
+      index === 0 ? { ...group, rules: [...group.rules, newRule] } : group
+    )
+
+    onFiltersChange(newFilters.length > 0 ? newFilters : [{ ...targetGroup, rules: [newRule] }])
+  }, [columns, ensureDefaultGroup, onFiltersChange])
+
+  const addFilterGroup = useCallback(() => {
     const newGroup: AdvancedFilterGroup = {
       id: `group_${Date.now()}`,
       logic: 'AND',
       rules: [],
     }
     onFiltersChange([...filters, newGroup])
-  }
+    setShowAdvanced(true)
+  }, [filters, onFiltersChange])
 
-  const updateFilterGroup = (groupId: string, updates: Partial<AdvancedFilterGroup>) => {
-    onFiltersChange(
-      filters.map((group) => (group.id === groupId ? { ...group, ...updates } : group))
-    )
-  }
+  const updateFilterGroup = useCallback(
+    (groupId: string, updates: Partial<AdvancedFilterGroup>) => {
+      onFiltersChange(
+        filters.map((group) => (group.id === groupId ? { ...group, ...updates } : group))
+      )
+    },
+    [filters, onFiltersChange]
+  )
 
-  const removeFilterGroup = (groupId: string) => {
-    onFiltersChange(filters.filter((group) => group.id !== groupId))
-  }
+  const removeFilterGroup = useCallback(
+    (groupId: string) => {
+      onFiltersChange(filters.filter((group) => group.id !== groupId))
+    },
+    [filters, onFiltersChange]
+  )
 
-  const addRule = (groupId: string) => {
-    const firstColumn = columns.find((col) => col.searchable !== false)
-    if (!firstColumn) return
+  const addRule = useCallback(
+    (groupId: string) => {
+      const firstColumn = columns[0]
+      if (!firstColumn) return
 
-    const newRule: AdvancedFilterRule = {
-      id: `rule_${Date.now()}`,
-      column: firstColumn.id,
-      operator: 'equals',
-      value: '',
-      enabled: true,
-    }
+      const newRule: AdvancedFilterRule = {
+        id: `rule_${Date.now()}`,
+        column: firstColumn.id,
+        operator: 'contains',
+        value: '',
+        enabled: true,
+      }
 
-    updateFilterGroup(groupId, {
-      rules: [...(filters.find((g) => g.id === groupId)?.rules || []), newRule],
-    })
-  }
+      const group = filters.find((g) => g.id === groupId)
+      if (group) {
+        updateFilterGroup(groupId, { rules: [...group.rules, newRule] })
+      }
+    },
+    [columns, filters, updateFilterGroup]
+  )
 
-  const updateRule = (groupId: string, ruleId: string, updates: Partial<AdvancedFilterRule>) => {
-    const group = filters.find((g) => g.id === groupId)
-    if (!group) return
+  const updateRule = useCallback(
+    (groupId: string, ruleId: string, updates: Partial<AdvancedFilterRule>) => {
+      const group = filters.find((g) => g.id === groupId)
+      if (!group) return
 
-    const updatedRules = group.rules.map((rule) =>
-      rule.id === ruleId ? { ...rule, ...updates } : rule
-    )
-    updateFilterGroup(groupId, { rules: updatedRules })
-  }
+      const updatedRules = group.rules.map((rule) =>
+        rule.id === ruleId ? { ...rule, ...updates } : rule
+      )
+      updateFilterGroup(groupId, { rules: updatedRules })
+    },
+    [filters, updateFilterGroup]
+  )
 
-  const removeRule = (groupId: string, ruleId: string) => {
-    const group = filters.find((g) => g.id === groupId)
-    if (!group) return
+  const removeRule = useCallback(
+    (groupId: string, ruleId: string) => {
+      const group = filters.find((g) => g.id === groupId)
+      if (!group) return
 
-    const updatedRules = group.rules.filter((rule) => rule.id !== ruleId)
-    updateFilterGroup(groupId, { rules: updatedRules })
-  }
+      const updatedRules = group.rules.filter((rule) => rule.id !== ruleId)
+      updateFilterGroup(groupId, { rules: updatedRules })
+    },
+    [filters, updateFilterGroup]
+  )
 
-  const clearAllFilters = () => {
+  const clearAllFilters = useCallback(() => {
     onFiltersChange([])
-    setIsOpen(false)
-  }
+  }, [onFiltersChange])
 
-  const getAvailableOperators = (columnType: string) => {
+  const getAvailableOperators = useCallback((columnType: string) => {
     return Object.entries(OPERATORS)
-      .filter(([_, config]) => config.types.includes(columnType))
+      .filter(([_, config]) => config.types.includes(columnType || 'text'))
       .map(([key, config]) => ({
         value: key,
         label: config.label,
       }))
-  }
+  }, [])
 
-  const renderValueInput = (group: AdvancedFilterGroup, rule: AdvancedFilterRule) => {
-    const column = columns.find((c) => c.id === rule.column)
-    if (!column) return null
+  const getColumnTitle = useCallback(
+    (columnId: string) => {
+      return columns.find((c) => c.id === columnId)?.title || columnId
+    },
+    [columns]
+  )
 
-    const operator = OPERATORS[rule.operator]
-    if (!operator?.needsValue) return null
+  const renderValueInput = useCallback(
+    (groupId: string, rule: AdvancedFilterRule) => {
+      const column = columns.find((c) => c.id === rule.column)
+      if (!column) return null
 
-    switch (column.type) {
-      case 'select':
+      const operator = OPERATORS[rule.operator]
+      if (!operator?.needsValue) {
         return (
-          <SelectPortal
-            value={String(rule.value || '')}
-            onValueChange={(value) => updateRule(group.id, rule.id, { value })}
-            options={
-              column.options?.map((opt) => ({
-                value: String(opt.value),
-                label: opt.label,
-                color: opt.color,
-              })) || []
-            }
-            placeholder="Sélectionner..."
-            className="h-8 text-xs min-w-[120px]"
-          />
+          <span className="text-[10px] text-muted-foreground italic">
+            —
+          </span>
         )
+      }
 
-      case 'number':
-        return (
-          <div className="flex gap-1">
-            <Input
-              type="number"
+      const inputBaseClass = 'h-7 text-xs bg-background border-border/50 focus:border-primary'
+
+      switch (column.type) {
+        case 'select':
+        case 'multiselect':
+          return (
+            <Select
               value={String(rule.value || '')}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateRule(group.id, rule.id, { value: e.target.value })
-              }
-              placeholder="Valeur"
-              className="h-8 text-xs w-20"
-            />
-            {operator.needsValue2 && (
+              onValueChange={(value) => updateRule(groupId, rule.id, { value })}
+            >
+              <SelectTrigger className={cn(inputBaseClass, 'min-w-[100px]')}>
+                <SelectValue placeholder="..." />
+              </SelectTrigger>
+              <SelectContent>
+                {column.options?.map((opt) => (
+                  <SelectItem key={String(opt.value)} value={String(opt.value)}>
+                    <div className="flex items-center gap-2">
+                      {opt.color && (
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: opt.color }} />
+                      )}
+                      <span>{opt.label}</span>
+                    </div>
+                  </SelectItem>
+                )) || []}
+              </SelectContent>
+            </Select>
+          )
+
+        case 'number':
+          return (
+            <div className="flex items-center gap-1">
               <Input
                 type="number"
-                value={String(rule.value2 || '')}
+                value={String(rule.value || '')}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateRule(group.id, rule.id, { value2: e.target.value })
+                  updateRule(groupId, rule.id, { value: e.target.value })
                 }
-                placeholder="Valeur 2"
-                className="h-8 text-xs w-20"
+                placeholder="Val."
+                className={cn(inputBaseClass, 'w-20')}
               />
-            )}
-          </div>
-        )
+              {operator.needsValue2 && (
+                <>
+                  <span className="text-[10px] text-muted-foreground">→</span>
+                  <Input
+                    type="number"
+                    value={String(rule.value2 || '')}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      updateRule(groupId, rule.id, { value2: e.target.value })
+                    }
+                    placeholder="Val."
+                    className={cn(inputBaseClass, 'w-20')}
+                  />
+                </>
+              )}
+            </div>
+          )
 
-      case 'date':
-        return (
-          <div className="flex gap-1">
-            <Input
-              type="date"
-              value={String(rule.value || '')}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                updateRule(group.id, rule.id, { value: e.target.value })
-              }
-              className="h-8 text-xs w-32"
-            />
-            {operator.needsValue2 && (
+        case 'date':
+        case 'datetime':
+          return (
+            <div className="flex items-center gap-1">
               <Input
                 type="date"
-                value={String(rule.value2 || '')}
+                value={String(rule.value || '')}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateRule(group.id, rule.id, { value2: e.target.value })
+                  updateRule(groupId, rule.id, { value: e.target.value })
                 }
-                className="h-8 text-xs w-32"
+                className={cn(inputBaseClass, 'w-32')}
               />
-            )}
-          </div>
-        )
+              {operator.needsValue2 && (
+                <>
+                  <span className="text-[10px] text-muted-foreground">→</span>
+                  <Input
+                    type="date"
+                    value={String(rule.value2 || '')}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      updateRule(groupId, rule.id, { value2: e.target.value })
+                    }
+                    className={cn(inputBaseClass, 'w-32')}
+                  />
+                </>
+              )}
+            </div>
+          )
 
-      default:
-        return (
-          <Input
-            value={String(rule.value || '')}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              updateRule(group.id, rule.id, { value: e.target.value })
-            }
-            placeholder="Valeur"
-            className="h-8 text-xs min-w-[120px]"
-          />
-        )
-    }
-  }
-
-  const renderFilterRule = (
-    group: AdvancedFilterGroup,
-    rule: AdvancedFilterRule,
-    index: number
-  ) => {
-    const column = columns.find((c) => c.id === rule.column)
-    const availableOperators = column ? getAvailableOperators(column.type) : []
-
-    return (
-      <div key={rule.id} className="flex items-center gap-2 p-2 bg-gray-50 rounded border">
-        {/* Logic connector pour les règles après la première */}
-        {index > 0 && (
-          <SelectPortal
-            value={group.logic}
-            onValueChange={(value: string) =>
-              updateFilterGroup(group.id, { logic: value as 'AND' | 'OR' })
-            }
-            options={[
-              { value: 'AND', label: 'ET' },
-              { value: 'OR', label: 'OU' },
-            ]}
-            className="h-7 text-xs w-14"
-          />
-        )}
-
-        {/* Column selector */}
-        <SelectPortal
-          value={rule.column}
-          onValueChange={(value) => {
-            const newColumn = columns.find((c) => c.id === value)
-            const firstOperator = newColumn
-              ? getAvailableOperators(newColumn.type)[0]?.value
-              : 'equals'
-            updateRule(group.id, rule.id, {
-              column: value,
-              operator: firstOperator as FilterOperator,
-              value: '',
-              value2: undefined,
-            })
-          }}
-          options={columns
-            .filter((col) => col.searchable !== false)
-            .map((col) => ({
-              value: col.id,
-              label: col.title,
-            }))}
-          className="h-7 text-xs min-w-[100px]"
-        />
-
-        {/* Operator selector */}
-        <SelectPortal
-          value={rule.operator}
-          onValueChange={(value) =>
-            updateRule(group.id, rule.id, {
-              operator: value as FilterOperator,
-              value: '',
-              value2: undefined,
-            })
-          }
-          options={availableOperators}
-          className="h-7 text-xs min-w-[120px]"
-        />
-
-        {/* Value input(s) */}
-        {renderValueInput(group, rule)}
-
-        {/* Enable/Disable toggle */}
-        <Button
-          type="button"
-          variant={rule.enabled ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => updateRule(group.id, rule.id, { enabled: !rule.enabled })}
-          className="h-7 w-7 p-0"
-        >
-          <ToggleLeft
-            className={cn('h-3 w-3 transition-transform', rule.enabled && 'rotate-180')}
-          />
-        </Button>
-
-        {/* Remove rule */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => removeRule(group.id, rule.id)}
-          className="h-7 w-7 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-        >
-          <X className="h-3 w-3" />
-        </Button>
-      </div>
-    )
-  }
-
-  const renderFilterGroup = (group: AdvancedFilterGroup, groupIndex: number) => {
-    return (
-      <div key={group.id} className="border rounded-lg p-3 bg-white">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Groupe {groupIndex + 1}</span>
-            {groupIndex > 0 && (
-              <Badge variant="outline" className="text-xs">
-                ET
-              </Badge>
-            )}
-          </div>
-          <div className="flex gap-1">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => addRule(group.id)}
-              className="h-7 text-xs"
+        case 'boolean':
+          return (
+            <Select
+              value={String(rule.value || '')}
+              onValueChange={(value) => updateRule(groupId, rule.id, { value })}
             >
-              <Plus className="h-3 w-3 mr-1" />
-              Règle
-            </Button>
+              <SelectTrigger className={cn(inputBaseClass, 'w-20')}>
+                <SelectValue placeholder="..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Oui</SelectItem>
+                <SelectItem value="false">Non</SelectItem>
+              </SelectContent>
+            </Select>
+          )
+
+        default:
+          return (
+            <Input
+              value={String(rule.value || '')}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                updateRule(groupId, rule.id, { value: e.target.value })
+              }
+              placeholder="Valeur..."
+              className={cn(inputBaseClass, 'min-w-[80px] flex-1')}
+            />
+          )
+      }
+    },
+    [columns, updateRule]
+  )
+
+  const renderFilterRule = useCallback(
+    (group: AdvancedFilterGroup, rule: AdvancedFilterRule, index: number, showLogicConnector: boolean) => {
+      const column = columns.find((c) => c.id === rule.column)
+      const availableOperators = column ? getAvailableOperators(column.type) : getAvailableOperators('text')
+
+      return (
+        <div key={rule.id} className="space-y-1">
+          {/* Connecteur logique entre les cartes */}
+          {showLogicConnector && (
+            <div className="flex items-center justify-center">
+              <LogicToggle
+                value={group.logic}
+                onChange={(logic) => updateFilterGroup(group.id, { logic })}
+                size="sm"
+              />
+            </div>
+          )}
+
+          <div
+            className={cn(
+              'rounded-md border transition-all',
+              rule.enabled
+                ? 'bg-card border-border'
+                : 'bg-muted/30 border-border/50 opacity-60'
+            )}
+          >
+            {/* Layout compact : tout sur une ou deux lignes */}
+            <div className="p-2 flex items-center gap-1.5 flex-wrap">
+              {/* Colonne */}
+              <Select
+                value={rule.column}
+                onValueChange={(value) => {
+                  const newColumn = columns.find((c) => c.id === value)
+                  const newOperators = newColumn ? getAvailableOperators(newColumn.type) : []
+                  const firstOperator = newOperators[0]?.value || 'equals'
+                  updateRule(group.id, rule.id, {
+                    column: value,
+                    operator: firstOperator as FilterOperator,
+                    value: '',
+                    value2: undefined,
+                  })
+                }}
+              >
+                <SelectTrigger className="h-7 text-xs min-w-[120px] bg-background">
+                  <SelectValue placeholder="Colonne" />
+                </SelectTrigger>
+                <SelectContent>
+                  {columns.map((col) => (
+                    <SelectItem key={col.id} value={col.id}>
+                      {col.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Opérateur */}
+              <Select
+                value={rule.operator}
+                onValueChange={(value) =>
+                  updateRule(group.id, rule.id, {
+                    operator: value as FilterOperator,
+                    value: '',
+                    value2: undefined,
+                  })
+                }
+              >
+                <SelectTrigger className="h-7 text-xs min-w-[130px] bg-background">
+                  <SelectValue placeholder="Op." />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableOperators.map((op) => (
+                    <SelectItem key={op.value} value={op.value}>
+                      {op.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Valeur */}
+              <div className="flex-1 min-w-[100px]">
+                {renderValueInput(group.id, rule)}
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center gap-0.5 ml-auto">
+                <Switch
+                  size="sm"
+                  checked={rule.enabled}
+                  onCheckedChange={(checked) =>
+                    updateRule(group.id, rule.id, { enabled: checked })
+                  }
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => removeRule(group.id, rule.id)}
+                  className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    },
+    [columns, getAvailableOperators, removeRule, renderValueInput, updateFilterGroup, updateRule]
+  )
+
+  const renderFilterGroup = useCallback(
+    (group: AdvancedFilterGroup, groupIndex: number) => {
+      const activeRulesCount = group.rules.filter((r) => r.enabled).length
+
+      return (
+        <div key={group.id} className="space-y-1">
+          {/* Connecteur entre groupes */}
+          {groupIndex > 0 && (
+            <div className="flex items-center justify-center">
+              <div className="flex items-center gap-2">
+                <div className="h-px w-6 bg-border" />
+                <LogicToggle value={groupsLogic} onChange={handleGroupsLogicChange} size="sm" />
+                <div className="h-px w-6 bg-border" />
+              </div>
+            </div>
+          )}
+
+          {/* Carte du groupe */}
+          <div className="rounded-lg border border-border/60 bg-muted/20 overflow-hidden">
+            {/* Header du groupe - compact */}
+            <div className="flex items-center justify-between px-2 py-1.5 bg-muted/30 border-b border-border/40">
+              <div className="flex items-center gap-1.5">
+                <Layers className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-medium text-foreground">
+                  Groupe {groupIndex + 1}
+                </span>
+                {activeRulesCount > 0 && (
+                  <span className="px-1 py-0.5 rounded text-[9px] font-medium bg-primary/10 text-primary">
+                    {activeRulesCount}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-0.5">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => addRule(group.id)}
+                  className="h-6 px-1.5 text-[10px]"
+                >
+                  <Plus className="h-3 w-3 mr-0.5" />
+                  Ajouter
+                </Button>
+                {filters.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeFilterGroup(group.id)}
+                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Règles - scrollable si > 3 éléments */}
+            <div
+              className="p-2 overflow-y-auto space-y-1 filter-scroll"
+              style={{ maxHeight: '180px' }}
+            >
+              {group.rules.length > 0 ? (
+                group.rules.map((rule, index) => renderFilterRule(group, rule, index, index > 0))
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => addRule(group.id)}
+                  className="w-full py-3 border border-dashed border-border/50 rounded text-muted-foreground hover:border-primary/50 hover:text-primary hover:bg-primary/5 transition-colors"
+                >
+                  <Plus className="h-3.5 w-3.5 mx-auto mb-0.5" />
+                  <span className="text-[10px]">Ajouter une condition</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )
+    },
+    [addRule, filters.length, groupsLogic, handleGroupsLogicChange, removeFilterGroup, renderFilterRule]
+  )
+
+  return (
+    <div className={cn('relative', className)}>
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className={cn(
+              'h-9 gap-1.5 text-muted-foreground',
+              activeFiltersCount > 0 && 'text-primary bg-primary/10 hover:bg-primary/15'
+            )}
+          >
+            <Filter className="h-4 w-4" />
+            <span className="hidden sm:inline">Filtres</span>
+            {activeFiltersCount > 0 && (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground">
+                {activeFiltersCount}
+              </span>
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          side="bottom"
+          className="w-[440px] max-w-[95vw] p-0"
+        >
+        <div
+          className="flex flex-col overflow-hidden"
+          style={{ maxHeight: 'min(500px, 70vh)' }}
+        >
+          {/* Injection des styles scrollbar */}
+          <style>{scrollbarStyles}</style>
+
+          {/* Header - compact - fixe */}
+          <div className="flex-shrink-0 flex items-center justify-between px-3 py-2 border-b border-border/50 bg-muted/20">
+            <div className="flex items-center gap-1.5">
+              <Filter className="h-3.5 w-3.5 text-muted-foreground" />
+              <h3 className="text-sm font-semibold text-foreground">Filtres</h3>
+              {activeFiltersCount > 0 && (
+                <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </div>
             <Button
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => removeFilterGroup(group.id)}
-              className="h-7 w-7 p-0 text-red-600"
+              onClick={() => setIsOpen(false)}
+              className="h-6 w-6 p-0"
             >
-              <Trash2 className="h-3 w-3" />
+              <X className="h-3.5 w-3.5" />
             </Button>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          {group.rules.map((rule, index) => renderFilterRule(group, rule, index))}
-          {group.rules.length === 0 && (
-            <div className="text-center py-4 text-gray-500 text-sm">Aucune règle de filtrage</div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className={cn('relative', className)}>
-      <DropdownPortal
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        align="start"
-        side="bottom"
-        className="min-w-[800px] max-w-[90vw] max-h-[80vh] overflow-auto p-0"
-        trigger={
-          <Button type="button" variant="outline" size="sm" className="relative">
-            <Filter className="h-4 w-4 mr-2" />
-            Filtres avancés
-            {activeFiltersCount > 0 && (
-              <Badge variant="destructive" className="ml-2 h-5 px-1.5 text-xs">
-                {activeFiltersCount}
-              </Badge>
-            )}
-          </Button>
-        }
-        onInteractOutside={(event) => {
-          // Ne pas fermer si on clique sur un SelectPortal
-          const target = event.target as Element
-          if (
-            target.closest('[data-select-portal]') ||
-            target.closest('[role="listbox"]') ||
-            target.closest('[role="option"]')
-          ) {
-            event.preventDefault()
-            return
-          }
-          // Sinon, fermer le dropdown
-          setIsOpen(false)
-        }}
-      >
-        <div className="p-4 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold">Filtres avancés</h3>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={addFilterGroup}
-                className="text-xs"
-              >
-                <Plus className="h-3 w-3 mr-1" />
-                Groupe
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={clearAllFilters}
-                className="text-xs text-red-600"
-              >
-                <RotateCcw className="h-3 w-3 mr-1" />
-                Tout effacer
-              </Button>
+          {/* Filtres actifs (chips) - compact - fixe */}
+          {allRules.length > 0 && (
+            <div className="flex-shrink-0 px-3 py-1.5 border-b border-border/30 bg-muted/10 max-h-20 overflow-y-auto filter-scroll">
+              <div className="flex flex-wrap gap-1">
+                {allRules.map((rule) => (
+                  <FilterChip
+                    key={rule.id}
+                    rule={rule}
+                    columnTitle={getColumnTitle(rule.column)}
+                    onRemove={() => removeRule(rule.groupId, rule.id)}
+                    onToggle={() =>
+                      updateRule(rule.groupId, rule.id, { enabled: !rule.enabled })
+                    }
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="space-y-3">
-            {filters.map((group, index) => renderFilterGroup(group, index))}
-            {filters.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                <Filter className="h-12 w-12 mx-auto mb-3 opacity-30" />
-                <p className="text-sm">Aucun filtre configuré</p>
-                <p className="text-xs text-gray-400">Cliquez sur "Groupe" pour commencer</p>
+          {/* Contenu principal - scrollable */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-3 space-y-2 filter-scroll">
+            {filters.length === 0 ? (
+              /* État vide - compact */
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/50 mb-3">
+                  <Filter className="h-5 w-5 text-muted-foreground/60" />
+                </div>
+                <p className="text-xs font-medium text-foreground mb-0.5">Aucun filtre</p>
+                <p className="text-[10px] text-muted-foreground mb-3 max-w-[200px]">
+                  Filtrez les données du tableau
+                </p>
+                <Button type="button" onClick={addQuickFilter} size="sm" className="h-7 text-xs">
+                  <Plus className="h-3.5 w-3.5 mr-1" />
+                  Ajouter un filtre
+                </Button>
+              </div>
+            ) : (
+              /* Liste des groupes */
+              <div className="space-y-2">
+                {filters.map((group, index) => renderFilterGroup(group, index))}
               </div>
             )}
           </div>
 
-          <div className="flex justify-end pt-3 border-t">
-            <Button type="button" onClick={() => setIsOpen(false)} size="sm">
-              Appliquer les filtres
-            </Button>
+          {/* Footer - compact - fixe */}
+          <div className="flex-shrink-0 flex items-center justify-between px-3 py-2 border-t border-border/50 bg-muted/20">
+            <div className="flex items-center gap-1">
+              {filters.length > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearAllFilters}
+                  className="h-7 text-[10px] text-muted-foreground hover:text-destructive"
+                >
+                  <Trash2 className="h-3 w-3 mr-0.5" />
+                  Effacer
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5">
+              {filters.length > 0 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addFilterGroup}
+                  className="h-7 text-xs"
+                >
+                  <Layers className="h-3 w-3 mr-0.5" />
+                  Groupe
+                </Button>
+              )}
+              <Button
+                type="button"
+                variant={filters.length === 0 ? 'outline' : 'default'}
+                size="sm"
+                onClick={filters.length === 0 ? addQuickFilter : () => setIsOpen(false)}
+                className="h-7 text-xs"
+              >
+                {filters.length === 0 ? (
+                  <>
+                    <Plus className="h-3.5 w-3.5 mr-0.5" />
+                    Filtre
+                  </>
+                ) : (
+                  'Appliquer'
+                )}
+              </Button>
+            </div>
           </div>
         </div>
-      </DropdownPortal>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

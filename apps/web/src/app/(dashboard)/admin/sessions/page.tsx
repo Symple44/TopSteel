@@ -19,7 +19,9 @@ import {
   DialogHeader,
   DialogTitle,
   Input,
+  PageContainer,
   PageHeader,
+  PageSection,
   Select,
   SelectContent,
   SelectItem,
@@ -244,8 +246,7 @@ function SessionsManagementContent() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* En-tête */}
+    <PageContainer maxWidth="full" padding="default">
       <PageHeader
         title={t('sessions.title') || 'Sessions Utilisateurs'}
         description={t('sessions.description') || 'Surveillance des utilisateurs connectés et historique des connexions'}
@@ -270,8 +271,9 @@ function SessionsManagementContent() {
         }
       />
 
-      {/* Statistiques */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <PageSection spacing="default">
+        {/* Statistiques */}
+        <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-2">
@@ -618,6 +620,7 @@ function SessionsManagementContent() {
           </CardContent>
         </Card>
       )}
+      </PageSection>
 
       {/* Dialog de détails utilisateur */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
@@ -634,7 +637,7 @@ function SessionsManagementContent() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageContainer>
   )
 }
 

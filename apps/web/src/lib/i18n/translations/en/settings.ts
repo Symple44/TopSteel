@@ -222,11 +222,9 @@ export const settings = {
   settingsEnhanced: {
     appearance: {
       themes: {
-        vibrant: 'Vibrant',
         light: 'Light',
         dark: 'Dark',
         system: 'System',
-        vibrantDesc: 'Modern colorful theme',
         lightDesc: 'Light interface',
         darkDesc: 'Dark interface',
         systemDesc: 'Follow system settings',

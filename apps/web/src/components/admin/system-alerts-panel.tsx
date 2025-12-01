@@ -49,15 +49,15 @@ export function SystemAlertsPanel({
   const getAlertIcon = (type: string) => {
     switch (type) {
       case 'error':
-        return <AlertTriangle className="w-4 h-4 text-red-600" />
+        return <AlertTriangle className="w-4 h-4 text-destructive" />
       case 'warning':
-        return <AlertCircle className="w-4 h-4 text-yellow-600" />
+        return <AlertCircle className="w-4 h-4 text-warning" />
       case 'success':
-        return <CheckCircle2 className="w-4 h-4 text-green-600" />
+        return <CheckCircle2 className="w-4 h-4 text-success" />
       case 'info':
-        return <Info className="w-4 h-4 text-blue-600" />
+        return <Info className="w-4 h-4 text-info" />
       default:
-        return <Info className="w-4 h-4 text-gray-600" />
+        return <Info className="w-4 h-4 text-muted-foreground" />
     }
   }
 
@@ -79,15 +79,15 @@ export function SystemAlertsPanel({
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'border-l-red-600'
+        return 'border-l-destructive'
       case 'high':
-        return 'border-l-red-400'
+        return 'border-l-destructive/70'
       case 'medium':
-        return 'border-l-yellow-400'
+        return 'border-l-warning'
       case 'low':
-        return 'border-l-blue-400'
+        return 'border-l-info'
       default:
-        return 'border-l-gray-400'
+        return 'border-l-muted-foreground'
     }
   }
 
@@ -187,7 +187,7 @@ export function SystemAlertsPanel({
         <div className="space-y-2 max-h-96 overflow-y-auto">
           {filteredAlerts?.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <CheckCircle2 className="w-12 h-12 mx-auto mb-2 text-green-600" />
+              <CheckCircle2 className="w-12 h-12 mx-auto mb-2 text-success" />
               <p>Aucune alerte système</p>
               <p className="text-sm">Tout fonctionne correctement</p>
             </div>

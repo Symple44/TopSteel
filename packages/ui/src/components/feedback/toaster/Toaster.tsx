@@ -23,13 +23,13 @@ const Toaster = forwardRef<HTMLDivElement, ToasterProps>(
     const getTypeStyles = (type?: string) => {
       switch (type) {
         case 'success':
-          return 'border-green-200 bg-green-50 text-green-800'
+          return 'border-success/30 bg-success/10 text-success'
         case 'error':
-          return 'border-red-200 bg-red-50 text-red-800'
+          return 'border-destructive/30 bg-destructive/10 text-destructive'
         case 'warning':
-          return 'border-yellow-200 bg-yellow-50 text-yellow-800'
+          return 'border-warning/30 bg-warning/10 text-warning'
         default:
-          return 'border-gray-200 bg-white text-gray-900'
+          return 'border-border bg-popover text-popover-foreground'
       }
     }
 

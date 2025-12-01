@@ -1,5 +1,6 @@
 import type * as React from 'react'
 import type { ReactNode } from 'react'
+import type { DataTablePreset } from './presets'
 
 // Types de données supportés
 export type DataValue = string | number | boolean | Date | null | undefined
@@ -32,6 +33,7 @@ export interface ColumnConfig<T = DataRecord> {
   maxWidth?: number
   resizable?: boolean
   sortable?: boolean
+  filterable?: boolean
   searchable?: boolean
   editable?: boolean
   required?: boolean
@@ -197,6 +199,10 @@ export interface DataTableConfig<T = DataRecord> {
   // Identifiants
   tableId?: string // Pour la sauvegarde des paramètres
   userId?: string // Pour isoler les paramètres par utilisateur
+
+  // Preset system
+  /** Predefined configuration preset (minimal, standard, advanced, full) */
+  preset?: DataTablePreset
 
   // Fonctionnalites
   sortable?: boolean

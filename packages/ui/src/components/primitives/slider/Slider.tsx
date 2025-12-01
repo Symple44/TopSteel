@@ -44,7 +44,7 @@ const Slider = React.forwardRef<HTMLInputElement, SliderProps>(
         defaultValue={defaultValue}
         onChange={handleChange}
         className={cn(
-          'w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer',
+          'w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer',
           'slider:bg-primary slider:appearance-none slider:h-2 slider:rounded-lg',
           '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:cursor-pointer',
           '[&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-none',

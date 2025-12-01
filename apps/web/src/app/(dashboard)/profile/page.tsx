@@ -729,7 +729,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <PageContainer maxWidth="xl" padding="none">
+    <PageContainer maxWidth="full" padding="default">
       <PageHeader
         title={t('title')}
         description={t('subtitle')}

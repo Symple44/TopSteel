@@ -61,6 +61,10 @@ export class UnifiedRolesService {
     throw new Error('UnifiedRolesService stub should never be called - check aliasing in auth.module.ts')
   }
 
+  async getAllUsersRolesForSociete(societeId: string): Promise<Map<string, UserSocieteInfo>> {
+    throw new Error('UnifiedRolesService stub should never be called - check aliasing in auth.module.ts')
+  }
+
   async getUserSocieteRole(userId: string, societeId: string): Promise<UserSocieteInfo | null> {
     throw new Error('UnifiedRolesService stub should never be called - check aliasing in auth.module.ts')
   }

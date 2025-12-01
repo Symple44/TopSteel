@@ -1,12 +1,15 @@
 'use client'
 
 import { ArrowDown, ArrowUp, Calendar, Check, Filter, Hash, Search, X } from 'lucide-react'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { cn } from '../../../lib/utils'
 import { Label } from '../../primitives'
 import { Button } from '../../primitives/button'
-import { Checkbox } from '../../primitives/checkbox'
 import { Input } from '../../primitives/input'
+
+// Pagination
+const PAGE_SIZE = 50
 
 type FilterType =
   | {
@@ -60,21 +63,28 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
   const [numberRange, setNumberRange] = useState({ min: '', max: '' })
   const [dateRange, setDateRange] = useState({ start: '', end: '' })
   const [showOnlySelected, setShowOnlySelected] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
 
-  // Initialiser les valeurs sélectionnées à partir des filtres actuels
+  // Initialiser/réinitialiser les valeurs sélectionnées à partir des filtres actuels
   useEffect(() => {
-    if (
-      currentFilters &&
+    if (!currentFilters) {
+      // Réinitialiser tous les états quand le filtre est effacé
+      setSelectedValues(new Set())
+      setNumberRange({ min: '', max: '' })
+      setDateRange({ start: '', end: '' })
+      setShowOnlySelected(false)
+      setCurrentPage(0)
+    } else if (
       currentFilters.type === 'values' &&
       Array.isArray(currentFilters.values)
     ) {
       setSelectedValues(new Set(currentFilters.values))
-    } else if (currentFilters && currentFilters.type === 'range') {
+    } else if (currentFilters.type === 'range') {
       setNumberRange({
         min: currentFilters.min !== null ? String(currentFilters.min) : '',
         max: currentFilters.max !== null ? String(currentFilters.max) : '',
       })
-    } else if (currentFilters && currentFilters.type === 'dateRange') {
+    } else if (currentFilters.type === 'dateRange') {
       setDateRange({
         start: currentFilters.start || '',
         end: currentFilters.end || '',
@@ -206,6 +216,71 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isOpen])
 
+  // Callbacks pour appliquer/effacer les filtres (définis avant le useEffect qui les utilise)
+  const handleApplyFilter = useCallback(() => {
+    let filter: FilterType | null = null
+
+    if (
+      (columnType === 'text' ||
+        columnType === 'select' ||
+        columnType === 'boolean' ||
+        columnType === 'richtext') &&
+      selectedValues.size > 0
+    ) {
+      filter = { type: 'values', values: Array.from(selectedValues) }
+    } else if (columnType === 'number' && (numberRange.min || numberRange.max)) {
+      filter = {
+        type: 'range',
+        min: numberRange.min ? Number(numberRange.min) : null,
+        max: numberRange.max ? Number(numberRange.max) : null,
+      }
+    } else if (columnType === 'date' && (dateRange.start || dateRange.end)) {
+      filter = {
+        type: 'dateRange',
+        start: dateRange.start || null,
+        end: dateRange.end || null,
+      }
+    }
+
+    onFilter(filter)
+    setShowOnlySelected(false)
+    setIsOpen(false)
+  }, [columnType, selectedValues, numberRange, dateRange, onFilter])
+
+  const handleClearFilter = useCallback(() => {
+    setSelectedValues(new Set())
+    setNumberRange({ min: '', max: '' })
+    setDateRange({ start: '', end: '' })
+    setShowOnlySelected(false)
+    onFilter(null)
+    setIsOpen(false)
+  }, [onFilter])
+
+  // Raccourcis clavier : Échap pour fermer, Entrée pour appliquer
+  useEffect(() => {
+    if (!isOpen) return
+
+    function handleKeyDown(event: KeyboardEvent) {
+      // Ne pas intercepter si on est dans un champ de saisie et qu'on tape du texte
+      const target = event.target as HTMLElement
+      const isInputField = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        setIsOpen(false)
+      } else if (event.key === 'Enter' && !isInputField) {
+        // Appliquer le filtre seulement si on n'est pas dans un champ de saisie
+        event.preventDefault()
+        event.stopPropagation()
+        handleApplyFilter()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [isOpen, handleApplyFilter])
+
   // Positionner le dropdown
   useEffect(() => {
     if (!isOpen || !buttonRef.current || !dropdownRef.current) return
@@ -246,16 +321,17 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
       positionDropdown()
     })
 
-    // Gérer le scroll et le resize
+    // Repositionner au scroll/resize au lieu de fermer
     const handleScrollOrResize = (event?: Event) => {
-      // Ne pas fermer si le scroll vient du dropdown lui-même
+      // Ne pas repositionner si le scroll vient du dropdown lui-même
       if (event?.target && dropdownRef.current) {
         const target = event.target as Element
         if (dropdownRef.current.contains(target)) {
           return
         }
       }
-      setIsOpen(false)
+      // Repositionner au lieu de fermer
+      requestAnimationFrame(positionDropdown)
     }
 
     window.addEventListener('scroll', handleScrollOrResize, true)
@@ -269,45 +345,6 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
 
   const handleSort = (direction: 'asc' | 'desc' | null) => {
     onSort(direction)
-    setIsOpen(false)
-  }
-
-  const handleApplyFilter = () => {
-    let filter: FilterType | null = null
-
-    if (
-      (columnType === 'text' ||
-        columnType === 'select' ||
-        columnType === 'boolean' ||
-        columnType === 'richtext') &&
-      selectedValues.size > 0
-    ) {
-      filter = { type: 'values', values: Array.from(selectedValues) }
-    } else if (columnType === 'number' && (numberRange.min || numberRange.max)) {
-      filter = {
-        type: 'range',
-        min: numberRange.min ? Number(numberRange.min) : null,
-        max: numberRange.max ? Number(numberRange.max) : null,
-      }
-    } else if (columnType === 'date' && (dateRange.start || dateRange.end)) {
-      filter = {
-        type: 'dateRange',
-        start: dateRange.start || null,
-        end: dateRange.end || null,
-      }
-    }
-
-    onFilter(filter)
-    setShowOnlySelected(false) // Réinitialiser l'affichage
-    setIsOpen(false)
-  }
-
-  const handleClearFilter = () => {
-    setSelectedValues(new Set())
-    setNumberRange({ min: '', max: '' })
-    setDateRange({ start: '', end: '' })
-    setShowOnlySelected(false) // Réinitialiser l'affichage
-    onFilter(null)
     setIsOpen(false)
   }
 
@@ -335,11 +372,32 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
     }
   }
 
-  const filteredValues = uniqueValues.filter((value) => {
-    const matchesSearch = value.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesSelection = showOnlySelected ? selectedValues.has(value) : true
-    return matchesSearch && matchesSelection
-  })
+  const filteredValues = useMemo(() => {
+    return uniqueValues.filter((value) => {
+      const matchesSearch = value.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesSelection = showOnlySelected ? selectedValues.has(value) : true
+      return matchesSearch && matchesSelection
+    })
+  }, [uniqueValues, searchTerm, showOnlySelected, selectedValues])
+
+  // Réinitialiser la page quand la recherche change
+  useEffect(() => {
+    setCurrentPage(0)
+  }, [searchTerm, showOnlySelected])
+
+  // Calculs de pagination
+  const totalPages = Math.ceil(filteredValues.length / PAGE_SIZE)
+  const startIndex = currentPage * PAGE_SIZE
+  const endIndex = Math.min(startIndex + PAGE_SIZE, filteredValues.length)
+
+  // Valeurs à afficher (avec pagination)
+  const displayedValues = useMemo(() => {
+    return filteredValues.slice(startIndex, endIndex)
+  }, [filteredValues, startIndex, endIndex])
+
+  const goToPage = useCallback((page: number) => {
+    setCurrentPage(Math.max(0, Math.min(page, totalPages - 1)))
+  }, [totalPages])
 
   // Détecter si un filtre est réellement appliqué (pas juste défini)
   const isFiltered = React.useMemo(() => {
@@ -363,113 +421,138 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
 
   return (
     <>
-      <div className="relative">
-        <Button
-          type="button"
-          ref={buttonRef}
-          variant="ghost"
-          size="sm"
-          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-            e.stopPropagation()
-            setIsOpen(!isOpen)
-          }}
-          className={`h-6 w-6 p-0 transition-all duration-200 hover:bg-accent ${
-            isFiltered
-              ? 'text-blue-600 opacity-100'
-              : hasSort
-                ? 'text-blue-500 opacity-100'
-                : 'text-muted-foreground opacity-0 group-hover:opacity-70 hover:opacity-100'
-          }`}
-          title={
-            isFiltered
-              ? 'Filtre actif - Cliquez pour modifier'
-              : hasSort
-                ? 'Tri actif'
-                : 'Filtrer cette colonne'
-          }
-        >
-          <Filter
-            className={`h-3 w-3 transition-transform duration-200 ${
-              isFiltered ? 'scale-110' : 'scale-100'
-            } ${!isFiltered && !hasSort ? 'filter-icon-hover' : ''}`}
-          />
-        </Button>
-
-        {/* Indicateur subtil pour filtre actif */}
+      <Button
+        type="button"
+        ref={buttonRef}
+        variant="ghost"
+        size="sm"
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+          e.stopPropagation()
+          setIsOpen(!isOpen)
+        }}
+        className={`h-6 w-6 p-0 transition-all duration-200 relative ${
+          isFiltered
+            ? 'text-primary bg-primary/15 hover:bg-primary/25'
+            : hasSort
+              ? 'text-primary/70 bg-primary/10 hover:bg-primary/20'
+              : 'text-muted-foreground opacity-0 group-hover:opacity-70 hover:opacity-100 hover:bg-accent'
+        }`}
+        title={
+          isFiltered
+            ? 'Filtre actif - Cliquez pour modifier'
+            : hasSort
+              ? 'Tri actif - Cliquez pour filtrer'
+              : 'Filtrer cette colonne'
+        }
+      >
+        <Filter className="h-3 w-3" />
+        {/* Badge indicateur filtre actif */}
         {isFiltered && (
-          <div className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 bg-blue-600 rounded-full" />
+          <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary" />
+          </span>
         )}
-      </div>
+      </Button>
 
       {isOpen &&
         mounted &&
         createPortal(
-          <div
-            ref={dropdownRef}
-            className="column-filter-advanced w-80 bg-background border border-border rounded-md shadow-2xl"
-            style={{
-              position: 'fixed',
-              zIndex: 50000,
-            }}
-          >
-            {/* Header */}
-            <div className="p-3 border-b border-border bg-muted/50">
-              <div className="font-medium text-sm mb-2">{column.title}</div>
+          <>
+            {/* Styles pour la scrollbar */}
+            <style>{`
+              .filter-values-scroll::-webkit-scrollbar {
+                width: 6px;
+              }
+              .filter-values-scroll::-webkit-scrollbar-track {
+                background: hsl(var(--muted) / 0.3);
+                border-radius: 3px;
+              }
+              .filter-values-scroll::-webkit-scrollbar-thumb {
+                background: hsl(var(--muted-foreground) / 0.3);
+                border-radius: 3px;
+              }
+              .filter-values-scroll::-webkit-scrollbar-thumb:hover {
+                background: hsl(var(--muted-foreground) / 0.5);
+              }
+            `}</style>
+            <div
+              ref={dropdownRef}
+              className="column-filter-advanced w-72 bg-background border border-border rounded-md shadow-2xl animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150"
+              style={{
+                position: 'fixed',
+                zIndex: 50000,
+              }}
+            >
+            {/* Header compact */}
+            <div className="px-2.5 py-2 border-b border-border bg-muted/50">
+              <div className="flex items-center justify-between gap-2 mb-1.5">
+                <span className="font-medium text-xs truncate">{column.title}</span>
+                <span className="text-[10px] text-muted-foreground">
+                  {uniqueValues.length} valeurs
+                </span>
+              </div>
 
-              {/* Boutons de tri */}
+              {/* Boutons de tri compacts */}
               <div className="flex gap-1">
-                <Button
+                <button
                   type="button"
-                  variant={currentSort === 'desc' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                    e.stopPropagation()
-                    handleSort(currentSort === 'desc' ? null : 'desc')
-                  }}
-                  className="flex-1"
-                >
-                  <ArrowUp className="h-3 w-3 mr-1" />
-                  Croissant
-                </Button>
-                <Button
-                  type="button"
-                  variant={currentSort === 'asc' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  onClick={(e) => {
                     e.stopPropagation()
                     handleSort(currentSort === 'asc' ? null : 'asc')
                   }}
-                  className="flex-1"
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1 h-6 text-[11px] rounded border transition-colors',
+                    currentSort === 'asc'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background border-border hover:bg-muted'
+                  )}
                 >
-                  <ArrowDown className="h-3 w-3 mr-1" />
-                  Décroissant
-                </Button>
-                <Button
+                  <ArrowUp className="h-3 w-3" />
+                  A→Z
+                </button>
+                <button
                   type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  onClick={(e) => {
                     e.stopPropagation()
-                    handleSort(null)
+                    handleSort(currentSort === 'desc' ? null : 'desc')
                   }}
-                  className="px-2"
-                  title="Supprimer le tri"
+                  className={cn(
+                    'flex-1 flex items-center justify-center gap-1 h-6 text-[11px] rounded border transition-colors',
+                    currentSort === 'desc'
+                      ? 'bg-primary text-primary-foreground border-primary'
+                      : 'bg-background border-border hover:bg-muted'
+                  )}
                 >
-                  <X className="h-3 w-3" />
-                </Button>
+                  <ArrowDown className="h-3 w-3" />
+                  Z→A
+                </button>
+                {currentSort && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleSort(null)
+                    }}
+                    className="h-6 w-6 flex items-center justify-center rounded border border-border bg-background hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors"
+                    title="Supprimer le tri"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
               </div>
             </div>
 
             {/* Contenu du filtre selon le type */}
-            <div className="p-3 max-h-96 overflow-y-auto">
+            <div className="px-2.5 py-2">
               {(columnType === 'text' ||
                 columnType === 'select' ||
                 columnType === 'boolean' ||
                 columnType === 'richtext') && (
                 <>
-                  {/* Barre de recherche */}
-                  <div className="relative mb-3">
-                    <Search className="absolute left-2 top-2.5 h-3 w-3 text-muted-foreground" />
+                  {/* Barre de recherche compacte */}
+                  <div className="relative mb-2">
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
                     <Input
                       type="text"
                       placeholder="Rechercher..."
@@ -478,124 +561,202 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
                         setSearchTerm(e.target.value)
                       }
                       onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
-                      className="pl-7 h-8 text-sm"
+                      className="pl-7 h-7 text-xs"
                     />
+                    {searchTerm && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchTerm('')}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    )}
                   </div>
 
-                  {/* Options d'affichage */}
-                  <div className="flex justify-between items-center mb-2">
-                    <div className="flex gap-1">
-                      <Button
+                  {/* Barre d'outils compacte */}
+                  <div className="flex items-center justify-between gap-1 mb-2 pb-1.5 border-b border-border/30">
+                    <div className="flex gap-0.5">
+                      <button
                         type="button"
-                        variant={showOnlySelected ? 'ghost' : 'default'}
-                        size="sm"
-                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        onClick={(e) => {
                           e.stopPropagation()
                           setShowOnlySelected(false)
                         }}
-                        className="text-xs h-6 px-2"
+                        className={cn(
+                          'px-2 py-0.5 text-[10px] rounded transition-colors',
+                          !showOnlySelected
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-muted'
+                        )}
                       >
                         Tous
-                      </Button>
-                      <Button
+                      </button>
+                      <button
                         type="button"
-                        variant={showOnlySelected ? 'default' : 'ghost'}
-                        size="sm"
-                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                        onClick={(e) => {
                           e.stopPropagation()
-                          setShowOnlySelected(true)
+                          if (selectedValues.size > 0) setShowOnlySelected(true)
                         }}
-                        className="text-xs h-6 px-2"
                         disabled={selectedValues.size === 0}
+                        className={cn(
+                          'px-2 py-0.5 text-[10px] rounded transition-colors',
+                          showOnlySelected
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-muted disabled:opacity-50'
+                        )}
                       >
-                        Sélectionnés ({selectedValues.size})
-                      </Button>
+                        Sélection ({selectedValues.size})
+                      </button>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {filteredValues.length} affichés
-                    </span>
-                  </div>
-
-                  {/* Actions de sélection */}
-                  <div className="flex justify-between items-center mb-2">
-                    <Button
+                    <button
                       type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                      onClick={(e) => {
                         e.stopPropagation()
                         toggleAll()
                       }}
-                      className="text-xs"
+                      className="text-[10px] text-primary hover:underline"
                     >
-                      {showOnlySelected
-                        ? 'Désélectionner tout'
-                        : selectedValues.size === uniqueValues.length
-                          ? 'Désélectionner tout'
-                          : 'Sélectionner tout'}
-                    </Button>
-                    <span className="text-xs text-muted-foreground">
-                      {selectedValues.size} sélectionnés
-                    </span>
+                      {selectedValues.size === filteredValues.length ? 'Aucun' : 'Tout'}
+                    </button>
                   </div>
 
-                  {/* Liste des valeurs */}
-                  <div className="space-y-1 max-h-48 overflow-y-auto border rounded p-2">
-                    {filteredValues.map((value) => (
-                      <label
-                        key={value}
-                        className="flex items-center gap-2 p-1 hover:bg-muted/50 rounded cursor-pointer"
-                        htmlFor={`checkbox-${value.replace(/[^a-zA-Z0-9]/g, '_')}`}
-                      >
-                        <Checkbox
-                          id={`checkbox-${value.replace(/[^a-zA-Z0-9]/g, '_')}`}
-                          checked={selectedValues.has(value)}
-                          onCheckedChange={() => toggleValue(value)}
-                        />
-                        <span
-                          className={`text-sm truncate flex-1 ${value === '(Vide)' ? 'italic text-muted-foreground' : ''}`}
+                  {/* Liste des valeurs avec scroll stylisé */}
+                  <div
+                    className="border rounded bg-background overflow-hidden"
+                    style={{ maxHeight: 'min(200px, 40vh)' }}
+                  >
+                    <div className="overflow-y-auto h-full filter-values-scroll">
+                      {displayedValues.map((value) => (
+                        <div
+                          key={value}
+                          role="checkbox"
+                          aria-checked={selectedValues.has(value)}
+                          tabIndex={0}
+                          onClick={() => toggleValue(value)}
+                          onKeyDown={(e) => {
+                            if (e.key === ' ' || e.key === 'Enter') {
+                              e.preventDefault()
+                              toggleValue(value)
+                            }
+                          }}
+                          className={cn(
+                            'flex items-center gap-2 px-2 py-1.5 cursor-pointer border-b border-border/20 last:border-0 transition-colors select-none',
+                            selectedValues.has(value)
+                              ? 'bg-primary/10 hover:bg-primary/15'
+                              : 'hover:bg-muted/50'
+                          )}
                         >
-                          {value === '(Vide)' ? '(Vide - Non traduit)' : value}
+                          <span
+                            className={cn(
+                              'flex items-center justify-center h-4 w-4 rounded border-2 flex-shrink-0 transition-colors',
+                              selectedValues.has(value)
+                                ? 'bg-primary border-primary text-white'
+                                : 'border-muted-foreground/40 bg-background'
+                            )}
+                          >
+                            {selectedValues.has(value) && (
+                              <Check className="h-3 w-3" strokeWidth={3} />
+                            )}
+                          </span>
+                          <span
+                            className={cn(
+                              'text-xs truncate flex-1',
+                              value === '(Vide)' && 'italic text-muted-foreground'
+                            )}
+                          >
+                            {value}
+                          </span>
+                        </div>
+                      ))}
+
+                      {/* Message si aucun résultat */}
+                      {filteredValues.length === 0 && (
+                        <div className="py-3 text-center text-xs text-muted-foreground">
+                          Aucun résultat
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Pagination et compteur */}
+                  <div className="mt-1.5 flex items-center justify-between">
+                    {/* Pagination */}
+                    {totalPages > 1 ? (
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            goToPage(currentPage - 1)
+                          }}
+                          disabled={currentPage === 0}
+                          className="h-5 w-5 flex items-center justify-center text-[10px] rounded border border-border bg-background hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        >
+                          ‹
+                        </button>
+                        <span className="text-[10px] text-muted-foreground px-1">
+                          {currentPage + 1}/{totalPages}
                         </span>
-                      </label>
-                    ))}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            goToPage(currentPage + 1)
+                          }}
+                          disabled={currentPage >= totalPages - 1}
+                          className="h-5 w-5 flex items-center justify-center text-[10px] rounded border border-border bg-background hover:bg-muted disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        >
+                          ›
+                        </button>
+                      </div>
+                    ) : (
+                      <div />
+                    )}
+
+                    {/* Compteur */}
+                    <div className="text-[10px] text-muted-foreground">
+                      {startIndex + 1}-{endIndex}/{filteredValues.length}
+                      {selectedValues.size > 0 && (
+                        <span className="text-primary font-medium"> • {selectedValues.size} ✓</span>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
 
               {columnType === 'number' && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Hash className="h-4 w-4" />
-                    <span>Filtre numérique</span>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Hash className="h-3 w-3" />
+                    <span>Plage numérique</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <div>
-                      <Label className="text-xs">Minimum</Label>
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Label className="text-[10px] text-muted-foreground">Min</Label>
                       <Input
                         type="number"
-                        placeholder={`Min: ${numberBounds.min}`}
+                        placeholder={String(numberBounds.min)}
                         value={numberRange.min}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setNumberRange((prev) => ({ ...prev, min: e.target.value }))
                         }
                         onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
-                        className="h-8"
+                        className="h-7 text-xs"
                       />
                     </div>
-
-                    <div>
-                      <Label className="text-xs">Maximum</Label>
+                    <div className="flex-1">
+                      <Label className="text-[10px] text-muted-foreground">Max</Label>
                       <Input
                         type="number"
-                        placeholder={`Max: ${numberBounds.max}`}
+                        placeholder={String(numberBounds.max)}
                         value={numberRange.max}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setNumberRange((prev) => ({ ...prev, max: e.target.value }))
                         }
                         onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
-                        className="h-8"
+                        className="h-7 text-xs"
                       />
                     </div>
                   </div>
@@ -603,15 +764,42 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
               )}
 
               {columnType === 'date' && (
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4" />
-                    <span>Filtre par date</span>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    <span>Période</span>
                   </div>
 
-                  <div className="space-y-2">
-                    <div>
-                      <Label className="text-xs">Date de début</Label>
+                  {/* Filtres rapides compacts */}
+                  <div className="flex flex-wrap gap-1">
+                    {[
+                      { label: "Auj.", days: 0 },
+                      { label: '7j', days: 7 },
+                      { label: '30j', days: 30 },
+                      { label: '90j', days: 90 },
+                    ].map(({ label, days }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          const today = new Date()
+                          const end = today.toISOString().split('T')[0]
+                          const start = days === 0
+                            ? end
+                            : new Date(today.getTime() - days * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                          setDateRange({ start, end })
+                        }}
+                        className="px-2 py-0.5 text-[10px] rounded border border-border bg-background hover:bg-muted transition-colors"
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Label className="text-[10px] text-muted-foreground">Du</Label>
                       <Input
                         type="date"
                         value={dateRange.start}
@@ -619,12 +807,11 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
                           setDateRange((prev) => ({ ...prev, start: e.target.value }))
                         }
                         onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
-                        className="h-8"
+                        className="h-7 text-xs"
                       />
                     </div>
-
-                    <div>
-                      <Label className="text-xs">Date de fin</Label>
+                    <div className="flex-1">
+                      <Label className="text-[10px] text-muted-foreground">Au</Label>
                       <Input
                         type="date"
                         value={dateRange.end}
@@ -632,7 +819,7 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
                           setDateRange((prev) => ({ ...prev, end: e.target.value }))
                         }
                         onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.stopPropagation()}
-                        className="h-8"
+                        className="h-7 text-xs"
                       />
                     </div>
                   </div>
@@ -640,36 +827,33 @@ export function ColumnFilterAdvanced<T = Record<string, unknown>>({
               )}
             </div>
 
-            {/* Footer avec actions */}
-            <div className="p-3 border-t border-border bg-muted/30 flex gap-2">
-              <Button
+            {/* Footer compact */}
+            <div className="px-2.5 py-2 border-t border-border bg-muted/30 flex gap-1.5">
+              <button
                 type="button"
-                variant="outline"
-                size="sm"
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                onClick={(e) => {
                   e.stopPropagation()
                   handleClearFilter()
                 }}
-                className="flex-1"
+                className="flex-1 h-7 flex items-center justify-center gap-1 text-xs rounded border border-border bg-background hover:bg-muted transition-colors"
               >
-                <X className="h-3 w-3 mr-1" />
+                <X className="h-3 w-3" />
                 Effacer
-              </Button>
-              <Button
+              </button>
+              <button
                 type="button"
-                variant="default"
-                size="sm"
-                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                onClick={(e) => {
                   e.stopPropagation()
                   handleApplyFilter()
                 }}
-                className="flex-1"
+                className="flex-1 h-7 flex items-center justify-center gap-1 text-xs rounded bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                <Check className="h-3 w-3 mr-1" />
+                <Check className="h-3 w-3" />
                 Appliquer
-              </Button>
+              </button>
             </div>
-          </div>,
+            </div>
+          </>,
           document.body
         )}
     </>

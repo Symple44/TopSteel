@@ -16,23 +16,81 @@ export class UsersPrismaService {
       throw new ConflictException('Email already exists')
     }
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: createUserDto.email,
-        password: createUserDto.password,
-        nom: createUserDto.nom,
-        prenom: createUserDto.prenom,
-        role: createUserDto.role || 'OPERATEUR',
-        actif: createUserDto.actif !== undefined ? createUserDto.actif : true,
-        // acronyme: createUserDto.acronyme || null,
-        metadata: createUserDto.metadata as any,
-      },
+    // Transaction pour garantir l'atomicité : User + UserSettings
+    return await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: createUserDto.email,
+          password: createUserDto.password,
+          nom: createUserDto.nom,
+          prenom: createUserDto.prenom,
+          role: createUserDto.role || 'OPERATEUR',
+          actif: createUserDto.actif !== undefined ? createUserDto.actif : true,
+          // acronyme: createUserDto.acronyme || null,
+          metadata: createUserDto.metadata as any,
+        },
+      })
+
+      // Créer les paramètres par défaut dans la même transaction
+      await tx.userSettings.create({
+        data: {
+          userId: user.id,
+          profile: {
+            firstName: user.prenom,
+            lastName: user.nom,
+            email: user.email,
+          },
+          company: {
+            name: 'TopSteel Métallerie',
+            address: "123 Rue de l'Industrie",
+            city: 'Lyon',
+            postalCode: '69001',
+            country: 'France',
+          },
+          preferences: {
+            language: 'fr',
+            timezone: 'Europe/Paris',
+            theme: 'vibrant',
+            notifications: {
+              email: true,
+              push: true,
+              sms: false,
+              emailTypes: {
+                newMessages: true,
+                systemAlerts: true,
+                taskReminders: false,
+                weeklyReports: true,
+                securityAlerts: true,
+                maintenanceNotice: false,
+              },
+              pushTypes: {
+                enabled: true,
+                sound: true,
+                urgent: true,
+                normal: false,
+                quiet: true,
+              },
+              quietHours: {
+                enabled: true,
+                start: '22:00',
+                end: '07:00',
+              },
+            },
+            appearance: {
+              theme: 'vibrant',
+              language: 'fr',
+              fontSize: 'medium',
+              sidebarWidth: 'normal',
+              density: 'comfortable',
+              accentColor: 'blue',
+              contentWidth: 'compact',
+            },
+          },
+        },
+      })
+
+      return user
     })
-
-    // Créer les paramètres par défaut pour l'utilisateur
-    await this.createDefaultUserSettings(user.id)
-
-    return user
   }
 
   async findAll(query?: UserQueryDto) {

@@ -1,5 +1,5 @@
 import { Prisma, type UserMenuPreferences, type UserMenuItemPreference } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { Injectable } from '@nestjs/common'
 
 import { MenuConfigurationService, MenuTreeNode } from './menu-configuration.service'
@@ -148,9 +148,14 @@ type UserMenuPreferencesWithItems = UserMenuPreferences & {
 @Injectable()
 export class UserMenuPreferencesService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly menuConfigService: MenuConfigurationService
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   // ===== PREFERENCE MANAGEMENT =====
 

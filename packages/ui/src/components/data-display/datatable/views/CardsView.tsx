@@ -2,7 +2,12 @@
 
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from '../../../primitives/button'
-import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../../primitives/dropdown'
 import { Badge } from '../..//badge'
 import type { Card } from '../use-data-views'
 
@@ -37,9 +42,9 @@ export function CardsView({
   return (
     <div className={`grid ${gridClass} gap-6`}>
       {cards.map((card) => (
-        <button
+        <div
           key={card.id}
-          type="button"
+          role="button"
           className="bg-background border rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow w-full text-left"
           onClick={() => onCardClick?.(card)}
           onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCardClick?.(card)}
@@ -63,9 +68,8 @@ export function CardsView({
                 )}
               </div>
 
-              <DropdownPortal
-                align="end"
-                trigger={
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
                     type="button"
                     variant="ghost"
@@ -76,17 +80,18 @@ export function CardsView({
                   >
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
-                }
-              >
-                {onCardEdit && (
-                  <DropdownItem onClick={() => onCardEdit(card)}>Modifier</DropdownItem>
-                )}
-                {onCardDelete && (
-                  <DropdownItem onClick={() => onCardDelete(card)} className="text-red-600">
-                    Supprimer
-                  </DropdownItem>
-                )}
-              </DropdownPortal>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {onCardEdit && (
+                    <DropdownMenuItem onClick={() => onCardEdit(card)}>Modifier</DropdownMenuItem>
+                  )}
+                  {onCardDelete && (
+                    <DropdownMenuItem onClick={() => onCardDelete(card)} className="text-red-600">
+                      Supprimer
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Description */}
@@ -144,7 +149,7 @@ export function CardsView({
               {/* Placeholder pour d'autres infos comme la date, assignee, etc. */}
             </div>
           </div>
-        </button>
+        </div>
       ))}
 
       {/* Carte vide si aucune donnée */}

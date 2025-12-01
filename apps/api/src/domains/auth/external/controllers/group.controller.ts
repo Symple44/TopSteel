@@ -28,9 +28,22 @@ export class GroupController {
 
   @Get()
   @Roles('SUPER_ADMIN', 'ADMIN')
-  async findAll() {
-    const groups = await this.groupService.findAllGroups()
-    return { success: true, data: groups }
+  async findAll(@Query('page') page?: number, @Query('limit') limit?: number) {
+    const result = await this.groupService.findAllGroups({
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 20,
+    })
+
+    return {
+      success: true,
+      data: result.groups,
+      meta: {
+        total: result.total,
+        page: page || 1,
+        limit: limit || 20,
+        totalPages: Math.ceil(result.total / (limit || 20)),
+      },
+    }
   }
 
   @Get(':id')

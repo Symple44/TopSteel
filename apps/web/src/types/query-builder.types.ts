@@ -193,6 +193,125 @@ export interface QueryBuilderSettings {
   enableExport: boolean
   /** Available export formats */
   exportFormats: string[]
+  /** Row actions configuration (navigation buttons, etc.) */
+  rowActions?: RowActionsSettings
+}
+
+// ============================================================================
+// Row Actions Configuration
+// ============================================================================
+
+/**
+ * Row actions settings container
+ */
+export interface RowActionsSettings {
+  /** Whether row actions are enabled */
+  enabled: boolean
+  /** List of configured actions */
+  actions: RowActionConfig[]
+}
+
+/**
+ * Individual row action configuration
+ * Allows defining navigation buttons and other actions on DataTable rows
+ */
+export interface RowActionConfig {
+  /** Unique identifier for the action */
+  id: string
+  /** Display label for the action button */
+  label: string
+  /** Icon name (from Lucide icons) */
+  icon?: string
+  /** Action type */
+  type: RowActionType
+  /**
+   * URL template for navigation actions
+   * Supports placeholders like {id}, {user_id} that will be replaced with row data
+   * Example: "/admin/users/{id}" or "/orders/{order_id}/details"
+   */
+  target?: string
+  /**
+   * Field name to use as the primary identifier
+   * Used when target URL needs an ID field
+   */
+  idField?: string
+  /** Button variant for styling */
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+  /** Condition to disable the action */
+  disabled?: RowActionDisabledCondition
+  /** Required permissions to show this action */
+  permissions?: string[]
+  /** Required roles to show this action */
+  roles?: string[]
+  /** Confirmation message before executing (for destructive actions) */
+  confirmMessage?: string
+}
+
+/**
+ * Types of row actions
+ */
+export type RowActionType =
+  | 'navigation'  // Navigate to another page
+  | 'modal'       // Open a modal/dialog
+  | 'callback'    // Execute a callback function
+  | 'delete'      // Delete the row
+  | 'edit'        // Edit the row inline
+  | 'external'    // Open external URL
+
+/**
+ * Condition for disabling a row action
+ */
+export interface RowActionDisabledCondition {
+  /** Field name to check */
+  field: string
+  /** Operator for comparison */
+  operator: 'equals' | 'not_equals' | 'is_null' | 'is_not_null' | 'contains'
+  /** Value to compare against */
+  value?: unknown
+}
+
+/**
+ * Helper function to build URL from template and row data
+ * Replaces {fieldName} placeholders with actual values from the row
+ *
+ * @example
+ * buildActionUrl("/users/{id}/edit", { id: "123", name: "John" })
+ * // Returns: "/users/123/edit"
+ */
+export function buildActionUrl(template: string, row: Record<string, unknown>): string {
+  return template.replace(/\{(\w+)\}/g, (_, key) => {
+    const value = row[key]
+    return value !== undefined && value !== null ? String(value) : ''
+  })
+}
+
+/**
+ * Helper function to evaluate if an action should be disabled
+ */
+export function isActionDisabled(
+  condition: RowActionDisabledCondition | undefined,
+  row: Record<string, unknown>
+): boolean {
+  if (!condition) return false
+
+  const fieldValue = row[condition.field]
+
+  switch (condition.operator) {
+    case 'equals':
+      return fieldValue === condition.value
+    case 'not_equals':
+      return fieldValue !== condition.value
+    case 'is_null':
+      return fieldValue === null || fieldValue === undefined
+    case 'is_not_null':
+      return fieldValue !== null && fieldValue !== undefined
+    case 'contains':
+      return typeof fieldValue === 'string' &&
+             typeof condition.value === 'string' &&
+             fieldValue.includes(condition.value)
+    default:
+      return false
+  }
 }
 
 // ============================================================================

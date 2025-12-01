@@ -2,8 +2,9 @@
 
 export const dynamic = 'force-dynamic'
 
-import { Badge, Card, CardContent, CardHeader, CardTitle } from '@erp/ui'
+import { Badge, Card, CardContent, CardHeader, CardTitle, PageContainer, PageHeader, PageSection } from '@erp/ui'
 import {
+  BookOpen,
   Calculator,
   Database,
   Download,
@@ -18,15 +19,15 @@ import {
 
 export default function QueryBuilderDocsPage() {
   return (
-    <div className="container mx-auto p-6">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold mb-4">Guide d'utilisation Query Builder</h1>
-          <p className="text-lg text-muted-foreground">
-            Créez des requêtes complexes de manière visuelle et interactive
-          </p>
-        </div>
+    <PageContainer maxWidth="full" padding="default">
+      <PageHeader
+        title="Guide d'utilisation Query Builder"
+        description="Créez des requêtes complexes de manière visuelle et interactive"
+        icon={BookOpen}
+        iconBackground="bg-gradient-to-br from-blue-500 to-indigo-600"
+      />
 
+      <PageSection spacing="default">
         <div className="grid gap-6">
           <Card>
             <CardHeader>
@@ -272,7 +273,7 @@ export default function QueryBuilderDocsPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </div>
+      </PageSection>
+    </PageContainer>
   )
 }

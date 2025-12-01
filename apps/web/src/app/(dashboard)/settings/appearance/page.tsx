@@ -1,6 +1,6 @@
 /**
  * Page de gestion de l'apparence et des langues - TopSteel ERP
- * Fichier: apps/web/src/app/(dashboard)/settings/appearance/page.tsx
+ * Version simplifiée: Thème + Langue uniquement
  */
 
 'use client'
@@ -12,7 +12,6 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 import {
-  Button,
   Card,
   CardContent,
   CardHeader,
@@ -21,19 +20,8 @@ import {
   PageHeader,
   PageSection,
 } from '@erp/ui'
-import {
-  Eye,
-  Globe,
-  Layout,
-  Maximize,
-  Monitor,
-  Moon,
-  Palette,
-  Sun,
-  Type,
-} from 'lucide-react'
+import { Globe, Monitor, Moon, Palette, Sun } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { TemplateSelector } from '../../../../components/settings/template-selector'
 import { useAppearanceSettings } from '../../../../hooks/use-appearance-settings'
 import { useAuth } from '../../../../hooks/use-auth'
 import { useToastShortcuts } from '../../../../hooks/use-toast'
@@ -43,7 +31,6 @@ export default function AppearanceSettingsPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
   const { t } = useTranslation('settings')
-  const { t: tc } = useTranslation('common')
   const { success, error } = useToastShortcuts()
 
   // Hook pour gérer les préférences d'apparence
@@ -51,7 +38,6 @@ export default function AppearanceSettingsPage() {
     settings,
     updateSetting,
     saveSettings,
-    resetSettings,
     isLoading: settingsLoading,
     hasUnsavedChanges,
   } = useAppearanceSettings()
@@ -79,7 +65,7 @@ export default function AppearanceSettingsPage() {
             t('settingsEnhanced.appearance.messages.saveErrorDesc')
           )
         }
-      }, 1000) // Attendre 1 seconde après le dernier changement
+      }, 1000)
 
       return () => clearTimeout(timeoutId)
     }
@@ -98,19 +84,8 @@ export default function AppearanceSettingsPage() {
     )
   }
 
-  const _handleReset = () => {
-    if (confirm(t('appearance.resetConfirm'))) {
-      resetSettings()
-    }
-  }
-
+  // Thèmes simplifiés: Light, Dark, System (Vibrant retiré des options)
   const themes = [
-    {
-      id: 'vibrant' as const,
-      label: t('settingsEnhanced.appearance.themes.vibrant'),
-      icon: Palette,
-      description: t('settingsEnhanced.appearance.themes.vibrantDesc'),
-    },
     {
       id: 'light' as const,
       label: t('settingsEnhanced.appearance.themes.light'),
@@ -131,85 +106,29 @@ export default function AppearanceSettingsPage() {
     },
   ]
 
+  // Langues traduites uniquement: FR, EN, ES
   const languages = [
     { id: 'fr', label: t('settingsEnhanced.appearance.languages.fr'), flag: '🇫🇷' },
     { id: 'en', label: t('settingsEnhanced.appearance.languages.en'), flag: '🇺🇸' },
     { id: 'es', label: t('settingsEnhanced.appearance.languages.es'), flag: '🇪🇸' },
-    { id: 'de', label: 'Deutsch', flag: '🇩🇪' },
-  ]
-
-  const accentColors = [
-    {
-      id: 'blue' as const,
-      label: t('settingsEnhanced.appearance.accentColors.blue'),
-      color: 'bg-blue-500',
-    },
-    {
-      id: 'green' as const,
-      label: t('settingsEnhanced.appearance.accentColors.green'),
-      color: 'bg-green-500',
-    },
-    {
-      id: 'purple' as const,
-      label: t('settingsEnhanced.appearance.accentColors.purple'),
-      color: 'bg-purple-500',
-    },
-    {
-      id: 'orange' as const,
-      label: t('settingsEnhanced.appearance.accentColors.orange'),
-      color: 'bg-orange-500',
-    },
-    {
-      id: 'pink' as const,
-      label: t('settingsEnhanced.appearance.accentColors.pink'),
-      color: 'bg-pink-500',
-    },
-    {
-      id: 'red' as const,
-      label: t('settingsEnhanced.appearance.accentColors.red'),
-      color: 'bg-red-500',
-    },
-    { id: 'teal' as const, label: 'Sarcelle', color: 'bg-teal-500' },
-    {
-      id: 'indigo' as const,
-      label: t('settingsEnhanced.appearance.accentColors.indigo'),
-      color: 'bg-indigo-500',
-    },
-    {
-      id: 'yellow' as const,
-      label: t('settingsEnhanced.appearance.accentColors.yellow'),
-      color: 'bg-yellow-500',
-    },
-    { id: 'emerald' as const, label: 'Émeraude', color: 'bg-emerald-500' },
-    { id: 'rose' as const, label: 'Rose vif', color: 'bg-rose-500' },
-    { id: 'cyan' as const, label: 'Cyan', color: 'bg-cyan-500' },
   ]
 
   return (
-    <PageContainer maxWidth="xl" padding="default">
+    <PageContainer maxWidth="full" padding="default">
       <PageHeader
         title={t('appearance.title')}
         description={t('appearance.subtitle')}
         icon={Palette}
         iconBackground="bg-gradient-to-br from-indigo-500 to-purple-600"
-        onBack={() => router?.back()}
-        backLabel={t('appearance.back')}
       />
 
       <PageSection spacing="default">
         <div className="space-y-8">
-          {/* Sélecteur de Templates */}
-          <Card>
-            <CardContent className="p-6">
-              <TemplateSelector />
-            </CardContent>
-          </Card>
-
           {/* Thème */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-foreground">
-                <Palette className="h-6 w-6 mr-3 text-indigo-600" />
+                <Palette className="h-6 w-6 mr-3 text-primary" />
                 {t('settingsEnhanced.appearance.sections.theme')}
               </CardTitle>
             </CardHeader>
@@ -241,209 +160,26 @@ export default function AppearanceSettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center text-foreground">
-                <Globe className="h-6 w-6 mr-3 text-blue-600" />
+                <Globe className="h-6 w-6 mr-3 text-primary" />
                 {t('settingsEnhanced.appearance.sections.language')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 {languages?.map((lang) => (
                   <button
                     key={lang.id}
                     type="button"
-                    className={`w-full p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
+                    className={`w-full p-4 border-2 rounded-xl cursor-pointer transition-all text-center ${
                       settings.language === lang.id
                         ? 'border-primary bg-primary/5'
                         : 'border-border hover:border-primary/50'
                     }`}
                     onClick={() => updateSetting('language', lang.id)}
                   >
-                    <div className="text-2xl mb-1">{lang.flag}</div>
+                    <div className="text-3xl mb-2">{lang.flag}</div>
                     <span className="text-sm font-medium text-foreground">{lang.label}</span>
                   </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Couleur d'accent */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-foreground">
-                <Eye className="h-6 w-6 mr-3 text-purple-600" />
-                {t('settingsEnhanced.appearance.sections.accentColor')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
-                {accentColors?.map((color) => (
-                  <button
-                    key={color.id}
-                    type="button"
-                    className={`w-full p-3 border-2 rounded-xl cursor-pointer transition-all text-center ${
-                      settings.accentColor === color.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:border-primary/50'
-                    }`}
-                    onClick={() => updateSetting('accentColor', color.id)}
-                  >
-                    <div className={`w-8 h-8 ${color.color} rounded-full mx-auto mb-1`}></div>
-                    <span className="text-xs font-medium text-foreground">{color.label}</span>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Taille de police */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-foreground">
-                <Type className="h-6 w-6 mr-3 text-green-600" />
-                {t('settingsEnhanced.appearance.sections.fontSize')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  {
-                    id: 'small',
-                    label: t('settingsEnhanced.appearance.fontSizes.small'),
-                    sample: 'text-sm',
-                  },
-                  {
-                    id: 'medium',
-                    label: t('settingsEnhanced.appearance.fontSizes.medium'),
-                    sample: 'text-base',
-                  },
-                  {
-                    id: 'large',
-                    label: t('settingsEnhanced.appearance.fontSizes.large'),
-                    sample: 'text-lg',
-                  },
-                ].map((size) => (
-                  <label key={size.id} className="flex items-center space-x-3 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="fontSize"
-                      value={size.id}
-                      checked={settings.fontSize === size.id}
-                      onChange={(e) =>
-                        updateSetting(
-                          'fontSize',
-                          (e?.target?.value as 'small' | 'medium' | 'large') || 'medium'
-                        )
-                      }
-                      className="text-green-600"
-                    />
-                    <span className={`${size.sample} text-foreground`}>
-                      {size.label} - {tc('common.example')} de texte
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Densité d'affichage */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-foreground">
-                <Layout className="h-6 w-6 mr-3 text-orange-600" />
-                {t('settingsEnhanced.appearance.sections.density')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  {
-                    id: 'compact',
-                    label: t('settingsEnhanced.appearance.densities.compact'),
-                    description: "Plus d'éléments visibles",
-                  },
-                  {
-                    id: 'comfortable',
-                    label: t('settingsEnhanced.appearance.densities.comfortable'),
-                    description: 'Équilibre optimal',
-                  },
-                  {
-                    id: 'spacious',
-                    label: t('settingsEnhanced.appearance.densities.spacious'),
-                    description: "Plus d'espace entre les éléments",
-                  },
-                ].map((densityOption) => (
-                  <label
-                    key={densityOption.id}
-                    className="flex items-center space-x-3 cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      name="density"
-                      value={densityOption.id}
-                      checked={settings.density === densityOption.id}
-                      onChange={(e) =>
-                        updateSetting(
-                          'density',
-                          (e?.target?.value as 'compact' | 'comfortable' | 'spacious') ||
-                            'comfortable'
-                        )
-                      }
-                      className="text-orange-600"
-                    />
-                    <div>
-                      <div className="font-medium text-foreground">{densityOption.label}</div>
-                      <div className="text-sm text-muted-foreground">{densityOption.description}</div>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Largeur du contenu */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-foreground">
-                <Maximize className="h-6 w-6 mr-3 text-purple-600" />
-                {t('settingsEnhanced.appearance.sections.contentWidth')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {[
-                  {
-                    id: 'compact',
-                    label: t('settingsEnhanced.appearance.contentWidths.narrow'),
-                    description: 'Largeur limitée pour une meilleure lisibilité',
-                  },
-                  {
-                    id: 'full',
-                    label: t('settingsEnhanced.appearance.contentWidths.full'),
-                    description: "Utilise toute la largeur de l'écran",
-                  },
-                ].map((widthOption) => (
-                  <label
-                    key={widthOption.id}
-                    className="flex items-center space-x-3 cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      name="contentWidth"
-                      value={widthOption.id}
-                      checked={settings.contentWidth === widthOption.id}
-                      onChange={(e) =>
-                        updateSetting(
-                          'contentWidth',
-                          (e?.target?.value as 'compact' | 'full') || 'compact'
-                        )
-                      }
-                      className="text-purple-600"
-                    />
-                    <div>
-                      <div className="font-medium text-foreground">{widthOption.label}</div>
-                      <div className="text-sm text-muted-foreground">{widthOption.description}</div>
-                    </div>
-                  </label>
                 ))}
               </div>
             </CardContent>

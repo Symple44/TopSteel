@@ -8,9 +8,12 @@ import {
   CardHeader,
   CardTitle,
   DataTable,
+  PageContainer,
+  PageHeader,
+  PageSection,
 } from '@erp/ui'
 import type { ColumnConfig } from '@erp/ui'
-import { Edit, Eye, Plus, Trash2 } from 'lucide-react'
+import { Edit, Eye, Plus, Table, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 // Type de données pour le test
@@ -195,15 +198,17 @@ export default function TestDataTablePage() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>DataTable Test Page</CardTitle>
-          <CardDescription>Testing all DataTable features with {data.length} rows</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Statistics */}
+    <PageContainer maxWidth="full" padding="default">
+      <PageHeader
+        title="DataTable Test Page"
+        description={`Testing all DataTable features with ${data.length} rows`}
+        icon={Table}
+        iconBackground="bg-gradient-to-br from-blue-500 to-indigo-600"
+      />
+
+      <PageSection spacing="default">
+        <div className="space-y-4">
+          {/* Statistics */}
             <div className="grid grid-cols-4 gap-4">
               <Card>
                 <CardContent className="pt-6">
@@ -311,9 +316,8 @@ export default function TestDataTablePage() {
                 </CardContent>
               </Card>
             )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </PageSection>
+    </PageContainer>
   )
 }

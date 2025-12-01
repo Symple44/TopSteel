@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import * as bcrypt from 'bcrypt'
 import { Prisma } from '@prisma/client'
 import type { User, UserSession, Role, Permission, RolePermission } from '@prisma/client'
@@ -27,7 +27,12 @@ export class AuthPrismaService {
   private readonly logger = new Logger(AuthPrismaService.name)
   private readonly BCRYPT_SALT_ROUNDS = 10
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   // ============================================
   // USER OPERATIONS

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import type { Role, Permission, RolePermission } from '@prisma/client'
 import { getErrorMessage } from '../../../core/common/utils'
 
@@ -9,7 +9,12 @@ import { getErrorMessage } from '../../../core/common/utils'
  */
 @Injectable()
 export class AdminRolesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Récupère les permissions d'un rôle

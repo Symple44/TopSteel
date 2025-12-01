@@ -1,5 +1,5 @@
 import { Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { Prisma, Role } from '@prisma/client'
 
 // Type helpers for Role with relations
@@ -57,7 +57,12 @@ export type RoleComplete = Prisma.RoleGetPayload<{
 export class RolePrismaService {
   private readonly logger = new Logger(RolePrismaService.name)
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   // ============================================
   // ROLE CRUD OPERATIONS

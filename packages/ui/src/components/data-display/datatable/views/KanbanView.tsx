@@ -2,7 +2,12 @@
 
 import { MoreHorizontal, Plus } from 'lucide-react'
 import { Button } from '../../../primitives/button'
-import { DropdownItem, DropdownPortal } from '../../../primitives/dropdown-portal'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../../../primitives/dropdown'
 import { Badge } from '../..//badge'
 import type { Card, KanbanColumn } from '../use-data-views'
 
@@ -45,9 +50,9 @@ export function KanbanView({
           {/* Liste des cartes */}
           <div className="space-y-3">
             {column.items.map((card) => (
-              <button
+              <div
                 key={card.id}
-                type="button"
+                role="button"
                 className="bg-background border rounded-lg p-4 cursor-pointer hover:shadow-lg hover:border-accent transition-all duration-200 group w-full text-left"
                 onClick={() => onCardClick?.(card)}
                 onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onCardClick?.(card)}
@@ -137,9 +142,8 @@ export function KanbanView({
                     {/* Placeholder pour les avatars/assignees */}
                   </div>
 
-                  <DropdownPortal
-                    align="end"
-                    trigger={
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button
                         type="button"
                         variant="ghost"
@@ -150,19 +154,20 @@ export function KanbanView({
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
-                    }
-                  >
-                    {onCardEdit && (
-                      <DropdownItem onClick={() => onCardEdit(card)}>Modifier</DropdownItem>
-                    )}
-                    {onCardDelete && (
-                      <DropdownItem onClick={() => onCardDelete(card)} className="text-red-600">
-                        Supprimer
-                      </DropdownItem>
-                    )}
-                  </DropdownPortal>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {onCardEdit && (
+                        <DropdownMenuItem onClick={() => onCardEdit(card)}>Modifier</DropdownMenuItem>
+                      )}
+                      {onCardDelete && (
+                        <DropdownMenuItem onClick={() => onCardDelete(card)} className="text-red-600">
+                          Supprimer
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-              </button>
+              </div>
             ))}
 
             {/* Zone de drop pour ajouter une carte */}

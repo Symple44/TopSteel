@@ -114,10 +114,10 @@ export const hazardToBadgeVariant = createVariantMapper<HazardLevel>(
  */
 export function hazardToColor(level: HazardLevel): string {
   const colors: Record<HazardLevel, string> = {
-    low: 'text-green-600 bg-green-50',
-    medium: 'text-yellow-600 bg-yellow-50',
+    low: 'text-success bg-success/10',
+    medium: 'text-warning bg-warning/10',
     high: 'text-orange-600 bg-orange-50',
-    critical: 'text-red-600 bg-red-50',
+    critical: 'text-destructive bg-destructive/10',
   }
   return colors[level] || 'text-gray-600 bg-gray-50'
 }
@@ -156,11 +156,11 @@ export function normalizeMaterialCategory(category: string): MaterialPropertyCat
  */
 export function getCategoryColor(category: MaterialPropertyCategory): string {
   const colors: Record<MaterialPropertyCategory, string> = {
-    mechanical: 'text-blue-700 bg-blue-50 border-blue-200',
+    mechanical: 'text-info bg-info/10 border-info/30',
     chemical: 'text-purple-700 bg-purple-50 border-purple-200',
     thermal: 'text-orange-700 bg-orange-50 border-orange-200',
-    physical: 'text-green-700 bg-green-50 border-green-200',
-    electrical: 'text-yellow-700 bg-yellow-50 border-yellow-200',
+    physical: 'text-success bg-success/10 border-success/30',
+    electrical: 'text-warning bg-warning/10 border-warning/30',
   }
   return colors[category] || 'text-gray-700 bg-gray-50 border-gray-200'
 }

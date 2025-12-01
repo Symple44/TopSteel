@@ -97,7 +97,7 @@ export function PermissionGuard({
       }
       if (errorMessage) {
         return (
-          <div className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200">
+          <div className="text-sm text-destructive bg-destructive/10 p-2 rounded border border-destructive/30">
             {errorMessage}
           </div>
         )

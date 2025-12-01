@@ -25,6 +25,17 @@ export const queryBuilder = {
   syntax: 'Syntaxe',
   visual: 'Visuel',
   raw: 'Brut',
+  // Clés additionnelles pour query-builder-interface
+  settings: 'Paramètres',
+  calculatedFields: 'Champs calculés',
+  clickExecuteToSeeResults: 'Cliquez sur Exécuter pour voir les résultats',
+  clickExecuteToLoadData: 'Cliquez sur Exécuter pour charger les données',
+  selectTableToStart: 'Sélectionnez une table pour commencer',
+  saveSuccess: 'Requête sauvegardée avec succès',
+  saveError: 'Erreur lors de la sauvegarde',
+  saveRequired: 'Sauvegarde requise',
+  saveBeforeExecute: 'Veuillez sauvegarder avant d\'exécuter',
+  executeError: 'Erreur lors de l\'exécution',
 }
 
 export const datatable = {

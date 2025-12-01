@@ -195,7 +195,7 @@ export function PerformanceMetricsChart({
                     className="flex-1 flex flex-col items-center"
                   >
                     <div
-                      className="w-full bg-blue-500 hover:bg-blue-600 transition-colors rounded-t cursor-pointer"
+                      className="w-full bg-primary hover:bg-primary/90 transition-colors rounded-t cursor-pointer"
                       style={{ height: `${Math.max(height, 2)}%` }}
                       title={`${new Date(point.timestamp).toLocaleTimeString()}: ${value}${getMetricUnit()}`}
                     />

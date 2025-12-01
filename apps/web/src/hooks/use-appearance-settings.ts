@@ -9,7 +9,7 @@ import { translator } from '../lib/i18n/translator'
 import { callClientApi } from '../utils/backend-api'
 
 export interface AppearanceSettings {
-  theme: 'light' | 'dark' | 'vibrant' | 'system'
+  theme: 'light' | 'dark' | 'system'
   language: string
   fontSize: 'small' | 'medium' | 'large'
   sidebarWidth: 'compact' | 'normal' | 'wide'
@@ -40,13 +40,13 @@ interface UseAppearanceSettingsReturn {
 }
 
 const defaultSettings: AppearanceSettings = {
-  theme: 'vibrant', // Thème coloré par défaut
+  theme: 'light',
   language: 'fr',
   fontSize: 'medium',
   sidebarWidth: 'normal',
   density: 'comfortable',
   accentColor: 'blue',
-  contentWidth: 'compact', // Compact par défaut comme actuellement
+  contentWidth: 'full', // Full width par défaut (option retirée de l'UI)
 }
 
 // Clé pour le localStorage
@@ -120,9 +120,11 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
     }
 
     if (accentColors[newSettings.accentColor]) {
+      const accentColor = accentColors[newSettings.accentColor]
+
       // Appliquer la couleur d'accent comme couleur primaire
-      root.style.setProperty('--primary', accentColors[newSettings.accentColor])
-      root.style.setProperty('--accent-color', `hsl(${accentColors[newSettings.accentColor]})`)
+      root.style.setProperty('--primary', accentColor)
+      root.style.setProperty('--accent-color', `hsl(${accentColor})`)
 
       // Ajuster la couleur de texte primaire selon la luminosité
       const luminosityMap = {
@@ -145,213 +147,45 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
         luminosityMap[newSettings.accentColor] || '0 0% 98%'
       )
 
-      // Créer ou mettre à jour une feuille de style pour forcer les couleurs
-      let accentStyleElement = document.getElementById('topsteel-accent-styles')
-      if (!accentStyleElement) {
-        accentStyleElement = document.createElement('style')
-        accentStyleElement.id = 'topsteel-accent-styles'
-        document.head.appendChild(accentStyleElement)
-      }
+      // Définir toutes les variations de couleur comme CSS Custom Properties
+      // Ces variables seront utilisées par globals.css sans avoir besoin de !important
 
-      // Générer les styles dynamiques pour la couleur d'accent
-      accentStyleElement.textContent = `
-        /* Couleurs d'accent personnalisées - plus douces */
-        .bg-primary,
-        .vibrant .bg-primary {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.15) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.1) 100%) !important;
-          box-shadow: none !important;
-        }
-        
-        .text-primary {
-          color: hsl(${accentColors[newSettings.accentColor]} / 0.9) !important;
-        }
-        
-        .border-primary {
-          border-color: hsl(${accentColors[newSettings.accentColor]}) !important;
-        }
-        
-        /* Boutons primaires - plus subtils */
-        button.bg-primary,
-        .btn-primary,
-        .vibrant .btn-primary {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.9) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.8) 100%) !important;
-          box-shadow: 0 2px 8px hsl(${accentColors[newSettings.accentColor]} / 0.2) !important;
-        }
-        
-        button.bg-primary:hover,
-        .btn-primary:hover,
-        .vibrant .btn-primary:hover {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.9) 100%) !important;
-          box-shadow: 0 4px 16px hsl(${accentColors[newSettings.accentColor]} / 0.3) !important;
-        }
-        
-        /* Liens et éléments interactifs - couleur plus subtile */
-        a {
-          color: hsl(${accentColors[newSettings.accentColor]} / 0.8) !important;
-        }
-        
-        a:hover {
-          color: hsl(${accentColors[newSettings.accentColor]}) !important;
-        }
-        
-        /* Focus states */
-        input:focus,
-        .vibrant input:focus {
-          border-color: hsl(${accentColors[newSettings.accentColor]}) !important;
-          box-shadow: 0 0 0 2px hsl(${accentColors[newSettings.accentColor]} / 0.2) !important;
-        }
-        
-        /* Éléments sélectionnés */
-        .tab-active,
-        .selected,
-        [data-state="active"] {
-          color: hsl(${accentColors[newSettings.accentColor]}) !important;
-          border-color: hsl(${accentColors[newSettings.accentColor]}) !important;
-        }
-        
-        /* Icônes de navigation */
-        .vibrant .navigation-icon,
-        .from-primary.to-primary\\/80,
-        .vibrant .from-primary.to-primary\\/80 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.8) 100%) !important;
-        }
-        
-        /* Icône navigation au survol quand fermé */
-        button.navigation-icon:hover {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.9) 100%) !important;
-          box-shadow: 0 4px 16px hsl(${accentColors[newSettings.accentColor]} / 0.4) !important;
-        }
-        
-        /* Progress bars et indicateurs */
-        .bg-primary\\/10 {
-          background-color: hsl(${accentColors[newSettings.accentColor]} / 0.1) !important;
-        }
-        
-        .bg-primary\\/20 {
-          background-color: hsl(${accentColors[newSettings.accentColor]} / 0.2) !important;
-        }
-        
-        /* Menu sidebar - Gradients */
-        .bg-gradient-to-br.from-blue-500.to-purple-600,
-        .bg-gradient-to-r.from-blue-500.to-purple-600,
-        .bg-gradient-to-b.from-blue-500.to-purple-600 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.85) 100%) !important;
-        }
-        
-        /* Menu sidebar - Indicateur actif */
-        .absolute.left-0.bg-gradient-to-b {
-          background: linear-gradient(180deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.7) 100%) !important;
-        }
-        
-        /* Menu sidebar - Icônes actives */
-        .group-hover\\:text-foreground:hover {
-          color: hsl(${accentColors[newSettings.accentColor]}) !important;
-        }
-        
-        /* Badge du menu */
-        .bg-gradient-to-r.from-blue-500.to-purple-600 {
-          background: linear-gradient(90deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.9) 100%) !important;
-        }
-        
-        /* Indicateur toggle mode */
-        .bg-gradient-to-r.from-muted\\/50.to-accent\\/50:hover {
-          background: linear-gradient(90deg, hsl(${accentColors[newSettings.accentColor]} / 0.2) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.4) 100%) !important;
-        }
-        
-        /* Bouton toggle sidebar */
-        .vibrant .toggle-button {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.05) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.08) 100%) !important;
-          border: 1px solid hsl(${accentColors[newSettings.accentColor]} / 0.15) !important;
-          box-shadow: 0 2px 8px hsl(${accentColors[newSettings.accentColor]} / 0.1) !important;
-        }
-        
-        .vibrant .toggle-button:hover {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.8) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.7) 100%) !important;
-          transform: scale(1.1) !important;
-          box-shadow: 0 4px 16px hsl(${accentColors[newSettings.accentColor]} / 0.3) !important;
-        }
-        
-        /* Avatar utilisateur dans le menu */
-        .bg-gradient-to-br.from-emerald-500.to-teal-600 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.9) 100%) !important;
-        }
-        
-        /* Header de la sidebar (zone Navigation / Modules ERP) */
-        .vibrant .sidebar-header {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.03) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.05) 100%) !important;
-          border-bottom: 1px solid hsl(${accentColors[newSettings.accentColor]} / 0.1) !important;
-        }
-        
-        .vibrant .sidebar-header::before {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.05) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.08) 50%, hsl(${accentColors[newSettings.accentColor]} / 0.05) 100%) !important;
-        }
-        
-        /* Switch du menu personnalisé/standard */
-        .bg-gradient-to-r.from-muted\\/50.to-accent\\/20 {
-          background: linear-gradient(90deg, hsl(${accentColors[newSettings.accentColor]} / 0.08) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.12) 100%) !important;
-        }
-        
-        .hover\\:from-accent\\/20.hover\\:to-accent\\/30:hover {
-          background: linear-gradient(90deg, hsl(${accentColors[newSettings.accentColor]} / 0.15) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.2) 100%) !important;
-        }
-        
-        .bg-gradient-to-br.from-muted\\/60.to-accent\\/20 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.1) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.15) 100%) !important;
-        }
-        
-        /* Switch - états personnalisé vs standard */
-        .bg-gradient-to-br.from-purple-500.to-pink-600 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]}) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.9) 100%) !important;
-        }
-        
-        .bg-gradient-to-r.from-purple-400.to-pink-500 {
-          background: linear-gradient(90deg, hsl(${accentColors[newSettings.accentColor]} / 0.8) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.9) 100%) !important;
-        }
-        
-        .bg-gradient-to-br.from-purple-400.to-pink-500 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.8) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.9) 100%) !important;
-        }
-        
-        /* Info-bulles améliorées */
-        .bg-slate-900\\/95 {
-          background-color: hsl(220 13% 18% / 0.95) !important;
-        }
-        
-        .dark .bg-slate-800\\/95 {
-          background-color: hsl(220 13% 15% / 0.95) !important;
-        }
-        
-        .border-slate-700\\/50 {
-          border-color: hsl(${accentColors[newSettings.accentColor]} / 0.2) !important;
-        }
-        
-        .dark .border-slate-600\\/50 {
-          border-color: hsl(${accentColors[newSettings.accentColor]} / 0.25) !important;
-        }
-        
-        /* Tous les gradients génériques - désactivé pour éviter trop d'impact */
-        /* [class*="from-"][class*="to-"] {
-          --tw-gradient-from: hsl(${accentColors[newSettings.accentColor]}) !important;
-          --tw-gradient-to: hsl(${accentColors[newSettings.accentColor]} / 0.8) !important;
-        } */
-        
-        /* Icônes et éléments de page - plus subtils */
-        .from-indigo-600.to-purple-600,
-        .from-indigo-500.to-purple-600 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.8) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.6) 100%) !important;
-        }
-        
-        /* Logo dans le header */
-        .bg-gradient-to-br.from-primary.to-primary\\/80 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.9) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.75) 100%) !important;
-        }
-        
-        /* Backgrounds colorés des pages - très légers */
-        .bg-gradient-to-br.from-indigo-50,
-        .bg-gradient-to-br.from-purple-50 {
-          background: linear-gradient(135deg, hsl(${accentColors[newSettings.accentColor]} / 0.05) 0%, hsl(${accentColors[newSettings.accentColor]} / 0.03) 100%) !important;
-        }
-      `
+      // Variations d'opacité pour les backgrounds
+      root.style.setProperty('--accent-5', `hsl(${accentColor} / 0.05)`)
+      root.style.setProperty('--accent-8', `hsl(${accentColor} / 0.08)`)
+      root.style.setProperty('--accent-10', `hsl(${accentColor} / 0.10)`)
+      root.style.setProperty('--accent-12', `hsl(${accentColor} / 0.12)`)
+      root.style.setProperty('--accent-15', `hsl(${accentColor} / 0.15)`)
+      root.style.setProperty('--accent-20', `hsl(${accentColor} / 0.20)`)
+      root.style.setProperty('--accent-25', `hsl(${accentColor} / 0.25)`)
+      root.style.setProperty('--accent-30', `hsl(${accentColor} / 0.30)`)
+      root.style.setProperty('--accent-40', `hsl(${accentColor} / 0.40)`)
+
+      // Variations d'opacité pour les éléments plus visibles
+      root.style.setProperty('--accent-60', `hsl(${accentColor} / 0.60)`)
+      root.style.setProperty('--accent-70', `hsl(${accentColor} / 0.70)`)
+      root.style.setProperty('--accent-75', `hsl(${accentColor} / 0.75)`)
+      root.style.setProperty('--accent-80', `hsl(${accentColor} / 0.80)`)
+      root.style.setProperty('--accent-85', `hsl(${accentColor} / 0.85)`)
+      root.style.setProperty('--accent-90', `hsl(${accentColor} / 0.90)`)
+      root.style.setProperty('--accent-95', `hsl(${accentColor} / 0.95)`)
+      root.style.setProperty('--accent-100', `hsl(${accentColor})`)
+
+      // Couleurs pour les tooltips (slate colors)
+      root.style.setProperty('--tooltip-bg-light', 'hsl(220 13% 18% / 0.95)')
+      root.style.setProperty('--tooltip-bg-dark', 'hsl(220 13% 15% / 0.95)')
+
+      // Variables pour les gradients
+      root.style.setProperty('--gradient-from', `hsl(${accentColor})`)
+      root.style.setProperty('--gradient-to', `hsl(${accentColor} / 0.8)`)
+      root.style.setProperty('--gradient-to-light', `hsl(${accentColor} / 0.6)`)
+      root.style.setProperty('--gradient-to-lighter', `hsl(${accentColor} / 0.3)`)
+
+      // Nettoyer l'ancienne feuille de style si elle existe
+      const oldStyleElement = document.getElementById('topsteel-accent-styles')
+      if (oldStyleElement) {
+        oldStyleElement.remove()
+      }
     }
 
     // Appliquer les classes CSS pour la densité
@@ -394,6 +228,14 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
             // Synchroniser avec la langue du système i18n si différente
             if (languageFromI18n && languageFromI18n !== parsedSettings.language) {
               parsedSettings.language = languageFromI18n
+            }
+
+            // Migration: forcer contentWidth à 'full' (option retirée de l'UI)
+            parsedSettings.contentWidth = 'full'
+
+            // Migration: si thème vibrant, basculer vers light (vibrant retiré des options)
+            if ((parsedSettings.theme as string) === 'vibrant') {
+              parsedSettings.theme = 'light'
             }
 
             initialSettings = parsedSettings
@@ -456,6 +298,14 @@ export function useAppearanceSettings(): UseAppearanceSettingsReturn {
               !apiSettings.theme
             ) {
               apiSettings.theme = defaultSettings.theme
+            }
+
+            // Migration: forcer contentWidth à 'full' (option retirée de l'UI)
+            apiSettings.contentWidth = 'full'
+
+            // Migration: si thème vibrant, basculer vers light (vibrant retiré des options)
+            if ((apiSettings.theme as string) === 'vibrant') {
+              apiSettings.theme = 'light'
             }
 
             // Seulement mettre à jour si les données API sont différentes de localStorage

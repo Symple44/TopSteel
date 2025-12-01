@@ -1,0 +1,84 @@
+/* ============================================
+ * GENERATED FILE - DO NOT EDIT MANUALLY
+ * Generated from TypeScript tokens
+ * Run: pnpm generate:css to regenerate
+ * ============================================ */
+
+:root {
+  /* Light Theme Colors */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 217 91% 45%;
+  --primary-foreground: 220 13% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+  --warning: 45 93% 47%;
+  --warning-foreground: 0 0% 100%;
+  --info: 217 91% 60%;
+  --info-foreground: 0 0% 100%;
+
+  /* Layout Dimensions */
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 56px;
+  --content-max-width: 1400px;
+
+  /* Status Colors */
+  --status-en-cours: 217 91% 60%;
+  --status-termine: 142 76% 36%;
+  --status-annule: 0 84% 60%;
+  --status-brouillon: 220 9% 46%;
+  --status-en-attente: 45 93% 47%;
+  --status-accepte: 142 76% 36%;
+  --status-refuse: 0 84% 60%;
+  --status-planifie: 231 48% 48%;
+  --status-en-production: 25 95% 53%;
+  --status-controle-qualite: 271 91% 65%;
+  --status-en-stock: 160 84% 39%;
+  --status-rupture: 0 84% 60%;
+  --status-stock-faible: 38 92% 50%;
+}
+
+.dark {
+  /* Dark Theme Colors */
+  --background: 220 13% 18%;
+  --foreground: 220 9% 98%;
+  --card: 220 13% 21%;
+  --card-foreground: 220 9% 98%;
+  --popover: 220 13% 21%;
+  --popover-foreground: 220 9% 98%;
+  --primary: 217 91% 60%;
+  --primary-foreground: 220 13% 98%;
+  --secondary: 220 13% 26%;
+  --secondary-foreground: 220 9% 98%;
+  --muted: 220 13% 26%;
+  --muted-foreground: 220 9% 78%;
+  --accent: 220 13% 26%;
+  --accent-foreground: 220 9% 98%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 220 13% 98%;
+  --border: 220 13% 28%;
+  --input: 220 13% 28%;
+  --ring: 217 91% 60%;
+  --success: 142 71% 45%;
+  --success-foreground: 220 13% 98%;
+  --warning: 45 93% 58%;
+  --warning-foreground: 220 13% 98%;
+  --info: 217 91% 60%;
+  --info-foreground: 220 13% 98%;
+}

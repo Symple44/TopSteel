@@ -6,6 +6,7 @@ import {
   Avatar,
   AvatarFallback,
   Badge,
+  Button,
   Card,
   CardContent,
   CardHeader,
@@ -14,9 +15,18 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  Input,
+  Label,
   PageContainer,
   PageGrid,
   PageSection,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Switch,
+  useFormFieldIds,
 } from '@erp/ui'
 import { Building, Calendar, Mail, Phone, Shield, Users } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -24,6 +34,7 @@ import { useState } from 'react'
 import { AdminGuard } from '../../../../components/auth/admin-guard'
 import { useTranslation } from '../../../../lib/i18n/hooks'
 import type { User } from '../../../../types/auth'
+import { callClientApi } from '../../../../utils/backend-api'
 import { UsersDataTable } from './users-datatable'
 
 export default function UsersManagementPage() {
@@ -31,12 +42,22 @@ export default function UsersManagementPage() {
   const { t } = useTranslation('admin')
   const [selectedUser] = useState<User | null>(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   const handleUserEdit = (user: { id: string }) => {
     router?.push(`/admin/users/${user.id}`)
   }
 
-  const handleUserCreate = () => {}
+  const handleUserCreate = () => {
+    setIsCreateDialogOpen(true)
+  }
+
+  const handleCreateSuccess = () => {
+    setIsCreateDialogOpen(false)
+    // Trigger refresh of the users list
+    setRefreshKey((prev) => prev + 1)
+  }
 
   return (
     <AdminGuard
@@ -44,7 +65,11 @@ export default function UsersManagementPage() {
       requiredPermissions={['USER_VIEW']}
       showUnauthorized={true}
     >
-      <UsersDataTable onUserEdit={handleUserEdit} onUserCreate={handleUserCreate} />
+      <PageContainer maxWidth="full" padding="default">
+        <PageSection spacing="default">
+          <UsersDataTable key={refreshKey} onUserEdit={handleUserEdit} onUserCreate={handleUserCreate} />
+        </PageSection>
+      </PageContainer>
 
       {/* User details dialog */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
@@ -187,6 +212,169 @@ export default function UsersManagementPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Create User Dialog */}
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{t('users.newUser')}</DialogTitle>
+            <DialogDescription>
+              {t('users.userManagementDescription')}
+            </DialogDescription>
+          </DialogHeader>
+          <UserForm onSuccess={handleCreateSuccess} />
+        </DialogContent>
+      </Dialog>
     </AdminGuard>
+  )
+}
+
+// User Form Component for creating users
+function UserForm({ onSuccess }: { onSuccess: () => void }) {
+  const { t } = useTranslation('admin')
+  const [formData, setFormData] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    password: '',
+    role: 'OPERATEUR',
+    actif: true,
+  })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fieldIds = useFormFieldIds(['nom', 'prenom', 'email', 'password', 'role', 'actif'])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e?.preventDefault()
+    setLoading(true)
+    setError(null)
+
+    try {
+      const response = await callClientApi('admin/users', {
+        method: 'POST',
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response?.json()
+
+      if (response?.ok && data?.success) {
+        onSuccess()
+      } else {
+        setError(data?.message || 'Error creating user')
+      }
+    } catch (err) {
+      setError('Connection error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-800 text-sm">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor={fieldIds.prenom}>{t('users.exportHeaders.firstName')}</Label>
+          <Input
+            id={fieldIds.prenom}
+            value={formData.prenom}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData((prev) => ({ ...prev, prenom: e?.target?.value }))
+            }
+            placeholder="John"
+            required
+          />
+        </div>
+
+        <div>
+          <Label htmlFor={fieldIds.nom}>{t('users.exportHeaders.lastName')}</Label>
+          <Input
+            id={fieldIds.nom}
+            value={formData.nom}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFormData((prev) => ({ ...prev, nom: e?.target?.value }))
+            }
+            placeholder="Doe"
+            required
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor={fieldIds.email}>{t('users.exportHeaders.email')}</Label>
+        <Input
+          id={fieldIds.email}
+          type="email"
+          value={formData.email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFormData((prev) => ({ ...prev, email: e?.target?.value }))
+          }
+          placeholder="john.doe@example.com"
+          required
+        />
+      </div>
+
+      <div>
+        <Label htmlFor={fieldIds.password}>{t('database.password')}</Label>
+        <Input
+          id={fieldIds.password}
+          type="password"
+          value={formData.password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setFormData((prev) => ({ ...prev, password: e?.target?.value }))
+          }
+          placeholder="••••••••"
+          required
+          minLength={8}
+        />
+        <p className="text-xs text-muted-foreground mt-1">Minimum 8 characters</p>
+      </div>
+
+      <div>
+        <Label htmlFor={fieldIds.role}>{t('users.exportHeaders.roles')}</Label>
+        <Select
+          value={formData.role}
+          onValueChange={(value: string) => setFormData((prev) => ({ ...prev, role: value }))}
+        >
+          <SelectTrigger id={fieldIds.role}>
+            <SelectValue placeholder="Select a role" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="OPERATEUR">Opérateur</SelectItem>
+            <SelectItem value="TECHNICIEN">Technicien</SelectItem>
+            <SelectItem value="COMMERCIAL">Commercial</SelectItem>
+            <SelectItem value="MANAGER">Manager</SelectItem>
+            <SelectItem value="ADMIN">Admin</SelectItem>
+            <SelectItem value="SUPER_ADMIN">Super Admin</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="flex items-center space-x-2">
+        <Switch
+          id={fieldIds.actif}
+          checked={formData.actif}
+          onCheckedChange={(checked: boolean) =>
+            setFormData((prev) => ({ ...prev, actif: checked }))
+          }
+        />
+        <Label htmlFor={fieldIds.actif}>{t('users.active')}</Label>
+      </div>
+
+      <div className="flex justify-end space-x-2 pt-4">
+        <Button type="button" variant="outline" onClick={onSuccess} disabled={loading}>
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit" disabled={loading}>
+          {loading ? t('common.loading') : t('users.actions.create')}
+        </Button>
+      </div>
+    </form>
   )
 }

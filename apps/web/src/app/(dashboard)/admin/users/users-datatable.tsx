@@ -5,7 +5,6 @@ import { Avatar, AvatarFallback, Badge, Button, DataTable, PageHeader, usePersis
 import {
   Building,
   Calendar,
-  Download,
   Mail,
   Settings,
   Shield,
@@ -62,7 +61,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     description: t('users.userInfo'),
     type: 'text',
     sortable: true,
-
+    searchable: true,
     locked: true,
     width: 280,
     // Fonction pour extraire la valeur pour le filtrage/tri
@@ -102,7 +101,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     description: t('users.rolesAssigned'),
     type: 'select',
     sortable: true,
-
+    searchable: true,
     width: 200,
     // Options pour le filtrage
     options: [
@@ -145,7 +144,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     description: t('users.groupsAssigned'),
     type: 'text',
     sortable: true,
-
+    searchable: true,
     width: 200,
     // Fonction pour extraire la valeur string pour le filtrage
     getValue: (row) => {
@@ -179,7 +178,7 @@ const getColumns = (t: (key: string) => string): ColumnConfig<User>[] => [
     title: t('users.department'),
     type: 'text',
     sortable: true,
-
+    searchable: true,
     editable: true,
     width: 150,
     render: (value: unknown, _row: User, _column: ColumnConfig<User>) => (
@@ -315,44 +314,44 @@ export function UsersDataTable({ onUserEdit, onUserCreate, hideHeader = false }:
     }
   }
 
-  const handleDelete = (rows: User[]) => {
-    const idsToDelete = rows?.map((row) => row.id)
-    setUsers(users?.filter((user) => !idsToDelete?.includes(user.id)))
-    // Ici on pourrait envoyer la suppression au serveur
-  }
+  const handleDelete = async (rows: User[]) => {
+    const userCount = rows.length
+    const confirmMessage =
+      userCount === 1
+        ? `${t('users.confirmDelete')}: ${rows[0]?.firstName || ''} ${rows[0]?.lastName || ''}?`
+        : `${t('users.confirmDeleteMultiple', { count: userCount })}?`
 
-  const exportUsers = () => {
-    const headers = [
-      t('users.exportHeaders.email'),
-      t('users.exportHeaders.lastName'),
-      t('users.exportHeaders.firstName'),
-      t('users.exportHeaders.department'),
-      t('users.exportHeaders.status'),
-      t('users.exportHeaders.roles'),
-      t('users.exportHeaders.groups'),
-      t('users.exportHeaders.lastLogin'),
-    ]
-    const rows = users?.map((user) => [
-      user.email,
-      user.lastName || '',
-      user.firstName || '',
-      user.department || '',
-      user.isActive ? t('users.active') : t('users.inactive'),
-      user?.roles?.map((r) => r.name).join(', '),
-      user?.groups?.map((g) => g.name).join(', '),
-      formatDate(user.lastLogin, t),
-    ])
+    if (!confirm(confirmMessage)) {
+      return
+    }
 
-    const csv = [headers, ...rows]
-      .map((row) => row?.map((cell) => `"${cell}"`).join(','))
-      .join('\n')
+    try {
+      // Delete each user via API
+      const deletePromises = rows.map((user) =>
+        callClientApi(`admin/users/${user.id}`, {
+          method: 'DELETE',
+        })
+      )
 
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL?.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `users-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
+      const results = await Promise.all(deletePromises)
+
+      // Check if all deletions were successful
+      const allSuccessful = results.every((response) => response?.ok)
+
+      if (allSuccessful) {
+        // Remove deleted users from local state
+        const idsToDelete = rows?.map((row) => row.id)
+        setUsers(users?.filter((user) => !idsToDelete?.includes(user.id)))
+      } else {
+        // Some deletions failed - reload the list to get accurate state
+        await loadUsers()
+        alert(t('users.deletionError'))
+      }
+    } catch (_error) {
+      alert(t('users.deletionError'))
+      // Reload the list in case of error
+      await loadUsers()
+    }
   }
 
   return (
@@ -367,10 +366,6 @@ export function UsersDataTable({ onUserEdit, onUserCreate, hideHeader = false }:
           spacing="sm"
           actions={
             <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="sm" onClick={exportUsers}>
-                <Download className="h-4 w-4" />
-                <span className="ml-2 hidden sm:inline">{t('users.export')}</span>
-              </Button>
               <Button type="button" variant="ghost" size="sm" onClick={() => setIsBulkManagementOpen(true)}>
                 <Settings className="h-4 w-4" />
                 <span className="ml-2 hidden sm:inline">{t('users.bulkManagement')}</span>
@@ -419,6 +414,7 @@ export function UsersDataTable({ onUserEdit, onUserCreate, hideHeader = false }:
         sortable
         searchable
         filterable
+        exportable
         height={600}
         actions={[
           {

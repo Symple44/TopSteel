@@ -25,6 +25,17 @@ export const queryBuilder = {
   syntax: 'Syntax',
   visual: 'Visual',
   raw: 'Raw',
+  // Additional keys for query-builder-interface
+  settings: 'Settings',
+  calculatedFields: 'Calculated Fields',
+  clickExecuteToSeeResults: 'Click Execute to see results',
+  clickExecuteToLoadData: 'Click Execute to load data',
+  selectTableToStart: 'Select a table to start building your query',
+  saveSuccess: 'Query saved successfully',
+  saveError: 'Error saving query',
+  saveRequired: 'Save required',
+  saveBeforeExecute: 'Please save the query before executing',
+  executeError: 'Error executing query',
 }
 
 export const datatable = {

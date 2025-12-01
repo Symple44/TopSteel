@@ -30,7 +30,6 @@ export const common = {
   light: 'Claro',
   dark: 'Oscuro',
   system: 'Auto',
-  vibrant: '🎨 Vibrante',
   logout: 'Cerrar sesión',
   profile: 'Perfil',
   settings: 'Configuración',

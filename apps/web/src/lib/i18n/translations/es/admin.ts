@@ -150,6 +150,7 @@ export const admin = {
     configurationRetrievalError: 'Error al obtener la configuración',
   },
   database: {
+    password: 'Contraseña',
     title: 'Administración Multi-Tenant',
     subtitle: 'Gestión centralizada de bases de datos AUTH, SHARED y TENANT',
     loading: 'Cargando datos...',

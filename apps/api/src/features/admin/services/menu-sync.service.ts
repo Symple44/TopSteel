@@ -1,5 +1,5 @@
 import type { MenuConfiguration, MenuItem } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { Injectable, Logger } from '@nestjs/common'
 import { MenuConfigurationService } from './menu-configuration.service'
 
@@ -19,9 +19,14 @@ export class MenuSyncService {
   private readonly logger = new Logger(MenuSyncService.name)
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly menuConfigService: MenuConfigurationService
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Synchronise la structure de menu du sidebar avec la base de données
@@ -55,6 +60,7 @@ export class MenuSyncService {
 
   /**
    * Structure de navigation actuelle du sidebar
+   * IMPORTANT: Cette structure doit correspondre à celle du frontend (navigation.ts)
    */
   getSidebarNavigationStructure(): SidebarNavItem[] {
     return [
@@ -65,110 +71,75 @@ export class MenuSyncService {
         gradient: 'from-blue-500 to-purple-600',
       },
       {
-        title: 'Partenaires',
-        icon: 'Users',
-        gradient: 'from-violet-500 to-purple-600',
-        children: [
-          {
-            title: 'Tous les partenaires',
-            href: '/partners',
-            icon: 'Users',
-          },
-          {
-            title: 'Clients',
-            href: '/partners/clients',
-            icon: 'Briefcase',
-          },
-          {
-            title: 'Fournisseurs',
-            href: '/partners/suppliers',
-            icon: 'Building2',
-          },
-        ],
-      },
-      {
-        title: 'Inventaire',
-        icon: 'Package',
-        gradient: 'from-orange-500 to-red-600',
-        children: [
-          {
-            title: 'Matériaux',
-            href: '/inventory/materials',
-            icon: 'Factory',
-          },
-          {
-            title: 'Articles',
-            href: '/inventory/articles',
-            icon: 'Package',
-          },
-          {
-            title: 'Stock',
-            href: '/inventory/stock',
-            icon: 'HardDrive',
-          },
-        ],
-      },
-      {
-        title: 'Ventes',
-        icon: 'TrendingUp',
-        gradient: 'from-green-500 to-emerald-600',
-        children: [
-          {
-            title: 'Devis',
-            href: '/sales/quotes',
-            icon: 'FileText',
-          },
-          {
-            title: 'Commandes',
-            href: '/sales/orders',
-            icon: 'ListChecks',
-          },
-        ],
-      },
-      {
-        title: 'Finance',
-        href: '/finance/invoices',
-        icon: 'CreditCard',
-        gradient: 'from-yellow-500 to-orange-600',
-      },
-      {
-        title: 'Projets',
-        href: '/projects',
-        icon: 'FolderKanban',
-        gradient: 'from-cyan-500 to-blue-600',
-      },
-      {
         title: 'Query Builder',
         href: '/query-builder',
         icon: 'Search',
         gradient: 'from-emerald-500 to-teal-600',
       },
       {
+        title: 'Paramètres',
+        icon: 'Settings',
+        gradient: 'from-slate-500 to-gray-600',
+        children: [
+          {
+            title: 'Apparence',
+            href: '/settings/appearance',
+            icon: 'Palette',
+            gradient: 'from-indigo-500 to-purple-600',
+          },
+          {
+            title: 'Notifications',
+            href: '/settings/notifications',
+            icon: 'Bell',
+            gradient: 'from-amber-500 to-orange-600',
+          },
+          {
+            title: 'Sécurité',
+            href: '/settings/security',
+            icon: 'Lock',
+            gradient: 'from-red-500 to-rose-600',
+          },
+          {
+            title: 'Personnalisation du Menu',
+            href: '/settings/menu',
+            icon: 'Menu',
+            gradient: 'from-purple-500 to-pink-600',
+          },
+        ],
+      },
+      {
         title: 'Configuration',
         href: '/admin',
         icon: 'Shield',
         gradient: 'from-red-500 to-pink-600',
-        roles: ['ADMIN', 'SUPER_ADMIN'],
+        roles: ['SUPER_ADMIN', 'ADMIN'],
         children: [
           {
-            title: 'Gestion des sessions',
-            href: '/admin/sessions',
-            icon: 'Monitor',
-            gradient: 'from-cyan-500 to-teal-600',
+            title: 'Configuration Entreprise',
+            href: '/admin/company',
+            icon: 'Building2',
+            gradient: 'from-blue-500 to-indigo-600',
             roles: ['SUPER_ADMIN', 'ADMIN'],
           },
           {
-            title: 'Gestion des traductions',
-            href: '/admin/translations',
-            icon: 'Languages',
-            gradient: 'from-emerald-500 to-green-600',
-            roles: ['SUPER_ADMIN', 'ADMIN'],
-          },
-          {
-            title: 'Test DataTable',
-            href: '/admin/datatable-test',
-            icon: 'Table',
+            title: 'Gestion des Utilisateurs',
+            href: '/admin/users',
+            icon: 'Users',
             gradient: 'from-violet-500 to-purple-600',
+            roles: ['SUPER_ADMIN', 'ADMIN'],
+          },
+          {
+            title: 'Gestion des Rôles',
+            href: '/admin/roles',
+            icon: 'UserCog',
+            gradient: 'from-orange-500 to-red-600',
+            roles: ['SUPER_ADMIN'],
+          },
+          {
+            title: 'Gestion des Groupes',
+            href: '/admin/groups',
+            icon: 'UsersRound',
+            gradient: 'from-teal-500 to-cyan-600',
             roles: ['SUPER_ADMIN', 'ADMIN'],
           },
           {
@@ -177,6 +148,48 @@ export class MenuSyncService {
             icon: 'Building2',
             gradient: 'from-blue-500 to-indigo-600',
             roles: ['SUPER_ADMIN'],
+          },
+          {
+            title: 'Sessions Utilisateurs',
+            href: '/admin/sessions',
+            icon: 'Monitor',
+            gradient: 'from-cyan-500 to-teal-600',
+            roles: ['SUPER_ADMIN', 'ADMIN'],
+          },
+          {
+            title: 'Base de Données',
+            href: '/admin/database',
+            icon: 'Database',
+            gradient: 'from-emerald-500 to-green-600',
+            roles: ['SUPER_ADMIN'],
+          },
+          {
+            title: 'Configuration des Menus',
+            href: '/admin/menu-config',
+            icon: 'Menu',
+            gradient: 'from-purple-500 to-pink-600',
+            roles: ['SUPER_ADMIN', 'ADMIN'],
+          },
+          {
+            title: 'Gestion des Traductions',
+            href: '/admin/translations',
+            icon: 'Languages',
+            gradient: 'from-emerald-500 to-green-600',
+            roles: ['SUPER_ADMIN', 'ADMIN'],
+          },
+          {
+            title: 'Paramètres Admin',
+            href: '/admin/admin',
+            icon: 'Settings',
+            gradient: 'from-slate-500 to-gray-600',
+            roles: ['SUPER_ADMIN', 'ADMIN'],
+          },
+          {
+            title: 'Test DataTable',
+            href: '/admin/datatable-test',
+            icon: 'Table',
+            gradient: 'from-violet-500 to-purple-600',
+            roles: ['SUPER_ADMIN', 'ADMIN'],
           },
         ],
       },
@@ -241,6 +254,10 @@ export class MenuSyncService {
       const sidebarItem = items[i]
       const orderIndex = (i + 1) * 10 + orderOffset
 
+      // Determine menu type based on item properties
+      // 'M' = Menu/Folder (no href), 'P' = Program (has href)
+      const menuType = sidebarItem.href ? 'P' : 'M'
+
       // Créer l'item de menu
       const menuItemData = {
         menuConfigurationId: configId,
@@ -252,10 +269,13 @@ export class MenuSyncService {
         isActive: true,
         isVisible: true,
         metadata: {
+          type: menuType, // Store compact menu type
           gradient: sidebarItem.gradient,
           badge: sidebarItem.badge,
           icon: sidebarItem.icon,
           originalTitle: sidebarItem.title,
+          requiredRoles: sidebarItem.roles || [], // Stocker les noms de rôles dans metadata
+          programId: sidebarItem.href, // Store programId for consistency
         },
       }
 
@@ -263,15 +283,28 @@ export class MenuSyncService {
       const savedItem = await this.prisma.menuItem.create({ data: menuItemData })
       this.logger.debug(`Item créé: ${savedItem.label} (${savedItem.id})`)
 
-      // Créer les rôles si spécifiés
+      // Créer les rôles si spécifiés - rechercher les rôles par nom
       if (sidebarItem.roles && sidebarItem.roles.length > 0) {
-        await this.prisma.menuItemRole.createMany({
-          data: sidebarItem.roles.map((roleId) => ({
-            menuItemId: savedItem.id,
-            roleId,
-          })),
+        const existingRoles = await this.prisma.role.findMany({
+          where: { name: { in: sidebarItem.roles } },
+          select: { id: true, name: true },
         })
-        this.logger.debug(`Rôles ajoutés pour ${savedItem.label}: ${sidebarItem.roles.join(', ')}`)
+
+        if (existingRoles.length > 0) {
+          await this.prisma.menuItemRole.createMany({
+            data: existingRoles.map((role) => ({
+              menuItemId: savedItem.id,
+              roleId: role.id,
+            })),
+          })
+          this.logger.debug(
+            `Rôles ajoutés pour ${savedItem.label}: ${existingRoles.map((r) => r.name).join(', ')}`
+          )
+        } else {
+          this.logger.warn(
+            `Aucun rôle trouvé pour ${savedItem.label}: ${sidebarItem.roles.join(', ')}`
+          )
+        }
       }
 
       // Créer les enfants de manière récursive

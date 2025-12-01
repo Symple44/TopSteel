@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { TopSteelLogger } from '../../../core/common/logger/structured-logger.service'
 import { RedisService } from '../../../core/common/services/redis.service'
 
@@ -240,10 +240,15 @@ export const ROLE_PERMISSIONS: Record<string, Permission[]> = {
 @Injectable()
 export class PermissionPrismaService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly cacheService: RedisService,
     private readonly logger: TopSteelLogger
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Récupère toutes les permissions d'un utilisateur dans une société

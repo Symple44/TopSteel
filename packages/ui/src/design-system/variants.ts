@@ -218,9 +218,9 @@ export const metallurgyVariants = cva('rounded-lg border p-4 font-mono text-sm',
   variants: {
     variant: {
       specification: 'bg-steel-50 border-steel-200 text-steel-900',
-      calculation: 'bg-blue-50 border-blue-200 text-blue-900',
-      quality: 'bg-green-50 border-green-200 text-green-900',
-      hazard: 'bg-red-50 border-red-200 text-red-900',
+      calculation: 'bg-info/10 border-info/30 text-info',
+      quality: 'bg-success/10 border-success/30 text-success',
+      hazard: 'bg-destructive/10 border-destructive/30 text-destructive',
       certification: 'bg-amber-50 border-amber-200 text-amber-900',
     },
     priority: {

@@ -140,7 +140,7 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
           <p className="mt-4 text-gray-600">Vérification de l'authentification...</p>
         </div>
       </div>
@@ -152,7 +152,7 @@ export function AuthLoader({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
           <p className="mt-4 text-gray-600">Récupération des informations utilisateur...</p>
         </div>
       </div>
@@ -227,7 +227,7 @@ export function RouteGuard({
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <div className="inline-flex h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent motion-reduce:animate-[spin_1.5s_linear_infinite]" />
           <p className="mt-4 text-gray-600">Vérification des permissions...</p>
         </div>
       </div>
@@ -265,7 +265,7 @@ export function RouteGuard({
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
-            <div className="text-red-600 text-6xl mb-4">🚫</div>
+            <div className="text-destructive text-6xl mb-4">🚫</div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Accès refusé</h1>
             <p className="text-gray-600 mb-4">
               Vous n'avez pas les permissions nécessaires pour accéder à cette page.
@@ -273,7 +273,7 @@ export function RouteGuard({
             <button
               type="button"
               onClick={() => router?.back()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
             >
               Retour
             </button>

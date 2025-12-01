@@ -8,6 +8,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ErpInfoModalWrapper as ErpInfoModal } from '../../components/wrappers'
 import { useBackendStatus } from '../../hooks/use-backend-health'
 import { useDynamicMenu } from '../../hooks/use-dynamic-menu'
+import { usePermissions } from '../../hooks/use-permissions'
 import { useSidebarPreferences } from '../../hooks/use-ui-preferences'
 import { useTranslation } from '../../lib/i18n'
 import { cn } from '../../lib/utils'
@@ -43,6 +44,7 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
   }, [persistedExpanded])
 
   const { statusColor, statusText } = useBackendStatus()
+  const { hasAnyRole } = usePermissions()
 
   const {
     filteredMenu,
@@ -62,16 +64,43 @@ export function Sidebar({ isCollapsed = false, onToggle }: SidebarProps) {
     [t]
   )
 
+  // Filter navigation items by role
+  const filterNavByRole = useCallback((items: NavItemType[]): NavItemType[] => {
+    return items
+      .filter((item) => {
+        // If no roles are specified, show the item to everyone
+        if (!item.roles || item.roles.length === 0) {
+          return true
+        }
+        // Check if user has any of the required roles
+        return hasAnyRole(item.roles)
+      })
+      .map((item) => ({
+        ...item,
+        // Recursively filter children
+        children: item.children ? filterNavByRole(item.children) : undefined,
+      }))
+      .filter((item) => {
+        // Remove items that have no href and no children (empty folders)
+        return item.href || (item.children && item.children.length > 0)
+      })
+  }, [hasAnyRole])
+
   const navigation = useMemo(() => {
-    if (!loading && Array.isArray(filteredMenu)) {
-      return convertMenuCallback(filteredMenu)
+    if (!loading && Array.isArray(filteredMenu) && filteredMenu.length > 0) {
+      // Le filtrage par rôle est déjà fait côté serveur par l'endpoint /tree/filtered
+      // Ne pas refiltrer côté frontend pour éviter les race conditions
+      const converted = convertMenuCallback(filteredMenu)
+      return converted
     } else if (loading) {
-      return staticNavigation
-    } else if (error) {
-      return staticNavigation
+      // Pendant le chargement, montrer le menu statique filtré par rôle
+      return filterNavByRole(staticNavigation)
+    } else if (error || filteredMenu.length === 0) {
+      // En cas d'erreur ou menu vide, utiliser le menu statique filtré
+      return filterNavByRole(staticNavigation)
     }
-    return []
-  }, [loading, filteredMenu, convertMenuCallback, staticNavigation, error])
+    return filterNavByRole(staticNavigation)
+  }, [loading, filteredMenu, convertMenuCallback, staticNavigation, error, filterNavByRole])
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) => {

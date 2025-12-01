@@ -1,2 +1,2 @@
 // Settings components export
-export { TemplateSelector } from './template-selector'
+// TemplateSelector supprimé - simplification de l'apparence

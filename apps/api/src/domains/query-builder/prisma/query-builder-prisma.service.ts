@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import type { QueryBuilder, Prisma } from '@prisma/client'
 
 /**
@@ -21,7 +21,12 @@ import type { QueryBuilder, Prisma } from '@prisma/client'
 export class QueryBuilderPrismaService {
   private readonly logger = new Logger(QueryBuilderPrismaService.name)
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Créer un query builder

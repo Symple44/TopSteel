@@ -169,6 +169,12 @@ export class CsrfService {
       '/api/health', // Health checks
       '/api/metrics', // Métriques Prometheus
       '/api/auth/logout', // Logout (déjà authentifié)
+      '/api/admin/menu-config', // Menu configuration (protected by JWT)
+      '/api/admin/menu-raw', // Menu raw (protected by JWT)
+      '/api/admin/users', // Users management (protected by JWT)
+      '/api/admin/roles', // Roles management (protected by JWT)
+      '/api/admin/groups', // Groups management (protected by JWT)
+      '/api/admin/societes', // Societes management (protected by JWT)
     ]
 
     // Routes d'upload qui nécessitent une validation différente

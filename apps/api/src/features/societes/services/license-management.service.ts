@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import type { License, LicenseStatus, LicenseType, Prisma } from '@prisma/client'
 import { GlobalUserRole } from '../../../domains/auth/core/constants/roles.constants'
 
@@ -89,9 +89,14 @@ export class LicenseManagementService {
   private readonly logger = new Logger(LicenseManagementService.name)
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private configService: ConfigService
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Vérifier si une société peut authentifier un nouvel utilisateur

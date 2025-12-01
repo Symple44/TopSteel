@@ -18,7 +18,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from '../../../lib/utils'
 import { Checkbox } from '../../primitives/checkbox'
 import { Input } from '../../primitives/input'
-import { SelectPortal } from '../../primitives/select-portal'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../primitives/select'
 import { Badge } from '../badge'
 import { FormulaEditor } from './FormulaEditor'
 import type { ColumnConfig } from './types'
@@ -230,27 +236,36 @@ export function InlineEditor<T = Record<string, unknown>>({
 
       case 'select':
         return (
-          <SelectPortal
+          <Select
             value={value as string}
             onValueChange={(newValue) => {
               setValue(newValue)
               // Auto-save pour les selects
               setTimeout(() => handleSave(), 0)
             }}
-            options={
-              column.options?.map((opt) => ({
-                value: String(opt.value),
-                label: opt.label,
-                color: opt.color,
-              })) || []
-            }
-            placeholder="Choisir..."
-            className={cn(
-              'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
-              !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
-              validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
-            )}
-          />
+          >
+            <SelectTrigger
+              className={cn(
+                'h-8 text-xs border border-input bg-transparent rounded-md shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring',
+                !validation.isValid && 'border-red-500 focus-visible:ring-red-500',
+                validation.warning && 'border-yellow-500 focus-visible:ring-yellow-500'
+              )}
+            >
+              <SelectValue placeholder="Choisir..." />
+            </SelectTrigger>
+            <SelectContent>
+              {column.options?.map((opt) => (
+                <SelectItem key={String(opt.value)} value={String(opt.value)}>
+                  <div className="flex items-center gap-2">
+                    {opt.color && (
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: opt.color }} />
+                    )}
+                    <span>{opt.label}</span>
+                  </div>
+                </SelectItem>
+              )) || []}
+            </SelectContent>
+          </Select>
         )
 
       case 'multiselect':

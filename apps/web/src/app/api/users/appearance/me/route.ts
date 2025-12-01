@@ -76,7 +76,7 @@ export async function PATCH(request: NextRequest) {
       }
     } catch (_backendError) {
       // Fallback si le backend est indisponible
-      const validThemes = ['light', 'dark', 'system', 'vibrant']
+      const validThemes = ['light', 'dark', 'system', 'light']
       const validLanguages = ['fr', 'en']
       const validFontSizes = ['small', 'medium', 'large']
       const validSidebarWidths = ['compact', 'normal', 'wide']
@@ -85,7 +85,7 @@ export async function PATCH(request: NextRequest) {
       const validContentWidths = ['compact', 'normal', 'wide']
 
       const appearanceSettings = {
-        theme: validThemes?.includes(body.theme) ? body.theme : 'vibrant',
+        theme: validThemes?.includes(body.theme) ? body.theme : 'light',
         language: validLanguages?.includes(body.language) ? body.language : 'fr',
         fontSize: validFontSizes?.includes(body.fontSize) ? body.fontSize : 'medium',
         sidebarWidth: validSidebarWidths?.includes(body.sidebarWidth)
@@ -174,7 +174,7 @@ export async function GET(request: NextRequest) {
     } catch (_backendError) {
       // Fallback si le backend est indisponible
       const defaultSettings = {
-        theme: 'vibrant',
+        theme: 'light',
         language: 'fr',
         fontSize: 'medium',
         sidebarWidth: 'normal',

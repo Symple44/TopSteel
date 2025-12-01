@@ -543,11 +543,11 @@ export function BulkUserAssignment({
                 type="button"
                 onClick={handleBulkAssignment}
                 disabled={loading}
-                className="bg-green-600 hover:bg-green-700"
+                variant="success"
               >
                 {loading ? (
                   <>
-                    <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2" />
+                    <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2" />
                     Assignation en cours...
                   </>
                 ) : (

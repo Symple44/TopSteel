@@ -18,7 +18,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { UsersService } from '../users/users.service'
 import { GlobalUserRole, SocieteRoleType } from './core/constants/roles.constants'
 import { SessionPrismaService } from './prisma/session-prisma.service'
-import { PrismaService } from '../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../core/multi-tenant/tenant-prisma.service'
 // Type aliases for entities (no longer using TypeORM)
 type Site = any
 type User = any
@@ -53,8 +53,13 @@ export class AuthService {
     // DISABLED: TypeORM dependency - License checking temporarily disabled
     // private readonly licenseManagementService: LicenseManagementService,
     private readonly sessionPrismaService: SessionPrismaService,
-    private readonly prisma: PrismaService
+    private readonly tenantPrisma: TenantPrismaService
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   async validateUser(
     emailOrAcronym: string,

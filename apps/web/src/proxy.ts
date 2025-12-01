@@ -278,8 +278,8 @@ function addSecurityHeaders(response: NextResponse, _request: NextRequest): Next
         "default-src 'self'",
         // Very permissive for development - allows inline styles/scripts
         `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live`,
-        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
-        "img-src 'self' data: blob: https:",
+        `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com`,
+        "img-src 'self' data: blob: https: https://unpkg.com https://tile.openstreetmap.org https://raw.githubusercontent.com https://cdnjs.cloudflare.com",
         "font-src 'self' https://fonts.gstatic.com data:",
         "connect-src 'self' ws://localhost:* http://localhost:* https: wss:",
         "frame-src 'none'",
@@ -296,8 +296,8 @@ function addSecurityHeaders(response: NextResponse, _request: NextRequest): Next
         "default-src 'self'",
         // Strict nonce-based CSP for production
         `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
-        `style-src 'self' 'nonce-${nonce}'`,
-        "img-src 'self' data: blob: https:",
+        `style-src 'self' 'nonce-${nonce}' https://unpkg.com https://cdnjs.cloudflare.com`,
+        "img-src 'self' data: blob: https: https://unpkg.com https://tile.openstreetmap.org https://raw.githubusercontent.com https://cdnjs.cloudflare.com",
         "font-src 'self' https://fonts.gstatic.com data:",
         "connect-src 'self' https: wss:",
         "frame-src 'none'",

@@ -68,23 +68,23 @@ const TYPE_LABELS: Record<string, string> = {
   query: 'Requête',
 }
 
-// Couleurs par type avec styles modernes
+// Couleurs par type avec styles modernes - utilise des tokens sémantiques
 const TYPE_COLORS: Record<string, string> = {
-  menu: 'text-blue-700 bg-gradient-to-br from-blue-500/10 to-blue-600/10',
-  client: 'text-emerald-700 bg-gradient-to-br from-emerald-500/10 to-emerald-600/10',
-  fournisseur: 'text-orange-700 bg-gradient-to-br from-orange-500/10 to-orange-600/10',
-  article: 'text-purple-700 bg-gradient-to-br from-purple-500/10 to-purple-600/10',
-  material: 'text-indigo-700 bg-gradient-to-br from-indigo-500/10 to-indigo-600/10',
-  shared_material: 'text-cyan-700 bg-gradient-to-br from-cyan-500/10 to-cyan-600/10',
-  projet: 'text-amber-700 bg-gradient-to-br from-amber-500/10 to-amber-600/10',
-  devis: 'text-pink-700 bg-gradient-to-br from-pink-500/10 to-pink-600/10',
-  facture: 'text-red-700 bg-gradient-to-br from-red-500/10 to-red-600/10',
-  commande: 'text-teal-700 bg-gradient-to-br from-teal-500/10 to-teal-600/10',
-  user: 'text-slate-700 bg-gradient-to-br from-slate-500/10 to-slate-600/10',
-  societe: 'text-sky-700 bg-gradient-to-br from-sky-500/10 to-sky-600/10',
-  price_rule: 'text-violet-700 bg-gradient-to-br from-violet-500/10 to-violet-600/10',
-  notification: 'text-yellow-700 bg-gradient-to-br from-yellow-500/10 to-yellow-600/10',
-  query: 'text-gray-700 bg-gradient-to-br from-gray-500/10 to-gray-600/10',
+  menu: 'text-info bg-gradient-to-br from-info/10 to-info/20',
+  client: 'text-success bg-gradient-to-br from-success/10 to-success/20',
+  fournisseur: 'text-warning bg-gradient-to-br from-warning/10 to-warning/20',
+  article: 'text-primary bg-gradient-to-br from-primary/10 to-primary/20',
+  material: 'text-info bg-gradient-to-br from-info/10 to-info/20',
+  shared_material: 'text-info bg-gradient-to-br from-info/10 to-info/20',
+  projet: 'text-warning bg-gradient-to-br from-warning/10 to-warning/20',
+  devis: 'text-primary bg-gradient-to-br from-primary/10 to-primary/20',
+  facture: 'text-destructive bg-gradient-to-br from-destructive/10 to-destructive/20',
+  commande: 'text-success bg-gradient-to-br from-success/10 to-success/20',
+  user: 'text-muted-foreground bg-gradient-to-br from-muted/10 to-muted/20',
+  societe: 'text-info bg-gradient-to-br from-info/10 to-info/20',
+  price_rule: 'text-primary bg-gradient-to-br from-primary/10 to-primary/20',
+  notification: 'text-warning bg-gradient-to-br from-warning/10 to-warning/20',
+  query: 'text-muted-foreground bg-gradient-to-br from-muted/10 to-muted/20',
 }
 
 interface CommandPaletteProps {
@@ -211,9 +211,9 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               </div>
             )}
             {searchEngine === 'elasticsearch' && (
-              <div className="ml-3 flex items-center gap-1 px-2 py-1 bg-yellow-500/10 rounded-md">
-                <Zap className="h-3 w-3 text-yellow-600" />
-                <span className="text-xs font-medium text-yellow-600">Elastic</span>
+              <div className="ml-3 flex items-center gap-1 px-2 py-1 bg-warning/10 rounded-md">
+                <Zap className="h-3 w-3 text-warning" />
+                <span className="text-xs font-medium text-warning">Elastic</span>
               </div>
             )}
           </div>
@@ -303,7 +303,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               {selectedTab
                 ? // Vue filtrée par type
                   filteredResults?.map((result, index) => {
-                    const typeColor = TYPE_COLORS[result.type] || 'text-gray-600 bg-gray-50'
+                    const typeColor = TYPE_COLORS[result.type] || 'text-muted-foreground bg-muted/50'
 
                     return (
                       <SearchResultItem
@@ -319,7 +319,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                   types?.map((type) => {
                     const typeResults = groupedResults?.[type]?.slice(0, 5)
                     const Icon = getIcon(type)
-                    const typeColor = TYPE_COLORS[type] || 'text-gray-600 bg-gray-50'
+                    const typeColor = TYPE_COLORS[type] || 'text-muted-foreground bg-muted/50'
 
                     return (
                       <div key={type} className="mb-4 last:mb-0">

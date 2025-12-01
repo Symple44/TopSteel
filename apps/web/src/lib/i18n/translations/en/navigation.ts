@@ -43,6 +43,20 @@ export const navigation = {
   notifications_management: 'Notification management',
   menu_configuration: 'Menu configuration',
   menu_personalization: 'Menu personalization',
+  // Settings menu
+  appearance: 'Appearance',
+  notifications: 'Notifications',
+  security: 'Security',
+  menuCustomization: 'Menu Customization',
+  // Admin menu
+  companySettings: 'Company Settings',
+  usersManagement: 'User Management',
+  rolesManagement: 'Role Management',
+  groupsManagement: 'Group Management',
+  societesManagement: 'Company Management',
+  databaseManagement: 'Database',
+  menuConfiguration: 'Menu Configuration',
+  adminSettings: 'Admin Settings',
 }
 
 export const navigationEnhanced = {

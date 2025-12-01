@@ -1,7 +1,7 @@
 /**
  * Multi-Tenant Module Exports
  *
- * Architecture unifiée (Single Database + Row-Level Security)
+ * Architecture unifiée (Single Database + Prisma $extends)
  */
 
 // Module principal
@@ -13,7 +13,16 @@ export {
   type TenantContext,
 } from './tenant-context.service'
 
-// Middleware & Intercepteurs
+export { TenantPrismaService } from './tenant-prisma.service'
+
+// Prisma Extension
+export {
+  createTenantExtension,
+  TENANT_MODELS,
+  type TenantPrismaClient,
+} from './prisma-tenant.extension'
+
+// Intercepteurs (optionnel - pour RLS PostgreSQL)
 export { TenantRLSInterceptor } from './tenant-rls.interceptor'
 
 // Guards

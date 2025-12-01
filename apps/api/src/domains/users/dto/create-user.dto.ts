@@ -6,6 +6,7 @@ import {
   IsEnum,
   IsOptional,
   IsString,
+  Matches,
   MaxLength,
   MinLength,
 } from 'class-validator'
@@ -35,9 +36,19 @@ export class CreateUserDto {
   @Transform(({ value }) => value?.toLowerCase().trim())
   email!: string
 
-  @ApiProperty({ example: 'motdepasse123', minLength: 6 })
+  @ApiProperty({
+    example: 'SecureP@ss123',
+    minLength: 8,
+    description: 'Password must be at least 8 characters and contain: uppercase letter, lowercase letter, number, and special character (!@#$%^&*...)'
+  })
   @IsString()
-  @MinLength(6)
+  @MinLength(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' })
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
+    {
+      message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial (!@#$%^&*...)',
+    }
+  )
   password!: string
 
   @ApiPropertyOptional({ enum: GlobalUserRole, default: GlobalUserRole.OPERATEUR })

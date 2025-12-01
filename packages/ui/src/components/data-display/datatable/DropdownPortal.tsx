@@ -8,6 +8,10 @@ interface DropdownPortalProps {
   id?: string
 }
 
+/**
+ * Simple portal helper for rendering dropdown content in the document body
+ * Used internally by ColumnFilterDropdown
+ */
 export function DropdownPortal({ children, id = 'dropdown-portal' }: DropdownPortalProps) {
   const [mounted, setMounted] = useState(false)
 
@@ -30,7 +34,6 @@ export function DropdownPortal({ children, id = 'dropdown-portal' }: DropdownPor
     }
 
     return () => {
-      // Ne pas supprimer le portail, il pourrait être réutilisé
       setMounted(false)
     }
   }, [id])

@@ -98,10 +98,10 @@ export function DataTableBody<T extends Record<string, unknown>>({
           ref={(el) => isVirtualized && handleRowRef(actualIndex, el)}
           data-index={actualIndex}
           className={cn(
-            'border-b transition-colors',
-            striped && actualIndex % 2 === 0 && 'bg-muted/50',
-            hoverable && 'hover:bg-muted/50',
-            isSelected && 'bg-primary/10',
+            'group border-b border-border/30 transition-colors',
+            striped && actualIndex % 2 === 1 && 'bg-muted/20',
+            hoverable && 'hover:bg-muted/40',
+            isSelected && 'bg-primary/5 hover:bg-primary/10',
             onRowClick && 'cursor-pointer'
           )}
           onClick={() => onRowClick?.(row, actualIndex)}
@@ -109,7 +109,7 @@ export function DataTableBody<T extends Record<string, unknown>>({
         >
           {/* Checkbox de selection */}
           {state.selection && (
-            <td className="w-12 px-4">
+            <td className="w-12 px-4 py-2.5">
               <Checkbox
                 checked={isSelected}
                 onCheckedChange={() => toggleRow(rowId)}
@@ -130,7 +130,7 @@ export function DataTableBody<T extends Record<string, unknown>>({
 
           {/* Actions en ligne */}
           {actions && actions.length > 0 && (
-            <td className="w-20 px-2">
+            <td className="w-16 px-2 py-2.5 text-right">
               <InlineActions row={row} actions={actions} />
             </td>
           )}
@@ -162,28 +162,29 @@ export function DataTableBody<T extends Record<string, unknown>>({
     <tr
       key={`skeleton-${index}`}
       className={cn(
-        'border-b animate-pulse',
-        striped && index % 2 === 0 && 'bg-muted/30'
+        'border-b border-border/20',
+        striped && index % 2 === 1 && 'bg-muted/10'
       )}
     >
       {state.selection && (
         <td className="w-12 px-4 py-3">
-          <div className="h-4 w-4 bg-muted rounded" />
+          <div className="h-4 w-4 bg-muted/60 rounded animate-pulse" />
         </td>
       )}
       {visibleColumns.map((column, colIndex) => (
         <td key={`skeleton-${index}-${column.id}`} className="px-4 py-3">
           <div
-            className="h-4 bg-muted rounded"
+            className="h-4 bg-muted/60 rounded animate-pulse"
             style={{
-              width: colIndex === 0 ? '70%' : colIndex === visibleColumns.length - 1 ? '40%' : '60%',
+              width: colIndex === 0 ? '75%' : colIndex === visibleColumns.length - 1 ? '45%' : '55%',
+              animationDelay: `${colIndex * 50}ms`,
             }}
           />
         </td>
       ))}
       {actions && actions.length > 0 && (
-        <td className="w-20 px-2 py-3">
-          <div className="h-6 w-6 bg-muted rounded mx-auto" />
+        <td className="w-16 px-2 py-3">
+          <div className="h-5 w-5 bg-muted/60 rounded animate-pulse mx-auto" />
         </td>
       )}
     </tr>
@@ -193,7 +194,6 @@ export function DataTableBody<T extends Record<string, unknown>>({
   if (loading) {
     return (
       <tbody>
-        {/* Afficher 5 skeleton rows pour un meilleur feedback */}
         {Array.from({ length: 5 }).map((_, index) => (
           <SkeletonRow key={index} index={index} />
         ))}
@@ -205,27 +205,25 @@ export function DataTableBody<T extends Record<string, unknown>>({
     return (
       <tbody>
         <tr>
-          <td colSpan={colSpan} className="py-12">
-            <div className="flex flex-col items-center justify-center text-center">
-              <svg
-                className="w-12 h-12 text-muted-foreground/50 mb-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={1.5}
-                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                />
-              </svg>
-              <p className="text-sm font-medium text-muted-foreground mb-1">
-                {state.isFiltered ? 'Aucun résultat trouvé' : 'Aucune donnée'}
+          <td colSpan={colSpan} className="py-16">
+            <div className="flex flex-col items-center justify-center text-center px-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted/50 mb-4">
+                {state.isFiltered ? (
+                  <svg className="h-6 w-6 text-muted-foreground/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                ) : (
+                  <svg className="h-6 w-6 text-muted-foreground/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                  </svg>
+                )}
+              </div>
+              <p className="text-sm font-medium text-foreground mb-1">
+                {state.isFiltered ? 'Aucun résultat' : 'Aucune donnée'}
               </p>
-              <p className="text-xs text-muted-foreground/70">
+              <p className="text-xs text-muted-foreground max-w-[240px]">
                 {state.isFiltered
-                  ? 'Essayez de modifier vos filtres de recherche'
+                  ? 'Essayez de modifier votre recherche ou vos filtres'
                   : emptyMessage}
               </p>
             </div>

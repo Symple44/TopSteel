@@ -1,13 +1,13 @@
 /**
  * 🎨 CONFIGURATION DES THÈMES UNIFIÉS - TOPSTEEL ERP
- * Configuration centralisée des thèmes light/dark/vibrant
+ * Configuration centralisée des thèmes light/dark
  * Compatible avec CSS variables et providers multi-app
  */
 
 // ===== TYPES DE THÈMES =====
 
-export type ThemeName = 'light' | 'dark' | 'vibrant' | 'system'
-export type ResolvedTheme = 'light' | 'dark' | 'vibrant'
+export type ThemeName = 'light' | 'dark' | 'system'
+export type ResolvedTheme = 'light' | 'dark'
 
 export interface ThemeColorValues {
   // Couleurs de base
@@ -172,69 +172,14 @@ export const darkTheme: ThemeConfig = {
   },
 }
 
-/**
- * Thème Vibrant - Coloré et moderne (Glassmorphism inspired)
- */
-export const vibrantTheme: ThemeConfig = {
-  name: 'vibrant',
-  displayName: 'Vibrant',
-  description: 'Thème coloré moderne avec effets glassmorphism',
-  cssClass: 'vibrant',
-  colors: {
-    // Couleurs de base - Arrière-plans avec gradients subtils
-    background: '270 20% 96%',
-    foreground: '270 15% 9%',
-
-    // Surfaces - Cartes avec effet glassmorphism
-    card: '270 20% 98%',
-    cardForeground: '270 15% 9%',
-    popover: '270 20% 98%',
-    popoverForeground: '270 15% 9%',
-
-    // Couleurs primaires - Violet/indigo tendance
-    primary: '270 91% 38%',
-    primaryForeground: '0 0% 100%',
-
-    // Couleurs secondaires - Rose poudré moderne
-    secondary: '320 20% 92%',
-    secondaryForeground: '270 15% 9%',
-
-    // Couleurs muettes - Lavande subtile
-    muted: '270 15% 90%',
-    mutedForeground: '270 10% 45%',
-
-    // Couleurs d'accent - Cyan électrique
-    accent: '185 100% 85%',
-    accentForeground: '270 15% 9%',
-
-    // Couleurs destructives - Rouge vibrant
-    destructive: '348 91% 58%',
-    destructiveForeground: '0 0% 100%',
-
-    // Interactions - Couleurs vives
-    border: '270 15% 85%',
-    input: '270 15% 85%',
-    ring: '270 91% 38%',
-
-    // Extensions TopSteel - Palette énergique
-    success: '142 71% 45%',
-    successForeground: '0 0% 100%',
-    warning: '38 100% 50%',
-    warningForeground: '0 0% 100%',
-    info: '200 91% 50%',
-    infoForeground: '0 0% 100%',
-  },
-}
-
 // ===== REGISTRY DES THÈMES =====
 
 export const themeRegistry = {
   light: lightTheme,
   dark: darkTheme,
-  vibrant: vibrantTheme,
 } as const
 
-export const availableThemes: ThemeConfig[] = [lightTheme, darkTheme, vibrantTheme]
+export const availableThemes: ThemeConfig[] = [lightTheme, darkTheme]
 
 // ===== UTILITAIRES =====
 
@@ -270,7 +215,7 @@ export function applyThemeToDOM(theme: ThemeConfig): void {
   const cssVars = generateThemeCSSVariables(theme)
 
   // Supprimer les anciennes classes de thème
-  root.classList.remove('light', 'dark', 'vibrant')
+  root.classList.remove('light', 'dark')
 
   // Ajouter la nouvelle classe
   root.classList.add(theme.cssClass)

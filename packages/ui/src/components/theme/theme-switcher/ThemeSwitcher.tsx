@@ -3,7 +3,7 @@
 /**
  * 🎨 THEME SWITCHER UNIFIÉ - TOPSTEEL ERP
  * Composant de commutation de thème connecté au provider unifié
- * Support des 3 thèmes : light, dark, vibrant + system
+ * Support des thèmes : light, dark + system
  */
 
 import { ChevronDownIcon, MonitorIcon, MoonIcon, SparklesIcon, SunIcon } from 'lucide-react'
@@ -62,11 +62,6 @@ const themeData: Record<Theme, { icon: React.ElementType; label: string; descrip
     icon: MoonIcon,
     label: 'Sombre',
     description: 'Thème sombre moderne',
-  },
-  vibrant: {
-    icon: SparklesIcon,
-    label: 'Vibrant',
-    description: 'Thème vibrant TopSteel',
   },
   system: {
     icon: MonitorIcon,

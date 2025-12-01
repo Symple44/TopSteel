@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import type { Permission, Role, RolePermission, UserSocieteRole } from '@prisma/client'
-import { PrismaService } from '../../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../../core/multi-tenant/tenant-prisma.service'
 import { getErrorMessage } from '../../../core/common/utils/error.utils'
 import { OptimizedCacheService } from '../../../infrastructure/cache/redis-optimized.service'
 import type { IPermission, IRolePermission } from '../types/entities.types'
@@ -47,9 +47,14 @@ export class PermissionCalculatorService {
   private readonly CACHE_TTL = 300 // 5 minutes
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly tenantPrisma: TenantPrismaService,
     private readonly cacheService: OptimizedCacheService
   ) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   /**
    * Calcule les permissions effectives d'un utilisateur dans une société

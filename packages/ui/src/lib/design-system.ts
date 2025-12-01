@@ -7,26 +7,25 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          'bg-primary text-white shadow-md hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm [&:not(:hover)]:text-white',
+          'bg-primary text-primary-foreground shadow-md hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm',
         destructive:
-          'bg-destructive text-white shadow-md hover:bg-destructive/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 [&:not(:hover)]:text-white',
+          'bg-destructive text-destructive-foreground shadow-md hover:bg-destructive/90 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0',
         outline:
           'border-2 border-input bg-background hover:bg-accent hover:text-accent-foreground hover:border-accent-foreground/20',
         secondary:
           'bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        // Nouveaux variants
         success:
-          'bg-emerald-600 text-white shadow-md hover:bg-emerald-700 hover:shadow-lg hover:-translate-y-0.5',
+          'bg-success text-success-foreground shadow-md hover:bg-success/90 hover:shadow-lg hover:-translate-y-0.5',
         warning:
-          'bg-amber-500 text-white shadow-md hover:bg-amber-600 hover:shadow-lg hover:-translate-y-0.5',
+          'bg-warning text-warning-foreground shadow-md hover:bg-warning/90 hover:shadow-lg hover:-translate-y-0.5',
         subtle:
           'bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground',
       },
       size: {
-        default: 'h-10 px-5 py-2',
-        sm: 'h-8 rounded-lg px-3 text-xs',
+        default: 'h-10 px-6 py-2',
+        sm: 'h-8 rounded-lg px-4 text-xs',
         lg: 'h-12 rounded-lg px-8 text-base',
         xl: 'h-14 rounded-xl px-10 text-lg',
         icon: 'h-10 w-10',
@@ -49,11 +48,14 @@ export const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-primary text-white shadow hover:bg-primary/80',
+        default: 'border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80',
         secondary:
           'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        destructive: 'border-transparent bg-destructive text-white shadow hover:bg-destructive/80',
-        outline: 'text-foreground',
+        destructive: 'border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80',
+        outline: 'text-foreground border-border',
+        success: 'border-transparent bg-success text-success-foreground shadow hover:bg-success/90',
+        warning: 'border-transparent bg-warning text-warning-foreground shadow hover:bg-warning/90',
+        info: 'border-transparent bg-info text-info-foreground shadow hover:bg-info/90',
       },
     },
     defaultVariants: {
@@ -352,4 +354,4 @@ export type TooltipVariants = VariantProps<typeof tooltipVariants>
 // Import unified theme types and configurations
 export type { ResolvedTheme, ThemeConfig } from '../design-system/themes'
 
-export { darkTheme, lightTheme, vibrantTheme } from '../design-system/themes'
+export { darkTheme, lightTheme } from '../design-system/themes'

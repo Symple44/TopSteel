@@ -183,18 +183,20 @@ export function useDynamicMenu() {
       setLoading(true)
       setError(null)
 
-      // Pour le menu standard, utiliser la configuration active de la base de données
-      // MAIS sans les préférences utilisateur personnalisées
-      const response = await fetchTyped<MenuConfigResponse>('/admin/menu-raw/configurations/active')
+      // Use the correct endpoint that properly filters by user permissions
+      // This endpoint checks user roles and permissions server-side
+      const response = await fetchTyped<{ success: boolean; data: MenuItemConfig[] }>(
+        '/admin/menu-config/tree/filtered'
+      )
 
       // La réponse de fetchTyped enveloppe les données dans response.data
       const apiResponse = (response as any).data || response
 
-      if (apiResponse.success && apiResponse.data) {
-        // Utiliser le menuTree de la configuration active
-        const menuItems = Array.isArray(apiResponse.data.menuTree) ? apiResponse.data.menuTree : []
-        setStandardMenu(menuItems)
-        setMenuConfig(apiResponse.data.configuration)
+      if (apiResponse.success && Array.isArray(apiResponse.data)) {
+        // The filtered endpoint returns the menu tree directly
+        setStandardMenu(apiResponse.data)
+        // Note: This endpoint doesn't return configuration details, just the filtered menu
+        // If needed, we can make a separate call to get configuration details
       } else {
         setStandardMenu([])
       }
@@ -274,6 +276,7 @@ export function useDynamicMenu() {
         .filter((item) => {
           // Pour les types de menu du nouveau système, adapter la logique
           const hasValidLink =
+            item.href ||
             item.programId ||
             item.externalUrl ||
             item.queryBuilderId ||
@@ -339,10 +342,10 @@ export function useDynamicMenu() {
   // Menu utilisé basé sur le mode sélectionné
   const currentMenu = mode === 'custom' ? customMenu : standardMenu
 
-  // Appliquer le filtrage par permissions seulement au menu standard
-  // Le menu custom est déjà filtré côté serveur
-  // TEMPORAIRE: Désactiver le filtrage pour tester
-  const filteredMenu = mode === 'custom' ? currentMenu : currentMenu // Temporairement sans filtrage: filterMenuByPermissions(currentMenu)
+  // Note: Le filtrage est déjà fait côté serveur par l'endpoint /tree/filtered
+  // Ne pas refiltrer côté frontend pour éviter les race conditions
+  // (si le user n'est pas encore chargé, hasRole() retourne false et vide le menu)
+  const filteredMenu = currentMenu
 
   const refreshMenu = useCallback(() => {
     if (mode === 'custom') {

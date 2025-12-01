@@ -2,7 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 
-import { RoleManagementPanel } from '../../../../components/admin/role-management-panel'
+import { PageContainer, PageSection } from '@erp/ui'
+import { RolesDataTable } from '../../../../components/admin/roles-datatable'
 import { AdminGuard } from '../../../../components/auth/admin-guard'
 
 export default function RoleManagementPage() {
@@ -12,7 +13,11 @@ export default function RoleManagementPage() {
       requiredPermissions={['SYSTEM_ADMIN', 'USER_DELETE']}
       showUnauthorized={true}
     >
-      <RoleManagementPanel />
+      <PageContainer maxWidth="full" padding="default">
+        <PageSection spacing="default">
+          <RolesDataTable />
+        </PageSection>
+      </PageContainer>
     </AdminGuard>
   )
 }

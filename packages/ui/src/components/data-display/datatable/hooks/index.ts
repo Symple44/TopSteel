@@ -33,3 +33,5 @@ export type {
   UseVirtualizedTableReturn,
 } from './useVirtualizedTable'
 export { useVirtualizedTable, VIRTUAL_TABLE_DEFAULTS } from './useVirtualizedTable'
+export type { UseDataTableOptions, UseDataTableReturn } from './useDataTable'
+export { useDataTable } from './useDataTable'

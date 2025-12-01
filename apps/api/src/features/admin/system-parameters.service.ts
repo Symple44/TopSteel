@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common'
-import { PrismaService } from '../../core/database/prisma/prisma.service'
+import { TenantPrismaService } from '../../core/multi-tenant/tenant-prisma.service'
 import type {
   CreateSystemParameterDto,
   SystemParameterQueryDto,
@@ -11,7 +11,12 @@ import type { SystemParameter } from '@prisma/client'
 
 @Injectable()
 export class SystemParametersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly tenantPrisma: TenantPrismaService) {}
+
+  /** Client Prisma avec filtrage automatique par tenant */
+  private get prisma() {
+    return this.tenantPrisma.client
+  }
 
   async create(createDto: CreateSystemParameterDto): Promise<SystemParameter> {
     const existingParameter = await this.prisma.systemParameter.findFirst({
